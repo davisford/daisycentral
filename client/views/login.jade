@@ -1,0 +1,26 @@
+!!! 5
+html(lang="en")
+  head
+    != SocketStream
+    meta(charset="utf-8")
+    title Daisy Central Login
+  body
+    img#login_logo(src='/images/dw-logo2.png', alt='DaisyWorks Logo', width=197, height=128)
+    h1#welcome Welcome to Daisy Central
+    div.social_buttons
+      div.inset
+        a.tw.login_btn(href='/auth/twitter')
+          div.logo_wrapper
+            span.logo 
+          span Login with Twitter
+      div.inset
+        a.fb.login_btn(href='/auth/facebook')
+          div.logo_wrapper
+            span.logo
+          span Login with Facebook
+      div.inset
+        a.go.login_btn(href='/auth/google')
+          div.logo_wrapper
+            span.logo
+          span Login with Google
+
