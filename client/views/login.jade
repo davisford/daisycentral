@@ -4,23 +4,32 @@ html(lang="en")
     != SocketStream
     meta(charset="utf-8")
     title Daisy Central Login
+    meta(name="viewport", content="width=device-width,initial-scale=1.0")
+    meta(name="description", content="TODO")
+    meta(name="author", content="DaisyWorks,Inc.")
+
+    // if lt IE 9
+      script(src="http://html5shim.googlecode.com/svn/trunk/html5.js")
+
+    link(rel="shortcut icon", href="ico/favicon.ico")
+    link(rel="apple-touch-icon-precomposed", sizes="114x114", href="ico/apple-touch-icon-114-precomposed.png")
+    link(rel="apple-touch-icon-precomposed", sizes="72x72", href="ico/apple-touch-icon-72-precomposed.png")
+    link(rel="apple-touch-icon-precomposed", href="ico/apple-touch-icon-57-precomposed.png")
+
   body
-    img#login_logo(src='/images/dw-logo2.png', alt='DaisyWorks Logo', width=197, height=128)
-    h1#welcome Welcome to Daisy Central
-    div.social_buttons
-      div.inset
-        a.tw.login_btn(href='/auth/twitter')
-          div.logo_wrapper
-            span.logo 
-          span Login with Twitter
-      div.inset
-        a.fb.login_btn(href='/auth/facebook')
-          div.logo_wrapper
-            span.logo
-          span Login with Facebook
-      div.inset
-        a.go.login_btn(href='/auth/google')
-          div.logo_wrapper
-            span.logo
-          span Login with Google
+    div.navbar.navbar-fixed-top
+    div.container-fluid
+      div.row-fluid
+        
+          div.hero-unit
+            img#login_logo(src="/images/dw-logo2.png", alt="DaisyWorks Logo", width=197, height=128)
+            h1 Daisy Central
+            h2 
+              em Beta
+          div.btn-group
+            button.btn(href="/auth/twitter") Login with Twitter
+            button.btn(href="/auth/facebook") Login with Facebook
+            button.btn(href="/auth/google") Login with Google 
+
+    
 

@@ -51,7 +51,6 @@ everyauth.helpExpress(server);
 server.listen(3000);
 
 server.get('/', function (req, res) {
-  console.log(req.user);
   res.serveClient('main');
 });
 

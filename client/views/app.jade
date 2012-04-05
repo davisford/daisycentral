@@ -3,16 +3,72 @@ html(lang="en")
   head
     != SocketStream
     meta(charset="utf-8")
-    title Welcome
+    title Daisy Central
+    meta(name="viewport", content="width=device-width,initial-scale=1.0")
+    meta(name="description", content="TODO")
+    meta(name="author", content="DaisyWorks, Inc.")
+
+    // if lt IE 9
+      script(src="http://html5shim.googlecode.com/svn/trunk/html5.js")
+
+    link(rel="shortcut icon", href="ico/favicon.ico")
+    link(rel="apple-touch-icon-precomposed", sizes="114x114", href="ico/apple-touch-icon-114-precomposed.png")
+    link(rel="apple-touch-icon-precomposed", sizes="72x72", href="ico/apple-touch-icon-72-precomposed.png")
+    link(rel="apple-touch-icon-precomposed", href="ico/apple-touch-icon-57-precomposed.png")
+
   body
-    #content
-      a(href='https://github.com/socketstream/socketstream')
-        img(src='/images/logo.png', alt='SocketStream Logo', width=160, height=160)
-      h1 Welcome to your new realtime app!
-      
-      // QUICK CHAT DEMO
-      form#demo(onsubmit='return false')
-        h3 Quick Chat Demo
-        h5 Open this page in multiple tabs or browsers and type a message below
-        #chatlog
-        input(id='myMessage', type='text', autocomplete='off')
+    // navbar 
+    div.navbar.navbar-fixed-top
+      div.navbar-inner
+        div.container
+          a.btn.btn-navbar(data-toggle="collapse", data-target=".nav-collapse")
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+          a.brand(href="#") Daisy Central
+          div.nav-collapse
+            ul.nav 
+              li.active
+                a(href="#") Home
+              li
+                a(href="#about") About 
+              li 
+                a(href="#contact") Contact
+
+    // fluid container
+    div.container-fluid
+      div.row-fluid
+        div.span3
+          div.well.sidebar-nav
+            ul.nav.nav-list
+              li.nav-header Sidebar 
+              li.active
+                a(href="#") Some Link 
+              li 
+                a(href="#") Another Link
+              li.nav-header Another Section
+              li 
+                a(href="#") Yet More Links
+              li
+                a(href="#") Click Me 
+        div.span9
+          div.hero-unit
+            h1 Hello, world!
+            p This is a template for blah blah blah blah
+            p 
+              a.btn.btn-primary.btn-large Learn more &raquo;
+          div.row-fluid
+            div.span4
+              h2 Heading
+              p onec id elit non mi <em>porta gravida</em> at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+              p 
+                a.btn(href="#") View details &raquo;
+            div.span4
+              h2 Heading
+              p onec id elit non mi <abbr title="porta gravida">porta gravida</abbr> at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+              p
+                a.btn(href="#") View details &raquo;
+      hr 
+
+      footer 
+        p &copy; DaisyWorks, Inc. 2012
