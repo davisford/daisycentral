@@ -109,7 +109,7 @@ Files are under `docs/assets/` -- copied them directly over to the correct foldl
 ### Debugging with Breakpoints
 
 Start up node-inspector
-```
+```shell
 root@kafka:/home/davis/git/daisycentral# node-inspector &  </br>
 [1] 27065  </br>
 root@kafka:/home/davis/git/daisycentral#    info  - socket.io started  
