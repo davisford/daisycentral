@@ -28,7 +28,7 @@ This is the webapp that runs at http://live.daisyworks.com
 ### Ubuntu
 
 #### Install Node
-HEAD 0.7.x is unstable so you cannot use it yet.  Use git to checkout v0.6.14-release
+`HEAD 0.7.x` is unstable so you cannot use it yet.  Use git to checkout `v0.6.14-release`
 
 ```
 sudo apt-get install -y make git git-core g++ curl libssl-dev apache2-utils python
@@ -45,7 +45,7 @@ hello, world
 ```
 
 #### Install NPM
-*newbie-wonders*: If you run npm with the -g flag, it installs modules globally (i.e. at $NODE_MODULES), whereas if you leave the -g off, it installs in your local working directory.  I'm not sure yet if I should really be installing these modules into git -- perhaps it is better to update the _package.json_ file with a list of dependencies?  
+*newbie-ponders*: If you run npm with the `-g` flag, it installs modules globally (i.e. at `$NODE_MODULES`), whereas if you leave the `-g` off, it installs in your local working directory.  I'm not sure yet if I should really be installing these modules into git -- perhaps it is better to update the `package.json` file with a list of dependencies?  
 
 ```
 curl http://npmjs.org/install.sh | sh
@@ -104,7 +104,7 @@ git clone https://github.com/twitter/bootstrap/
 cd bootstram && make
 ```
 
-Files are under docs/assets/ -- copied them directly over to daisycentral
+Files are under `docs/assets/` -- copied them directly over to the correct foldlers in `daisycentral`
 
 ### Debugging with Breakpoints
 
@@ -121,7 +121,7 @@ Now run the app with debug flag
 nodemon --debug app.js
 ```
 
-Now, open browser to http://0.0.0.0:8080/debug?port=5858 in *Chrome*
+Now, open browser to [http://0.0.0.0:8080/debug?port=5858] in *Chrome*
 
 Port 9000 receives Daisy WiFly HTTP data.
 
