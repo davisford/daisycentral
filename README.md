@@ -45,6 +45,8 @@ hello, world
 ```
 
 #### Install NPM
+*newbie-wonders*: If you run npm with the -g flag, it installs modules globally (i.e. at $NODE_MODULES), whereas if you leave the -g off, it installs in your local working directory.  I'm not sure yet if I should really be installing these modules into git -- perhaps it is better to update the _package.json_ file with a list of dependencies?  
+
 ```
 curl http://npmjs.org/install.sh | sh
 ```
