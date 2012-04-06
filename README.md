@@ -85,6 +85,8 @@ cd daisycentral && nodemon app.js
 Now open browser to http://localhost:3000
 
 ### Rebuilding Twitter Bootstrap
+This step is not strictly necessary unless you want to rebuild it.  I have already built bootstrap and copied the files needed into the project...however, if we want to tweak bootstrap with a theme or what-not, then this is how to rebuild:
+
 You need less and uglify-js to build:
 ```
 npm install less uglify-js -g
@@ -116,4 +118,5 @@ nodemon --debug app.js
 
 Now, open browser to http://0.0.0.0:8080/debug?port=5858 in *Chrome*
 
+Port 9000 receives Daisy WiFly HTTP data.
 
