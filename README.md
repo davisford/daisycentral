@@ -50,15 +50,18 @@ curl http://npmjs.org/install.sh | sh
 ```
 
 #### Install Debug Tools
-##### Install [nodemon](https://github.com/remy/nodemon) -- allows you to run node as a daemon that reloads if client or server files change
+##### Install [nodemon](https://github.com/remy/nodemon) 
+Allows you to run node as a daemon that reloads if client or server files change
 
 ```npm install nodemon -g```
 
-##### [ss-console](https://github.com/socketstream/ss-console) -- adds REPL support in Chrome devtools console; can call server-side rpc from browser console
+##### Install [ss-console](https://github.com/socketstream/ss-console) 
+Adds REPL support in Chrome devtools console; can call server-side rpc from browser console
 
 ```npm install ss-console -g```
 
-##### [node-inspector](https://github.com/dannycoates/node-inspector) -- allows you to breakpoint and debug client and server-side code in Chrome devtools
+##### Install [node-inspector](https://github.com/dannycoates/node-inspector) 
+Allows you to breakpoint and debug client and server-side code in Chrome devtools
 
 ```npm install node-inspector -g```
 
