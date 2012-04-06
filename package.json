@@ -1,12 +1,11 @@
 {
-  "name": "my_realtime_app",
-  "description": "An awesome real time application",
+  "name": "daisycentral",
+  "description": "DaisyWorks DaisyCentral monitor real-time sensor data",
   "version": "0.0.1",
-  "author": "Me <me@mydomain.com>",
+  "author": "Davis <davis@daisyworks.com>",
   "private": true,
   "engines": { "node": ">= 0.6.0" },
   "dependencies": {
-    "ss-coffee": "0.1.x",
     "ss-stylus": "0.1.x",
     "ss-jade": "0.1.x",
     "ss-hogan": "0.1.x"
