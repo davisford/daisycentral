@@ -78,11 +78,11 @@ TODO
 
 ### Grab The Source 
 ``` 
-git@github.com:davisford/daisycentral.git
+git clone git@github.com:davisford/daisycentral.git
 cd daisycentral && nodemon app.js
 ```
 
-Now open browser to http://localhost:3000
+Now open browser to [http://localhost:3000]
 
 ### Rebuilding Twitter Bootstrap
 This step is not strictly necessary unless you want to rebuild it.  I have already built bootstrap and copied the files needed into the project...however, if we want to tweak bootstrap with a theme or what-not, then this is how to rebuild:
