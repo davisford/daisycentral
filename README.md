@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This the webapp that runs at http://live.daisyworks.com
+This is the webapp that runs at http://live.daisyworks.com
 
 ## Tech Stack
 
