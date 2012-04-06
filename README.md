@@ -28,10 +28,12 @@ This the webapp that runs at http://live.daisyworks.com
 ### Ubuntu
 
 ### Install Node
+HEAD 0.7.x is unstable so you cannot use it yet.  Use git to checkout v0.6.14-release
 
 ```
 sudo apt-get install -y make git git-core g++ curl libssl-dev apache2-utils python
 git clone https://github.com/joyent/node.git && cd node
+git checkout v0.6.14-release
 ./configure && make && make install
 ```
 
