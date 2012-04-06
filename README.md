@@ -111,9 +111,6 @@ Files are under `docs/assets/` -- copied them directly over to the correct foldl
 Start up node-inspector
 ```
 root@kafka:/home/davis/git/daisycentral# node-inspector &
-[1] 27065
-root@kafka:/home/davis/git/daisycentral# info - socket.io started
-visit http://0.0.0.0:8080/debug?port=5858 to start debugging
 ```
 
 Now run the app with debug flag
