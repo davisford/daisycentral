@@ -27,7 +27,7 @@ This the webapp that runs at http://live.daisyworks.com
 
 ### Ubuntu
 
-### Install Node
+#### Install Node
 HEAD 0.7.x is unstable so you cannot use it yet.  Use git to checkout v0.6.14-release
 
 ```
@@ -44,36 +44,36 @@ node console.log('hello, world');
 hello, world
 ```
 
-### Install NPM
+#### Install NPM
 ```
 curl http://npmjs.org/install.sh | sh
 ```
 
-### Install Debug Tools
-#### Install [nodemon](https://github.com/remy/nodemon) -- allows you to run node as a daemon that reloads if client or server files change
+#### Install Debug Tools
+##### Install [nodemon](https://github.com/remy/nodemon) -- allows you to run node as a daemon that reloads if client or server files change
 
 ```npm install nodemon -g```
 
-#### [ss-console](https://github.com/socketstream/ss-console) -- adds REPL support in Chrome devtools console; can call server-side rpc from browser console
+##### [ss-console](https://github.com/socketstream/ss-console) -- adds REPL support in Chrome devtools console; can call server-side rpc from browser console
 
 ```npm install ss-console -g```
 
-#### [node-inspector](https://github.com/dannycoates/node-inspector) -- allows you to breakpoint and debug client and server-side code in Chrome devtools
+##### [node-inspector](https://github.com/dannycoates/node-inspector) -- allows you to breakpoint and debug client and server-side code in Chrome devtools
 
 ```npm install node-inspector -g```
 
-### Install SocketStream
+#### Install SocketStream
 ```
 git clone https://github.com/socketstream/socketstream.git
 cd socketstream && sudo npm link
 ```
 
-### Install Redis
+#### Install Redis
 ```
 sudo apt-get install redis-server
 ```
 
-### Install Mongo-DB
+#### Install Mongo-DB
 TODO
 
 ### Grab The Source 
@@ -84,7 +84,7 @@ cd daisycentral && nodemon app.js
 
 Now open browser to http://localhost:3000
 
-## Rebuilding Twitter Bootstrap
+### Rebuilding Twitter Bootstrap
 You need less and uglify-js to build:
 ```
 npm install less uglify-js -g
@@ -116,7 +116,4 @@ nodemon --debug app.js
 
 Now, open browser to http://0.0.0.0:8080/debug?port=5858 in *Chrome*
 
-### Mac (todo)
-
-### Windows (forget it)
 
