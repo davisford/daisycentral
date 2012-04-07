@@ -21,7 +21,6 @@ ss.client.define('login', {
 });
 
 // Remove to use only plain .js, .html and .css files if you prefer
-ss.client.formatters.add(require('ss-coffee'));
 ss.client.formatters.add(require('ss-jade'));
 ss.client.formatters.add(require('ss-stylus'));
 
@@ -35,6 +34,7 @@ everyauth.twitter
   .consumerKey('nQ5UWsQvj9V2Y7eCHYbQ')
   .consumerSecret('SyB4rftvGYDP6BfTPDp0Gp63B7UBXFIbjh2Eg8ww4')
   .findOrCreateUser( function(session, accessToken, accessTokenSecret, twitterUserMetadata) {
+    // todo store in redis/mongo; move out to middleware
     var userName = twitterUserMetadata.screen_name;
     console.log('Twitter username is ', userName);
     session.userId = userName;
@@ -51,6 +51,7 @@ everyauth.helpExpress(server);
 server.listen(3000);
 
 server.get('/', function (req, res) {
+
   res.serveClient('main');
 });
 

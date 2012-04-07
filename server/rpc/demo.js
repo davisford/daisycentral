@@ -17,6 +17,11 @@ exports.actions = function(req, res, ss) {
       } else {
         return res(false);
       }
+    },
+
+    testAction: function() {
+      console.log('session: ', req.session);
     }
   };
+
 };

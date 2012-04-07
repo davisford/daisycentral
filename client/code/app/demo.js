@@ -1,7 +1,5 @@
 /* QUICK CHAT DEMO */
 
-// Delete this file once you've seen how the demo works
-
 // Listen out for newMessage events coming from the server
 ss.event.on('newMessage', function(message) {
 

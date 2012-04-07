@@ -26,10 +26,17 @@ html(lang="en")
             h1 Daisy Central
             h2 
               em Beta
-          div.btn-group
-            button.btn(href="/auth/twitter") Login with Twitter
-            button.btn(href="/auth/facebook") Login with Facebook
-            button.btn(href="/auth/google") Login with Google 
+              form.well.form-inline
+                input.input-small(type="text", placeholder="email")
+                input.input-small(type="text", placeholder="password")
+                label.checkbox Remember me
+                  input(type="checkbox") 
+                button.btn(type="submit") Sign in
+                div.btn-group
+                  a.btn(href="/auth/twitter") Login with Twitter
+                  a.btn(href="/auth/facebook") Login with Facebook
+                  a.btn(href="/auth/google") Login with Google 
+
 
     
 
