@@ -125,3 +125,7 @@ Now, open browser to http://0.0.0.0:8080/debug?port=5858 in *Chrome*
 
 Port 9000 receives Daisy WiFly HTTP data.
 
+### Updating package dependencies
+
+Inside the project dir run `sudo npm update` -- _note_ that this may end up having breaking changes depending on what gets pulled down.
+

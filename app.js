@@ -3,6 +3,7 @@
 var http = require('http')
   , ss = require('socketstream')
   , express = require('express')
+  , auth = require('./server/config/everyauth.js').init(ss)
   , everyauth = require('everyauth');
 
 // Define a single-page client
@@ -30,35 +31,28 @@ ss.client.templateEngine.use(require('ss-hogan'));
 // Minimize and pack assets if you type: SS_ENV=production node app.js
 if (ss.env == 'production') ss.client.packAssets();
 
-everyauth.twitter
-  .consumerKey('nQ5UWsQvj9V2Y7eCHYbQ')
-  .consumerSecret('SyB4rftvGYDP6BfTPDp0Gp63B7UBXFIbjh2Eg8ww4')
-  .findOrCreateUser( function(session, accessToken, accessTokenSecret, twitterUserMetadata) {
-    // todo store in redis/mongo; move out to middleware
-    var userName = twitterUserMetadata.screen_name;
-    console.log('Twitter username is ', userName);
-    session.userId = userName;
-    session.save();
-    return true;
-  }).redirectPath('/');
-
 ss.http.middleware.prepend(ss.http.connect.bodyParser());
-ss.http.middleware.append(everyauth.middleware());
 
 // Start web server
 var server = express.createServer(ss.http.middleware);
-everyauth.helpExpress(server);
+//everyauth.helpExpress(server);
 server.listen(3000);
 
 server.get('/', function (req, res) {
-
-  res.serveClient('main');
+  if(req.session.userId)
+    res.serveClient('main');
+  else
+    res.serveClient('login');
 });
 
 server.get('/login', function(req, res) {
   res.serveClient('login');
 });
 
+// start socketstream webapp
+ss.start(server);
+
+// start node server for daisy device posts
 http.createServer(function(req,res) {
 	console.log(req.url);
   ss.api.publish.all('flash', req.url);
@@ -66,7 +60,3 @@ http.createServer(function(req,res) {
 	res.end();
 }).listen(9000);
 
-
-
-// Start SocketStream
-ss.start(server);
