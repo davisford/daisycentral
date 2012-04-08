@@ -6,17 +6,17 @@ This is the webapp that runs at http://live.daisyworks.com
 
 ## Tech Stack
 
-* [node.js] (http://nodejs.org)
-* [socketstream] (https://github.com/socketstream/socketstream)
-* [socket.io] (http://socket.io/)
-* [connect] (https://github.com/senchalabs/connect)
-* [express] (http://expressjs.com/)
-* [redis] (http://redis.io)
-* [MongoDB] (http://www.mongodb.org/)
-* [jade] (http://jade-lang.com/)
-* [nib] (https://github.com/visionmedia/nib)
-* [stylus] (http://learnboost.github.com/stylus/)
-* [Twitter Bootstrap] (http://twitter.github.com/bootstrap/)
+* [node.js](http://nodejs.org)
+* [socketstream](https://github.com/socketstream/socketstream)
+* [socket.io](http://socket.io/)
+* [connect](https://github.com/senchalabs/connect)
+* [express](http://expressjs.com/)
+* [redis](http://redis.io)
+* [MongoDB](http://www.mongodb.org/)
+* [jade](http://jade-lang.com/)
+* [nib](https://github.com/visionmedia/nib)
+* [stylus](http://learnboost.github.com/stylus/)
+* [Twitter Bootstrap](http://twitter.github.com/bootstrap/)
 
 ## Dev Setup
 
@@ -79,7 +79,7 @@ sudo apt-get install redis-server
 ```
 
 #### Install Mongo-DB
-TODO
+This [http://www.mongodb.org/display/DOCS/Ubuntu+and+Debian+packages] has the instructions for Ubuntu
 
 ### Grab The Source 
 ``` 
