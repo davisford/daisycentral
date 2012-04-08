@@ -1,4 +1,64 @@
-var everyauth = require('everyauth');
+var everyauth = require('everyauth')
+  , Promise = everyauth.Promise
+  , conf = require('./conf')
+  , mongoose = require('mongoose')
+  , mongooseAuth = require('mongoose-auth')
+  , Schema = mongoose.Schema
+  , ObjectId = mongoose.SchemaTypes.ObjectId
+  , UserSchema = new Schema({})
+  , User;
+
+UserSchema.plugin(mongooseAuth, {
+  everymodule: {
+    everyauth: {
+      User: function() {
+        return User;
+      }
+    }
+  }
+  , facebook: {
+    everyauth: {
+      myHostname: 'http://local.host:3000'
+    , appId: conf.fb.appId
+    , appSecret: conf.fb.appSecret
+    , redirectPath: '/'
+    }
+  }
+  , twitter: {
+    everyauth: {
+      myHostname: 'http://local.host:3000'
+    , consumerKey: conf.twit.consumerKey
+    , consumerSecret: conf.twit.consumerSecret
+    , redirectPath: '/'
+    }
+  }
+  , password: {
+      loginWith: 'email'
+    , everyauth: {
+      getLoginPath: '/login'
+    , postLoginPath: '/login'
+    , loginView: 'login.jade'
+    , getRegisterPath: '/register'
+    , postRegisterPath: '/register'
+    , registerView: 'register.jade'
+    , loginSuccessRedirect: '/'
+    , registerSuccessRedirect: '/'
+    }
+  }
+  , google: {
+    everyauth: {
+      myHostname: 'http://localhost:3000'
+    , appId: conf.google.clientId
+    , appSecret: conf.google.clientSecret
+    , redirectPath: '/'
+    , scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
+    }
+  }
+});
+
+mongoose.model('User', UserSchema);
+
+mongoose.connect('mongodb://localhost/example');
 
 module.exports.init = function(ss, server) {
   ss.http.middleware.append(everyauth.middleware());
