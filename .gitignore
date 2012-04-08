@@ -9,6 +9,8 @@
 *.vi
 *~
 *.sass-cache
+# Don't check in compiled native code
+*.{node,a,o,dylib}
 
 # OS or Editor folders
 .DS_Store
