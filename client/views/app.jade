@@ -34,7 +34,8 @@ html(lang="en")
                 a(href="#about") About 
               li 
                 a(href="#contact") Contact
-          div#user
+              li 
+                a(href="/logout") Logout
     // fluid container
     div.container-fluid
       div.row-fluid
@@ -52,6 +53,8 @@ html(lang="en")
               li
                 a(href="#") Click Me 
         div.span9
+          div#user
+            span.user-id= everyauth.loggedIn
           div.hero-unit
             h1 Hello, world!
             p This is a template for blah blah blah blah

@@ -26,9 +26,13 @@ html(lang="en")
             h1 Daisy Central
             h2 
               em Beta
-              form.well.form-inline
-                input.input-small(type="text", placeholder="email")
-                input.input-small(type="text", placeholder="password")
+              - if ('undefined' !== typeof errors && errors.length)
+                ul#errors
+                  - each error in errors
+                    li.error= error
+              form.well.form-inline(action="/login", method="post")
+                input.input-small(type="text", placeholder="email", name=everyauth.password.loginFormFieldName)
+                input.input-small(type="text", placeholder="password", name=everyauth.password.passwordFormFieldName)
                 label.checkbox Remember me
                   input(type="checkbox") 
                 button.btn(type="submit") Sign in

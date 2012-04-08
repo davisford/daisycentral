@@ -2,9 +2,7 @@
 
 var http = require('http')
   , ss = require('socketstream')
-  , express = require('express')
-  , auth = require('./server/config/everyauth.js').init(ss)
-  , everyauth = require('everyauth');
+  , express = require('express');
 
 // Define a single-page client
 ss.client.define('main', {
@@ -22,7 +20,7 @@ ss.client.define('login', {
 });
 
 // Remove to use only plain .js, .html and .css files if you prefer
-ss.client.formatters.add(require('ss-jade'));
+
 ss.client.formatters.add(require('ss-stylus'));
 
 // Use server-side compiled Hogan (Mustache) templates. Others engines available
@@ -35,14 +33,20 @@ ss.http.middleware.prepend(ss.http.connect.bodyParser());
 
 // Start web server
 var server = express.createServer(ss.http.middleware);
-//everyauth.helpExpress(server);
+
+// initialize everyauth 
+require('./server/config/everyauth').init(ss, server);
 server.listen(3000);
 
 server.get('/', function (req, res) {
-  if(req.session.userId)
+  if(req.loggedIn) {
+    console.log('already logged in: ', req.user);
     res.serveClient('main');
-  else
+  }
+  else {
+    console.log('not logged in, redirecting...');
     res.serveClient('login');
+  }
 });
 
 server.get('/login', function(req, res) {
