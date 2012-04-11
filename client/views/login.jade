@@ -31,10 +31,10 @@ html(lang="en")
                   - each error in errors
                     li.error= error
               form.well.form-inline(action="/login", method="post")
-                input.input-small(type="text", placeholder="email", name=everyauth.password.loginFormFieldName)
-                input.input-small(type="text", placeholder="password", name=everyauth.password.passwordFormFieldName)
+                input.input-small#login(type="text", placeholder="email", name=everyauth.password.loginFormFieldName)
+                input.input-small#password(type="password", placeholder="password", name=everyauth.password.passwordFormFieldName)
                 label.checkbox Remember me
-                  input(type="checkbox") 
+                  input#submit(type="checkbox") 
                 button.btn(type="submit") Sign in
                 div.btn-group
                   a.btn(href="/auth/twitter") Login with Twitter
