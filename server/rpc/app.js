@@ -7,7 +7,9 @@ exports.actions = function(req, res, ss) {
   req.use('session');
 
   // Uncomment line below to use the middleware defined in server/middleware/example
-  //req.use('example.authenticated')
+  //req.use('example.authenticated');
+
+  req.use(multiplyNumber, 2);
 
   return {
     sendMessage: function(message) {
@@ -19,9 +21,27 @@ exports.actions = function(req, res, ss) {
       }
     },
 
+    getUser: function() {
+      return res(req.session.auth.google.user);
+    },
+
     testAction: function() {
       console.log('session: ', req.session);
+    },
+
+    showResult: function(n) {
+      res('The incoming number is '+n);
     }
+
   };
 
 };
+
+multiplyNumber = function(multiplier) {
+  return function(req, res, next) {
+    var num = req.params[0];
+    if (num && typeof(num) == 'number')
+      req.params[0] = (num * multiplier);
+    next();
+  }
+}

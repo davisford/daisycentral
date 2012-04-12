@@ -121,7 +121,7 @@ app.get('/', function (req, res) {
     console.log('already logged in, req.user =>', req.user);
     console.log('everyauth.user =>', everyauth.user);
     console.log('everyauth.twitter.user =>', everyauth.twitter.user);
-    res.serveClient('main', {user:"davis"});
+    res.serveClient('main', {title:"fantastic"});
   }
   else {
     console.log('not logged in, redirecting to login/');
