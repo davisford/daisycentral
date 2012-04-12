@@ -135,3 +135,8 @@ sudo npm update
 sudo npm link
 ```
 
+### Rebuild Platform Dependent Stuff
+Libraries like `bcrypt` have to be compiled natively, so do it thusly: `sudp npm rebuild bcrypt`
+
+The bcrypt build output should not be checked into git.
+
