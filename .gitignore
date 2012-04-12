@@ -36,5 +36,5 @@ nbproject
 .idea
 
 # don't check in bcrypt
-bcrypt/build/
+bcrypt/build
 bcrypt/.lock-wscript
