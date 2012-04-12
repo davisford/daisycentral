@@ -65,6 +65,12 @@ UserSchema.plugin(mongooseAuth, {
 mongoose.model('User', UserSchema);
 mongoose.connect('mongodb://localhost/example');
 User = mongoose.model('User');
+everyauth.everymodule.findUserById( function (userId, callback) {
+  console.log('findUserById: '+userId);
+  User.findById(userId, callback);
+});
+// disable for production
+everyauth.debug=true;
 
 /* _________________ PAGES ________________ */
 // the main webapp
@@ -94,16 +100,11 @@ ss.client.define('register', {
 ss.client.formatters.add(require('ss-stylus'));
 ss.client.formatters.add(require('ss-jade'), {locals:{everyauth:everyauth}});
 ss.client.templateEngine.use(require('ss-hogan'));
+// use redis for sticky sessions
 ss.session.store.use('redis');
 ss.publish.transport.use('redis');
-
-// Minimize and pack assets if you type: SS_ENV=production node app.js
+// minimize and pack assets if you type: SS_ENV=production node app.js
 if (ss.env == 'production') ss.client.packAssets();
-
-everyauth.everymodule.findUserById( function (userId, callback) {
-  console.log('findUserById: '+userId);
-  User.findById(userId, callback);
-});
 
 var app = express.createServer(
     express.bodyParser()
@@ -120,7 +121,7 @@ app.get('/', function (req, res) {
     console.log('already logged in, req.user =>', req.user);
     console.log('everyauth.user =>', everyauth.user);
     console.log('everyauth.twitter.user =>', everyauth.twitter.user);
-    res.serveClient('main');
+    res.serveClient('main', {user:"davis"});
   }
   else {
     console.log('not logged in, redirecting to login/');

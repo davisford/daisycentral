@@ -140,3 +140,8 @@ Libraries like `bcrypt` have to be compiled natively, so do it thusly: `sudp npm
 
 The bcrypt build output should not be checked into git.
 
+## MongoDB Admin
+To start the database server, run `mongod &` or `mongod -dbpath /path/to/data`.  The default path it uses is `/data/`.  You can then start the REPL in another window via `mongo`.
+
+FIXME: the database collection for users is hard-coded to `example`, so after starting the REPL, you'd type `use example`, and then you can find all users via `db.users.find()`
+

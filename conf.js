@@ -11,4 +11,7 @@ module.exports = {
   		clientId: '897736032157.apps.googleusercontent.com'
   	  , clientSecret: 'pEXRmB-rLZXVkAiujEkhcJGZ'
   }
+  , everyauth: {
+      debug: true
+  }
 };
