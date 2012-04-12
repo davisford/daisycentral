@@ -31,14 +31,19 @@ html(lang="en")
               li.active
                 a(href="#") Home
               li
-                a(href="#about") About 
+                a(href="#devices") Devices 
+              li
+                a(href="#rules") Rules
               li 
-                a(href="#contact") Contact
+                a(href="#profile") Profile
+              li
+                a(href="#help") Help
               li 
                 a(href="/logout") Logout
     // fluid container
-    div.container-fluid
-      div.row-fluid
+    div.container-fluid#content
+      div#home
+       div.row-fluid
         div.span3
           div.well.sidebar-nav
             ul.nav.nav-list
@@ -71,7 +76,15 @@ html(lang="en")
               p onec id elit non mi <abbr title="porta gravida">porta gravida</abbr> at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
               p
                 a.btn(href="#") View details &raquo;
-      hr 
+      div#devices(style="display:none")
+        h1 This is the Devices Page
+      div#rules(style="display:none")
+        h1 This is the Rules Page
+      div#profile(style="display:none")
+        h1 This is the Profile Page
+      div#help(style="display:none")
+        h1 This is the Help Page
+  hr 
 
-      footer 
-        p &copy; DaisyWorks, Inc. 2012
+  footer 
+    p &copy; DaisyWorks, Inc. 2012

@@ -145,3 +145,11 @@ To start the database server, run `mongod &` or `mongod -dbpath /path/to/data`. 
 
 FIXME: the database collection for users is hard-coded to `example`, so after starting the REPL, you'd type `use example`, and then you can find all users via `db.users.find()`
 
+## nodemon on Ubuntu
+Current version is *0.6.14* but this doesn't work on Ubuntu 11.10 https://github.com/remy/nodemon/issues/82, so drop it down:
+
+```
+sudo npm remove nodemon -g
+sudo npm install nodemon@0.5.7 -g
+```
+

@@ -18,6 +18,7 @@ ss.server.on('ready', function(){
     
     // Load chat demo app
     require('/demo');
+    require('/router');
   });
 
 });
