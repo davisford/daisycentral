@@ -38,3 +38,5 @@ nbproject
 # don't check in bcrypt
 bcrypt/build
 bcrypt/.lock-wscript
+node_modules/mongoose-auth/node_modules/bcrypt/.lock-wscript
+node_modules/mongoose-auth/node_modules/bcrypt/build
