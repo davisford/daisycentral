@@ -45,7 +45,9 @@ hello, world
 ```
 
 #### Install NPM
-*newbie-ponders*: If you run npm with the `-g` flag, it installs modules globally (i.e. at `$NODE_MODULES`), whereas if you leave the `-g` off, it installs in your local working directory.  I'm not sure yet if I should really be installing these modules into git -- perhaps it is better to update the `package.json` file with a list of dependencies?  
+[Read this first](http://npmjs.org/doc/folders.html)
+
+Install libraries that the code will `require()` locally.  Install command line binaries globally with `-g`.
 
 ```
 curl http://npmjs.org/install.sh | sh
@@ -124,5 +126,12 @@ Port 9000 receives Daisy WiFly HTTP data.
 
 ### Updating package dependencies
 
-Inside the project dir run `sudo npm update` -- _note_ that this may end up having breaking changes depending on what gets pulled down.
+To update locally run `sudo npm update` in the project dir.  To update globally run `sudo npm update -g`.  After update, you'll probably need to rebuild socketstream so:
+
+```
+cd socketstream
+git pull
+sudo npm update
+sudo npm link
+```
 

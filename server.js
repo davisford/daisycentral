@@ -66,7 +66,6 @@ mongoose.model('User', UserSchema);
 mongoose.connect('mongodb://localhost/example');
 User = mongoose.model('User');
 
-
 /* _________________ PAGES ________________ */
 // the main webapp
 ss.client.define('main', {
@@ -92,44 +91,54 @@ ss.client.define('register', {
   tmpl: '*'
 });
 
-
 ss.client.formatters.add(require('ss-stylus'));
 ss.client.formatters.add(require('ss-jade'), {locals:{everyauth:everyauth}});
 ss.client.templateEngine.use(require('ss-hogan'));
+ss.session.store.use('redis');
+ss.publish.transport.use('redis');
 
 // Minimize and pack assets if you type: SS_ENV=production node app.js
 if (ss.env == 'production') ss.client.packAssets();
 
-// must be appended
-ss.http.middleware.append(mongooseAuth.middleware());
+everyauth.everymodule.findUserById( function (userId, callback) {
+  console.log('findUserById: '+userId);
+  User.findById(userId, callback);
+});
 
-// create server
-var server = express.createServer(ss.http.middleware);
-mongooseAuth.helpExpress(server);
-server.listen(3000);
+var app = express.createServer(
+    express.bodyParser()
+  , express.static(__dirname + "/client/static")
+  , ss.http.middleware
+  , mongooseAuth.middleware()
+);
 
-/* ____________ ROUTING _____________ */
-server.get('/', function (req, res) {
+mongooseAuth.helpExpress(app);
+
+/* _________________ ROUTES _________________ */
+app.get('/', function (req, res) {
   if(req.loggedIn) {
-    console.log('already logged in: ', req.user);
+    console.log('already logged in, req.user =>', req.user);
+    console.log('everyauth.user =>', everyauth.user);
+    console.log('everyauth.twitter.user =>', everyauth.twitter.user);
     res.serveClient('main');
   }
   else {
-    console.log('not logged in, redirecting...');
+    console.log('not logged in, redirecting to login/');
     res.serveClient('login');
   }
 });
-
-server.get('/login', function(req, res) {
+app.get('/login', function(req, res) {
+  console.log("/login");
   res.serveClient('login');
 });
-
-server.get('/register', function (req, res) {
-  res.serveClient('register');
+app.get('/register', function(req, res) {
+  console.log("/register");
+  res.serveClient("register");
 });
 
 // start socketstream webapp
-ss.start(server);
+app.listen(3000);
+ss.start(app);
 
 // start node server for daisy device posts
 http.createServer(function(req,res) {
