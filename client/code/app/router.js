@@ -2,36 +2,38 @@ var Router = Backbone.Router.extend({
       routes: {
       	"":  "home",
       	"devices": "devices",
-      	"rules": "rules",
-      	"profile": "profile",
-      	"help": "help"
+        "rules": "rules",
+        "profile": "profile",
+        "help": "help"
       },
 
       home: function(e, a) {
-      	$("#content").children().hide();
-      	$("#home").show();
+        $("#home").show();
       },
 
       devices: function(e, a) {
-      	$("#content").children().hide();
-      	$("#devices").show();
+        $("#devices").show();
       },
 
       rules: function() {
-      	$("#content").children().hide();
-      	$("#rules").show();
+        $("#rules").show();
       },
 
       profile: function() {
-      	$("#content").children().hide();
-      	$("#profile").show();
+        $("#profile").show();
       },
 
       help: function() {
-      	$("#content").children().hide();
-      	$("#help").show();
+        $("#help").show();
       }
 });
 
 var router = new Router();
 Backbone.history.start();
+
+// navigtation links
+$(".nav li").click(function (e) {
+  $("#content").children().hide();
+  $(".nav li").removeClass("active");
+  $(this).addClass("active");
+});
