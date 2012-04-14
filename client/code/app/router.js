@@ -12,7 +12,7 @@ var Router = Backbone.Router.extend({
       },
 
       devices: function(e, a) {
-        $("#devices").show();
+        $("#devices").show().slideDown();
       },
 
       rules: function() {
