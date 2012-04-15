@@ -70,7 +70,7 @@ UserSchema.plugin(mongooseAuth, {
 });
 
 mongoose.model('User', UserSchema);
-mongoose.connect('mongodb://localhost/example');
+mongoose.connect('mongodb://localhost/daisycentral');
 User = mongoose.model('User');
 everyauth.everymodule.findUserById( function (userId, callback) {
   console.log('findUserById: '+userId);
