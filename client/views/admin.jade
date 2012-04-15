@@ -1,0 +1,95 @@
+!!! 5
+html(lang="en")
+  head
+    != SocketStream
+    meta(charset="utf-8")
+    title Daisy Central
+    meta(name="viewport", content="width=device-width,initial-scale=1.0")
+    meta(name="description", content="TODO")
+    meta(name="author", content="DaisyWorks, Inc.")
+
+    // if lt IE 9
+      script(src="http://html5shim.googlecode.com/svn/trunk/html5.js")
+
+    link(rel="shortcut icon", href="ico/favicon.ico")
+    link(rel="apple-touch-icon-precomposed", sizes="114x114", href="ico/apple-touch-icon-114-precomposed.png")
+    link(rel="apple-touch-icon-precomposed", sizes="72x72", href="ico/apple-touch-icon-72-precomposed.png")
+    link(rel="apple-touch-icon-precomposed", href="ico/apple-touch-icon-57-precomposed.png")
+
+  body
+    // navbar 
+    div.navbar.navbar-fixed-top
+      div.navbar-inner
+        div.container
+          a.btn.btn-navbar(data-toggle="collapse", data-target=".nav-collapse")
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+          a.brand(href="#") Daisy Central
+          div.nav-collapse
+            ul.nav 
+              li.active
+                a(href="#") Home
+              li
+                a(href="#devices") Devices 
+              li
+                a(href="#rules") Rules
+              li 
+                a(href="#profile") Profile
+              li
+                a(href="#help") Help
+              li 
+                a(href="/logout") Logout
+    // fluid container
+    div.container-fluid#content
+      div.container-fluid#home
+       div.row-fluid
+        div.span3
+          div.well.sidebar-nav
+            ul.nav.nav-list
+              li.nav-header Sidebar 
+              li.active
+                a(href="#") Some Link 
+              li 
+                a(href="#") Another Link
+              li.nav-header Another Section
+              li 
+                a(href="#") Yet More Links
+              li
+                a(href="#") Click Me 
+        div.span9
+          div#user
+            //Logged in with `user.id` #{user.id} - aka `everyauth.user.id` #{everyauth.user.id}
+          div.hero-unit
+            h1 Hello, world!
+            p This is a template for blah blah blah blah
+            p 
+              a.btn.btn-primary.btn-large Learn more &raquo;
+          div.row-fluid
+            div.span4
+              h2 Heading
+              p onec id elit non mi <em>porta gravida</em> at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+              p 
+                a.btn(href="#") View details &raquo;
+            div.span4
+              h2 Heading
+              p onec id elit non mi <abbr title="porta gravida">porta gravida</abbr> at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+              p
+                a.btn(href="#") View details &raquo;
+      div.container#devices(style="display:none")
+        h1 This is the Devices Page 1
+        h1 This is the Devices Page 2
+        h1 This is the Devices Page 3
+        h1 This is the Devices Page 4
+        h1 This is the Devices Page 5
+        h1 This is the Devices Page 6
+      div.row-fluid#rules(style="display:none")
+        h1 This is the Rules Page
+      div#profile(style="display:none")
+        h1 This is the Profile Page
+      div#help(style="display:none")
+        h1 This is the Help Page
+  hr 
+
+  footer 
+    p &copy; DaisyWorks, Inc. 2012

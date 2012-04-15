@@ -53,6 +53,7 @@ module.exports.init = function(ss, conf) {
   }).listen(module.conf.deviceserver.port);
 };
 
+// message handler for incoming device sensor data
 function onMessage(req, res) {
 
   // parse out the query params

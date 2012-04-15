@@ -7,7 +7,7 @@ exports.actions = function(req, res, ss) {
   req.use('session');
 
   // Uncomment line below to use the middleware defined in server/middleware/example
-  //req.use('example.authenticated');
+  req.use('example.authenticated');
 
   req.use(multiplyNumber, 2);
 
