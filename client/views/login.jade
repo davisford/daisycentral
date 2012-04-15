@@ -31,14 +31,14 @@ html(lang="en")
                   a(href="#registerTab", data-toggle="tab") Register 
               div.tab-content#myTabContent
                 div.alert.alert-error(style="display:none;")
-                  a.close(data-dismiss="alert") x
+                  a.close(data-dismiss="alert") &times;
                   p#err This is an error
                 div.tab-pane.active#loginTab
                   form.form-inline#loginForm
-                    input.input-small#login(type="text", placeholder="email", name="email")
-                    input.input-small#password(type="password", placeholder="password", name="password")
+                    input.input-small#login-email(type="text", placeholder="email", name="email")
+                    input.input-small#login-pass(type="password", placeholder="password", name="password")
                     label.checkbox Remember me
-                      input#remember(type="checkbox") 
+                      input#sticky(type="checkbox") 
                     button.btn.btn-primary#login-submit(type="submit") Login
                     hr
                     div.btn-group
@@ -47,10 +47,10 @@ html(lang="en")
                       a.btn.btn-large#goog(href="/auth/google") Login with Google
                 div.tab-pane#registerTab
                   form.form-inline#registerForm
-                    input.input-small#email(type="text", placeholder="email", name="email")
-                    input.input-small#password(type="password", placeholder="password", name="password")
-                    input.input-small#passwordv(type="password", placeholder="verify password")
-                    button.btn.btn-primary(type="submit") Sign Up
+                    input.input-small#reg-email(type="text", placeholder="email", name="email")
+                    input.input-small#reg-pass1(type="password", placeholder="password", name="password")
+                    input.input-small#reg-pass2(type="password", placeholder="verify password", name="password")
+                    button.btn.btn-primary#register-submit(type="submit") Sign Up
 
               
 

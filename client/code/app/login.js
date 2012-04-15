@@ -1,20 +1,21 @@
 
+// focus on login/email text box when loaded
+$('#login-email').focus();
+
+// submit handler for login.click
 $('#login-submit').click(function (e) {
 	$('.alert').remove();
     e.preventDefault();
-	var email = $('#login').val();
-	var password1 = $('#password').val();
-	var password2 = $('#password2').val();
+	var email = $('#login-email').val()
+	  , password = $('#login-pass').val()
+	  , sticky = $('#sticky').is(':checked');
 
   if(false === exports.validateEmail(email)) {
   	showError("Email address is not valid");
-  } else if(false === exports.validatePassword(password1) || 
-  	        false === exports.validatePassword(password2)) {
-  	showError("Password must be at least 8 characters with 1 Uppercase, 1 lowercase, and 1 special character");
-  } else if(password1 !== password2) {
-  	showError("Passwords do not match");
+  } else if(false === exports.validatePassword(password)) {
+  	showError("Password must be at least 6 characters");
   } else {
-    ss.rpc('auth.login', email, password1, rememberme, function(success) {
+    ss.rpc('auth.login', email, password, sticky, function(success) {
       if (success) {
       	alert('success');
       } else {
@@ -24,16 +25,56 @@ $('#login-submit').click(function (e) {
   }
 });
 
+// submit handler for register.click
+$('#register-submit').click(function (e) {
+  $('.alert').remove();
+  e.preventDefault();
+  var email = $('#reg-email').val()
+    , pass1 = $('#reg-pass1').val()
+    , pass2 = $('#reg-pass2').val();
+
+  if(false === exports.validateEmail(email)) {
+  	showError("Email address is not valid");
+  } else if (false === exports.validatePassword(pass1)) {
+  	showError("Password must be at least 6 characters");
+  } else if (false === pass1 === pass2) {
+  	showError("Passwords do not match");
+  } else {
+  	ss.rpc('auth.register', email, pass1, function(success) {
+      if (success) {
+      	alert('success');
+      } else {
+      	alert('registration failed');
+      }
+  	});
+  }
+});
+
+// when user tabs between login/register, set focus on textbox
+$("a[data-toggle='tab']").on('shown', function (e) {
+  switch($(e.target).attr('href')) {
+  	case "#registerTab":
+  	  $("#reg-email").focus();
+  	  break;
+  	case "#loginTab":
+  	  $("#login-email").focus();
+  	  break;
+  }
+});
+
+// show an error
 function showError(text) {
-  $('#myTabContent').slideDown(1000).before("<div class='alert alert-error'><a class='close' data-dismiss='alert'>&times;</a><p>"+text+"</p></div>");
+	var html = ss.tmpl['login-error'].render({message:text});
+  $('#myTabContent').slideDown(1000).before(html);
 }
 
+// exported function to validate email address
 exports.validateEmail = function (text) {
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(text);
 }
 
+// exported function to validate password
 exports.validatePassword = function (text) {
-  var re = /(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
-  return re.text(text);
+  return text.length >= 6;
 }
