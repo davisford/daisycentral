@@ -30,20 +30,23 @@ html(lang="en")
                 li
                   a(href="#registerTab", data-toggle="tab") Register 
               div.tab-content#myTabContent
+                div.alert.alert-error(style="display:none;")
+                  a.close(data-dismiss="alert") x
+                  p#err This is an error
                 div.tab-pane.active#loginTab
-                  form.form-inline
+                  form.form-inline#loginForm
                     input.input-small#login(type="text", placeholder="email", name="email")
                     input.input-small#password(type="password", placeholder="password", name="password")
                     label.checkbox Remember me
-                      input#submit(type="checkbox") 
-                    button.btn.btn-primary(type="submit") Login
+                      input#remember(type="checkbox") 
+                    button.btn.btn-primary#login-submit(type="submit") Login
                     hr
                     div.btn-group
                       a.btn.btn-large#twit(href="/auth/twitter") Login with Twitter  
                       a.btn.btn-large#fb(href="/auth/facebook") Login with Facebook
                       a.btn.btn-large#goog(href="/auth/google") Login with Google
                 div.tab-pane#registerTab
-                  form.form-inline
+                  form.form-inline#registerForm
                     input.input-small#email(type="text", placeholder="email", name="email")
                     input.input-small#password(type="password", placeholder="password", name="password")
                     input.input-small#passwordv(type="password", placeholder="verify password")
