@@ -18,7 +18,7 @@ ss.client.define('main', {
 // the login page
 ss.client.define('login', {
   view: 'login.jade',
-  css: ['libs', 'app.styl'],
+  css: ['libs', 'app.styl', 'login.styl'],
   code: ['libs', 'app'],
   tmpl: '*'
 });

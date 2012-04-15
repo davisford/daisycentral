@@ -23,7 +23,7 @@ html(lang="en")
           div.hero-unit
             img#login_logo(src="/images/dw-logo2.png", alt="DaisyWorks Logo", width=197, height=128)
             h1 Daisy Central
-            div.well
+            div.well.login-panel
               ul.nav.nav-tabs#tabs(data-tabs="tabs")
                 li.active
                   a(href="#loginTab", data-toggle="tab") Login
@@ -31,21 +31,23 @@ html(lang="en")
                   a(href="#registerTab", data-toggle="tab") Register 
               div.tab-content#myTabContent
                 div.tab-pane.active#loginTab
-                  input.input-small#login(type="text", placeholder="email", name="email")
-                  input.input-small#password(type="password", placeholder="password", name="password")
-                  label.checkbox Remember me
-                    input#submit(type="checkbox") 
-                  button.btn(type="submit") Sign in
-                  hr
-                  div.btn-group
-                    a.btn#twit(href="/auth/twitter") Login with Twitter
-                    a.btn#fb(href="/auth/facebook") Login with Facebook
-                    a.btn#goog(href="/auth/google") Login with Google
+                  form.form-inline
+                    input.input-small#login(type="text", placeholder="email", name="email")
+                    input.input-small#password(type="password", placeholder="password", name="password")
+                    label.checkbox Remember me
+                      input#submit(type="checkbox") 
+                    button.btn.btn-primary(type="submit") Login
+                    hr
+                    div.btn-group
+                      a.btn.btn-large#twit(href="/auth/twitter") Login with Twitter  
+                      a.btn.btn-large#fb(href="/auth/facebook") Login with Facebook
+                      a.btn.btn-large#goog(href="/auth/google") Login with Google
                 div.tab-pane#registerTab
-                  input.input-small#email(type="text", placeholder="email", name="email")
-                  input.input-small#password(type="password", placeholder="password", name="password")
-                  input.input-small#passwordv(type="password", placeholder="verify password")
-                  button.btn(type="submit") Sign 
+                  form.form-inline
+                    input.input-small#email(type="text", placeholder="email", name="email")
+                    input.input-small#password(type="password", placeholder="password", name="password")
+                    input.input-small#passwordv(type="password", placeholder="verify password")
+                    button.btn.btn-primary(type="submit") Sign Up
 
               
 

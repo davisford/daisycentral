@@ -32,7 +32,7 @@ var router = new Router();
 Backbone.history.start();
 
 // navigtation links
-$(".nav li").click(function (e) {
+$(".top-menu li").click(function (e) {
   $("#content").children().hide();
   $(".nav li").removeClass("active");
   $(this).addClass("active");
