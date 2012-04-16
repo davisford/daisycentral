@@ -1,10 +1,13 @@
 // Daisy Central server code
 
-var http = require('http')
+var express = require('express')
   , ss = require('socketstream')
-  , conf = require('./conf')
-  , process = require('./server/incoming/device.js').init(ss, conf)
-  , express = require('express');
+  , conf = require('./server/app/conf')
+  , deviceServer = require('./server/app/device.js').init(ss)
+  , auth = require('./server/app/auth.js')
+  , passport = require('passport')
+  , mongoose = require('mongoose')
+  , connectMongo = require('connect-mongodb');
 
 /* _________________ VIEWS ________________ */
 // the main webapp
@@ -50,42 +53,39 @@ ss.publish.transport.use('redis');
 // minimize and pack assets if you type: SS_ENV=production node app.js
 if (ss.env == 'production') ss.client.packAssets();
 
+// express cookieParser + session added by ss.http.middleware
 var app = express.createServer(
     express.bodyParser()
   , express.static(__dirname + "/client/static")
   , ss.http.middleware
+  , passport.initialize()
+  , passport.session()
 );
 
-// handles auth for us
-require('./server/auth/auth').init(ss, app);
-
-function isAdmin(req, res, next) {
-  if(req.session.isAdmin) {
-    next();
-  } else {
-    next(new Error("You don't have permissions to do that"));
-  }
-}
-
 /* _________________ ROUTES _________________ */
-app.get('/', function (req, res) {
-  if(req.loggedIn) {
-    console.log('already logged in, req.user =>', req.user);
-    res.serveClient('main');
-  }
-  else {
-    console.log('not logged in, redirecting to login/');
-    res.serveClient('login');
-  }
+app.get('/', ensureAuthenticated, function (req, res) {
+  res.serveClient('main');
 });
+
 app.get('/login', function(req, res) {
-  console.log("/login");
   res.serveClient('login');
 });
-app.get('/register', function(req, res) {
-  console.log("/register");
-  res.serveClient("register");
+
+app.post('/login',
+  passport.authenticate('local', {failureRedirect: '/login', failureFlash:true }),
+  function (req, res) {
+    res.serveClient('main');
+  });
+
+app.post('/register', function(req, res) {
+  // TODO
 });
+
+app.get('/logout', function (req, res) {
+  req.logout();
+  res.redirect('/login');
+});
+
 app.get('/admin', isAdmin, function(req, res, next) {
   console.log("/admin");
   res.serveClient("admin");
@@ -95,5 +95,18 @@ app.get('/admin', isAdmin, function(req, res, next) {
 app.listen(conf.webserver.port);
 ss.start(app);
 
+// Simple route middleware to ensure user is authenticated.
+// Use this route middleware on any resource that needs to be protected.
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) { return next(); }
+  res.redirect('/login');
+}
 
+function isAdmin(req, res, next) {
+  if(req.session.isAdmin) {
+    next();
+  } else {
+    next(new Error("You don't have permissions to do that"));
+  }
+}
 

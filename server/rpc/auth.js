@@ -1,29 +1,21 @@
 // - server/rpc/auth.js
 
 var mongoose = require('mongoose')
-  , mongooseAuth = require('mongoose-auth');
+  , passport = require('passport');
 
 var User = mongoose.model('User');
 
 exports.actions = function (req, res, ss) {
     req.use('session');
 
-
 	return {
 		login: function (email, pass, sticky) {
 			console.log('login, user:'+email+", pass:"+pass+", sticky:"+sticky);
-			
-			User()().authenticate(email, pass, function (err, user) {
-			  if (err) {
-			  	res(false, "Login failed: "+err);
-			  	return;
-			  } 
-			  if (!user) {
-			  	res(false, "User not registered");
-			  	return;
-			  }
-			  res(true);
+			passport.authenticate('local', function (req, res) {
+				// if this fn is called auth was successful
+				res(true);
 			});
+			
 		}, 
 
 		register: function(email, pass) {
