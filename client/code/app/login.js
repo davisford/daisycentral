@@ -4,7 +4,7 @@ $('#login-email').focus();
 
 // submit handler for login.click
 $('#login-submit').click(function (e) {
-	$('.alert').remove();
+/*	$('.alert').remove();
     e.preventDefault();
 	var email = $('#login-email').val()
 	  , password = $('#login-pass').val()
@@ -22,7 +22,7 @@ $('#login-submit').click(function (e) {
       	alert('login failed');
       }
     });
-  }
+  } */
 });
 
 // submit handler for register.click

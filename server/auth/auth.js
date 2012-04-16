@@ -50,7 +50,7 @@ UserSchema.plugin(mongooseAuth, {
     , everyauth: {
       getLoginPath: '/login'
     , postLoginPath: '/login'
-    , loginView: 'login.jade'
+    , loginView: 'client/views/login'
     , getRegisterPath: '/register'
     , postRegisterPath: '/register'
     , registerView: 'register.jade'

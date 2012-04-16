@@ -34,7 +34,7 @@ html(lang="en")
                   a.close(data-dismiss="alert") &times;
                   p#err This is an error
                 div.tab-pane.active#loginTab
-                  form.form-inline#loginForm
+                  form.form-inline#loginForm(action="/login", method="post")
                     input.input-small#login-email(type="text", placeholder="email", name="email")
                     input.input-small#login-pass(type="password", placeholder="password", name="password")
                     label.checkbox Remember me
