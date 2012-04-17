@@ -30,14 +30,14 @@ UserSchema
 UserSchema.static('authenticate', function (email, password, cb) {
 	this.findOne({ email: email}, function (err, user){
 		// database error
-		if (err) { return cb(err); }
+		if (err) { console.error("db error", err); return cb(err); }
 		// user not found
-		if (!user) { return cb(null, false, { message: 'Unknown user' }); }
+		if (!user) { console.log("user not found =>", email); return cb(null, false, { message: 'Unknown user' }); }
 		user.verifyPassword(password, function (err, passwordCorrect) {
 			// something wrong with bcrypt
-			if (err) { return cb(err); }
+			if (err) { console.error("bcrypt failure", err); return cb(err); }
 			// password incorrect
-			if (!passwordCorrect) { return cb(null, false, { message: 'Invalid password' }); }
+			if (!passwordCorrect) { console.log("password not correct"); return cb(null, false, { message: 'Invalid password' }); }
 			// success
 			return cb(null, user);
 		});
