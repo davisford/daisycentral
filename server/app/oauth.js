@@ -72,6 +72,13 @@ UserSchema.plugin(mongooseAuth, {
     everyauth: {
       User: function() {
         return User;
+      },
+      handleLogout: function (req, res) {
+        req.logout();
+        req.session.userId = undefined;
+        req.session.destroy();
+        res.writeHead(303, { 'Location': this.logoutRedirectPath() });
+        res.end();
       }
     }
   }
