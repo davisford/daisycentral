@@ -17,7 +17,12 @@ exports.actions = function (req, res, ss) {
 		  	} else if (!user) {
           return res(false, msg.message);
 		  	} else {
-		  		req.session.setUserId(user.id);
+		  		if(req.session.auth)
+		  			req.session.auth.userId = user.id;
+		  		else
+		  			req.session.auth = { userId: user.id };
+		  		req.user = user;
+		  		req.session.save();
 		  		return res(true);
 		  	}
 		  }); // end authenticate
@@ -34,7 +39,12 @@ exports.actions = function (req, res, ss) {
 						if(err) {
 							return res("Error: not able to save user: "+err);
 						} else {
-							req.session.setUserId(user.id);
+							if(req.session.auth)
+		  						req.session.auth.userId = user.id;
+		  					else
+		  					req.session.auth = { userId: user.id };
+		  					req.user = user;
+		  					req.session.save();
 							return res(true);
 						}
 					}); // end save

@@ -92,12 +92,16 @@ ss.start(app);
 // Simple route middleware to ensure user is authenticated.
 // Use this route middleware on any resource that needs to be protected.
 function ensureAuthenticated(req, res, next) {
-  if (req.session.userId) { return next(); }
+  console.dir(req.session);
+  if (req.session !== undefined) 
+    if (req.session.auth !== undefined)
+      if (req.session.auth.userId !== undefined)
+        return next(); 
   res.redirect('/login');
 }
 
 function isAdmin(req, res, next) {
-  if(req.session.isAdmin) {
+  if(req.session.auth.userId) {
     next();
   } else {
     next(new Error("You don't have permissions to do that"));
