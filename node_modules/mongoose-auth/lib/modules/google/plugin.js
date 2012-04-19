@@ -13,10 +13,19 @@ module.exports = function google (schema, opts) {
     
     var params = {
       google: {
-          email: googleUser.id
+          email: googleUser.email
         , expires: expiresDate
         , accessToken: accessToken
         , refreshToken: accessTokenExtra.refresh_token
+        , id: googleUser.id
+        , verifiedEmail: googleUser.verified_email
+        , name: googleUser.name
+        , givenName: googleUser.given_name
+        , familyName: googleUser.family_name
+        , link: googleUser.link
+        , picture: googleUser.picture
+        , gender: googleUser.gender
+        , locale: googleUser.locale
       }
     };
 

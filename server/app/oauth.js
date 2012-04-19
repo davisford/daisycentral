@@ -66,7 +66,7 @@ UserSchema.static('authenticate', function (email, password, cb) {
   }); // end findOne
 }); // end static authenticate
 
-// mongoose-auth plugin for twit, fb, goog
+// mongoose-auth plugin for twit, fb, goog; decorates schema
 UserSchema.plugin(mongooseAuth, {
   everymodule: {
     everyauth: {
@@ -96,6 +96,27 @@ UserSchema.plugin(mongooseAuth, {
     , consumerKey: conf.twit.consumerKey
     , consumerSecret: conf.twit.consumerSecret
     , redirectPath: '/'
+    , findOrCreateUser: function (session, accessTok, accessTokSecret, twitterUser) {
+      var promise = this.Promise()
+        , User = this.User()();
+      User.findById(session.auth.userId, function (err, user) {
+        if (err) return promise.fail(err);
+        if (!user) {
+          // twitter metadata doesn't have email; so no other way to link up
+          User.createWithTwitter(twitterUser, accessTok, accessTokSecret, function (err, createdUser) {
+            if (err) return promise.fail(err);
+            return promise.fulfill(createdUser);
+          }); // end createWithTwitter
+        } else {
+          assignTwitterDataToUser(user, accessTok, accessTokSecret, twitterUser);
+          user.save(function (err, user) {
+            if (err) return promise.fail(err);
+            return promise.fulfill(user);
+          });
+        }
+      }); // end findById
+      return promise;
+    }
     } // end everyauth
   } // end twitter
 , google: {
@@ -127,7 +148,7 @@ UserSchema.plugin(mongooseAuth, {
               }
             });
           } else {
-            assignGoogleDataTouser(user, accessTok, accessTokExtra, googleUser);
+            assignGoogleDataToUser(user, accessTok, accessTokExtra, googleUser);
             user.save( function(err, user) {
               if (err) return promise.fail(err);
               promise.fulfill(user);
@@ -147,12 +168,45 @@ everyauth.everymodule.findUserById(function (userId, callback) {
   User.findById(userId, callback);
 });
 
-function assignGoogleDataTouser(user, token, tokenExtra, googleUser) {
-  console.dir(googleUser);
+function assignGoogleDataToUser(user, token, tokenExtra, googleUser) {
+  console.log("\n google user metadata => \n", googleUser);
   user.google.accessToken = token;
   user.google.expires = tokenExtra.expires;
   user.google.refreshToken = googleUser.refreshToken;
   user.google.email = googleUser.email;
+
+  /* added by my mongoose-auth fork davisford/mongoose-auth */
+  user.google.id = googleUser.id;
+  user.google.verifiedEmail = googleUser.verified_email;
+  user.google.name = googleUser.name;
+  user.google.givenName = googleUser.given_name;
+  user.google.familyName = googleUser.family_name;
+  user.google.link = googleUser.link;
+  user.google.picture = googleUser.picture;
+  user.google.gender = googleUser.gender;
+  user.google.locale = googleUser.locale;
+}
+
+function assignTwitterDataToUser(user, token, tokenExtra, twitterUser) {
+  console.log("\n twitter user metadata => \n", twitterUser);
+  user.twit.accessToken = token;
+  user.twit.accessTokenSecret = tokenExtra;
+  user.twit.id = twitterUser.id;
+  user.twit.name = twitterUser.name;
+  user.twit.screenName = twitterUser.screen_name;
+  user.twit.location = twitterUser.location;
+  user.twit.description = twitterUser.description;
+  user.twit.profileImageUrl = twitterUser.profile_image_url;
+  user.twit.url = twitterUser.url;
+  user.twit.protected = twitterUser.protected;
+  user.twit.followersCount = twitterUser.followersCount;
+  user.twit.friendsCount = twitterUser.friends_count;
+  user.twit.utcOffset = twitterUser.utc_offset;
+  user.twit.timeZone = twitterUser.time_zone;
+  user.twit.profileBackgroundImageUrl = twitterUser.profile_background_image_url;
+  user.twit.verified = twitterUser.verified;
+  user.twit.statusesCount = twitterUser.statuses_count;
+  user.twit.lang = twitterUser.lang;
 }
 
 // disable for production
