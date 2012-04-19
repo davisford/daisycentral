@@ -145,6 +145,12 @@ To start the database server, run `mongod &` or `mongod -dbpath /path/to/data`. 
 
 FIXME: the database collection for users is hard-coded to `example`, so after starting the REPL, you'd type `use example`, and then you can find all users via `db.users.find()`
 
+### Add Admin Role To Your User Account
+Example for my email:
+`db.users.update({email:"davisford@gmail.com"}, {$set: {roles: ["admin"]}})`
+
+Now you have access to /admin section of the app
+
 ## nodemon on Ubuntu
 Current version is *0.6.14* but this doesn't work on Ubuntu 11.10 https://github.com/remy/nodemon/issues/82, so drop it down:
 
