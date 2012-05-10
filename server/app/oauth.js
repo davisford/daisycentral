@@ -19,7 +19,7 @@ var UserSchema = new mongoose.Schema({
       first: { type: String }
       , last: { type: String }
     }
-    , email: { type: String, unique: true }
+    , email: { type: String, index: true, unique: true }
     , salt: { type: String }
     , hash: { type: String }
   })

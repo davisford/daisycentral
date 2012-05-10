@@ -4,9 +4,10 @@ var express = require('express')
   , ss = require('socketstream')
   , conf = require('./server/app/conf')
   , deviceServer = require('./server/app/device.js').init(ss)
-  , oauth = require('./server/app/oauth.js')
   , mongoose = require('mongoose')
   , mongooseAuth = require('mongoose-auth');
+
+var UserModel = require('./server/models/user').User;
 
 // connect to mongodb
 mongoose.connect(conf.db.url);

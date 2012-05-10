@@ -139,4 +139,6 @@ describe("User", function() {
     });
   });
 
+  // TODO mongoose-auth tests
+
 });

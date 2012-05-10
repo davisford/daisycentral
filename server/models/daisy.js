@@ -23,7 +23,7 @@
 	  "_id" : ObjectId("4f963d422c6fab0000000008") 
  */
 
-var mongoose = require('mongoose');
+var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , ObjectId = mongoose.SchemaTypes.ObjectId;
 
@@ -37,7 +37,7 @@ var DaisySchema = new Schema({
   did:    String,
   ip:     String,
   mac:    String,
-  timestamp:  Number,
+  timestamp:  { type: Number, index: true },
   bat:  Number,
   rssi: Number,
   wake: Number,
@@ -54,3 +54,21 @@ var DaisySchema = new Schema({
   AD6: Number,
   AD7: Number
 });
+
+DaisySchema.virtual('localtime')
+  .get(function (){
+  	var localNow = new Date().getTimezoneOffset(),
+  	    min = this.timestamp / 1000 / 60;
+  	return (min - localNow) * 1000 * 60;
+  });
+DaisySchema.virtual('date')
+  .get(function (){
+  	return new Date(this.timestamp);
+  });
+DaisySchema.virtual('localdate')
+  .get(function (){
+  	return new Date(this.localtime);
+  });
+
+var Daisy = mongoose.model('Daisy', DaisySchema);
+module.exports.Daisy = Daisy;

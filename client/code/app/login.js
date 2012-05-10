@@ -41,7 +41,7 @@ $('#register-submit').click(function (e) {
   } else if (false === pass1 === pass2) {
   	showError("Passwords do not match");
   } else {
-  	ss.rpc('auth.register', email, pass1, function(success, err) {
+  	ss.rpc('auth.register', email, pass1, pass2, function(success, err) {
       if (success) {
       	window.location = '/';
       } else {
