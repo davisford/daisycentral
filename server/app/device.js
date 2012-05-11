@@ -44,6 +44,8 @@ var url = require('url')
   , qs  = require('querystring')
   , http = require('http')
   , conf = require('./conf')
+  , SensorData = require('../models/sensordata')
+  , Daisies = require('../models/daisies').getModel();
 
 module.exports.init = function(ss) {
   module.ss = ss;
@@ -83,8 +85,27 @@ function onMessage(req, res) {
     data["AD"+i] = parseInt(sensors.substring(i * 4, i * 4 + 4), 16);
   }
 
-  console.log("New sensor data received at "+new Date(data.timestamp));
-  console.log(data);
+  // register the device if not found
+  Daisies.findOne({mac: data.mac}, function (err, doc) {
+    if (err) { return console.log (err); }
+    if (doc) { return; }
+    else {
+      var daisy = new Daisies({did: data.did, mac: data.mac});
+      daisy.save(function (err, doc) {
+        if (err) { console.log(err); }
+        else { console.log("new daisy saved ", doc); }
+      });
+    }
+  })
+
+  // save the sensor data
+  var SensorDataModel = SensorData.getModel(SensorData.getColName(data.mac));
+  var sensors = new SensorDataModel(data);
+  sensors.save(function (err, doc) {
+    if (err) console.log(err);
+    else console.log("New sensor data saved; received at:"+doc.localdate);
+  });
+
   /* TODO
      look up mac in database
        if not exists: create entry and generate random token
@@ -93,7 +114,7 @@ function onMessage(req, res) {
   */
 
   // broadcast on flash channel - FIXME
-  module.ss.api.publish.all('flash', data);
+  module.ss.api.publish.all('flash', sensors.toJSON());
   res.writeHead(200, {"Content-Type": "text/plain"});
   res.end();
 }
