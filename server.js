@@ -3,7 +3,7 @@
 var express = require('express')
   , ss = require('socketstream')
   , conf = require('./server/app/conf')
-  , deviceServer = require('./server/app/device.js').init(ss)
+  , deviceServer = require('./server/app/daisyServer.js').init(ss)
   , mongoose = require('mongoose')
   , mongooseAuth = require('mongoose-auth');
 
@@ -36,7 +36,7 @@ ss.client.define('login', {
 ss.client.define('admin', {
   view: 'admin.jade',
   css: ['libs', 'app.styl'],
-  code: ['libs', 'app'],
+  code: ['libs', 'admin'],
   tmpl: '*'
 });
 
@@ -92,20 +92,18 @@ ss.start(app);
 
 // Simple route middleware to ensure user is authenticated.
 // Use this route middleware on any resource that needs to be protected.
-function ensureAuthenticated(req, res, next) {
-  console.dir(req.session);
-  if (req.session !== undefined) 
-    if (req.session.auth !== undefined)
-      if (req.session.auth.userId !== undefined)
-        return next(); 
+function ensureAuthenticated(req, res, next) {  
+  if (req.session.auth && req.session.auth.userId !== undefined)
+    return next();
   res.redirect('/login');
 }
 
 function isAdmin(req, res, next) {
-  if(req.session.auth.userId) {
-    next();
-  } else {
-    next(new Error("You don't have permissions to do that"));
-  }
+return next();
+/*
+  if (req.session.auth && req.session.auth.userId)
+    if (req.session.auth.isAdmin === true)
+      return next();
+  return next(new Error("You don't have permission to do that")); */
 }
 

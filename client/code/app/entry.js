@@ -1,4 +1,4 @@
-// This file gets called automatically by SocketStream and must always exist
+// in client/app/entry.js
 
 // Make 'ss' available to all modules and the browser console
 window.ss = require('socketstream');
@@ -22,6 +22,7 @@ ss.server.on('ready', function(){
     require('/login');
 
     $("#tabs").tab();
+
   });
 
 });

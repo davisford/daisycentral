@@ -17,11 +17,16 @@ exports.actions = function (req, res, ss) {
         } else if (!user) {
           return res(false, msg.message);
         } else {
-          if(req.session.auth)
+          if(req.session.auth) {
             req.session.auth.userId = user.id;
-          else
+          } else {
             req.session.auth = { userId: user.id };
-          req.user = user;
+          }
+          if (user.roles.indexOf('admin') !== -1) {
+            req.session.auth.isAdmin = true;
+          } else {
+            req.session.auth.isAdmin = false;
+          }
           req.session.save();
           return res(true);
         }
@@ -37,12 +42,12 @@ exports.actions = function (req, res, ss) {
         } else if (!user) {
           return res(false, msg.message);
         } else {
-          if (req.session.auth) 
+          if (req.session.auth) {
             req.session.auth.userId = user.id;
-          else
+          } else {
             req.session.auth = { userId: user.id };
-            req.user = user;
-            req.session.save();
+          }
+          req.session.save();
           return res(true);
         }
       });

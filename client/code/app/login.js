@@ -15,7 +15,7 @@ $('#login-submit').click(function (e) {
   } else if(false === validatePassword(password)) {
   	showError("Password must be at least 6 characters");
   } else {
-    ss.rpc('auth.login', email, password, function(success, err) {
+    ss.rpc('login.login', email, password, function(success, err) {
       console.log(err);
       if (success) {
       	window.location = '/';
@@ -41,7 +41,7 @@ $('#register-submit').click(function (e) {
   } else if (false === pass1 === pass2) {
   	showError("Passwords do not match");
   } else {
-  	ss.rpc('auth.register', email, pass1, pass2, function(success, err) {
+  	ss.rpc('login.register', email, pass1, pass2, function(success, err) {
       if (success) {
       	window.location = '/';
       } else {

@@ -1,31 +1,33 @@
+// in client/app/router.js
+
 var Router = Backbone.Router.extend({
-      routes: {
-      	"":  "home",
-      	"devices": "devices",
-        "rules": "rules",
-        "profile": "profile",
-        "help": "help"
-      },
+  routes: {
+    "":  "home",
+    "devices": "devices",
+    "rules": "rules",
+    "profile": "profile",
+    "help": "help"
+  },
 
-      home: function(e, a) {
-        $("#home").show();
-      },
+  home: function(e, a) {
+    $("#home").show();
+  },
 
-      devices: function(e, a) {
-        $("#devices").show().slideDown();
-      },
+  devices: function(e, a) {
+    $("#devices").show().slideDown();
+  },
 
-      rules: function() {
-        $("#rules").show();
-      },
+  rules: function() {
+    $("#rules").show();
+  },
 
-      profile: function() {
-        $("#profile").show();
-      },
+  profile: function() {
+    $("#profile").show();
+  },
 
-      help: function() {
-        $("#help").show();
-      }
+  help: function() {
+    $("#help").show();
+  }
 });
 
 var router = new Router();

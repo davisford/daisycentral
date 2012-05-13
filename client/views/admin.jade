@@ -3,7 +3,7 @@ html(lang="en")
   head
     != SocketStream
     meta(charset="utf-8")
-    title Daisy Central
+    title Daisy Central Admin
     meta(name="viewport", content="width=device-width,initial-scale=1.0")
     meta(name="description", content="TODO")
     meta(name="author", content="DaisyWorks, Inc.")
@@ -27,7 +27,7 @@ html(lang="en")
             span.icon-bar
           a.brand(href="#") Daisy Central
           div.nav-collapse
-            ul.nav 
+            ul.nav.top-menu 
               li.active
                 a(href="#") Home
               li
@@ -77,12 +77,30 @@ html(lang="en")
               p
                 a.btn(href="#") View details &raquo;
       div.container#devices(style="display:none")
-        h1 This is the Devices Page 1
-        h1 This is the Devices Page 2
-        h1 This is the Devices Page 3
-        h1 This is the Devices Page 4
-        h1 This is the Devices Page 5
-        h1 This is the Devices Page 6
+        table.table.table-striped.table-bordered#daisiesTable
+        p foo bar foo
+        table.table.table-striped.table-bordered#example
+          thead
+            tr
+              th Rendering engine
+              th Browser
+              th Platform
+              th Engine version
+              th CSS grade
+          tbody
+            tr.odd.gradeX
+              td Trident
+              td Internet Explorer 4.0
+              td Win 95+
+              td.center 5
+              td C
+            tr.even.gradeC
+              td Trident
+              td Internet Exploref 5.0
+              td Win 95+
+              td.center 5
+              td.center C
+
       div.row-fluid#rules(style="display:none")
         h1 This is the Rules Page
       div#profile(style="display:none")
