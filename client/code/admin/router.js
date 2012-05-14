@@ -19,13 +19,10 @@ var Router = Backbone.Router.extend({
       if (err) alert(err);
       else {
         console.dir(daisies);
-        var html = ss.tmpl['chat-message'].render({
-          message: "foo bar",
-          time: function() { return new Date(); }
-        })
-        console.log(html);
-        return $(html).appendTo('#daisies').slideDown();
+        var json = JSON.stringify(daisies[0]);
+        console.log(json);
 
+        $('#daisiesTable').dataTable().fnAddData([json]);
       }
     });
   },

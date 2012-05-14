@@ -1,9 +1,3 @@
-
-table
-  thead
-    tr: th daisies
-  tbody
-    each daisy, i in {{daisies}}
-      tr
-        td
-          daisy._id
+{{#daisies}}
+<p>{{_id}} {{did}} {{mac}}
+{{/daisies}}
