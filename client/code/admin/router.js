@@ -19,10 +19,10 @@ var Router = Backbone.Router.extend({
       if (err) alert(err);
       else {
         console.dir(daisies);
-        var json = JSON.stringify(daisies[0]);
-        console.log(json);
+        var json = JSON.stringify(daisies);
+        console.log([json]);
 
-        $('#daisiesTable').dataTable().fnAddData([json]);
+        $('#daisiesTable').dataTable().fnAddData(daisies);
       }
     });
   },
