@@ -15,6 +15,22 @@ exports.actions = function (req, res, ss) {
 					res(null, daisies);
 				}
 			});
+		},
+
+		save: function(daisy) {
+			console.log("save => ", daisy);
+			if(!daisy) { return res(false); }
+			Daisies.update({_id: daisy._id}, daisy, function (err, numAffected) {
+			  if (err) { 
+			  	console.log("could not update daisy", err); 
+			  	return res(false); 
+			  }
+			  if (numAffected !== 1) { 
+			  	console.log("we should only have updated ONE, but we modifed: "+numAffected);
+			  }
+			  console.log("update should have been successful");
+			  return res(true);
+			});
 		}
 	}
 }

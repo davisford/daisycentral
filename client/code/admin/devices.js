@@ -35,10 +35,17 @@ var Devices = function() {
         // add jEditable to table data
         // only columns with .canEdit class can be edited
         $('.canEdit', table.fnGetNodes()).editable(function (val, settings) {
-          // TODO: post back to server
-          console.log(this);
-          console.log(val);
-          console.log(settings);
+          // get the object for this row
+          var obj = table.fnGetData(table.fnGetPosition(this)[0]);
+          // we know it is the key property
+          obj.key = val;
+          console.log(obj);
+          ss.rpc('devices.save', obj, function(ok) {
+            if (ok === false) { 
+              alert("update failed"); 
+              _refresh();
+            }
+          });
           return (val);
         }, {type: 'textarea', submit: 'OK' })
       }
