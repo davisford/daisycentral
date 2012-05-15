@@ -1,5 +1,7 @@
 // in client/code/admin/router.js
 
+var devicesHandler = require('./devices.js');
+
 var Router = Backbone.Router.extend({
   routes: {
     "": "home",
@@ -10,33 +12,43 @@ var Router = Backbone.Router.extend({
   },
 
   home: function () {
-    $("#home").show();
+    $("#content").children().hide();
+    $("#home").show("fast", function() {
+      // do something when home is shown
+      console.log('home');
+    });
   },
 
   devices: function () {
-    $("#devices").show();
-    ss.rpc('devices.get', function(err, daisies) {
-      if (err) alert(err);
-      else {
-        console.dir(daisies);
-        var json = JSON.stringify(daisies);
-        console.log([json]);
-
-        $('#daisiesTable').dataTable().fnAddData(daisies);
-      }
+    $("#content").children().hide();
+    $("#devices").show("fast", function() {
+      // refresh table data
+      devicesHandler.refresh();
     });
   },
 
   rules: function () {
-    $("#rules").show();
+    $("#content").children().hide();
+    $("#rules").show("fast", function() {
+      // do something when rules is shown
+      console.log('rules');
+    });
   },
 
   profile: function () {
-    $("#profile").show();
+    $("#content").children().hide();
+    $("#profile").show("fast", function() {
+      // do something when profile is shown
+      console.log('profile');
+    });
   },
 
   help: function () {
-    $("#help").show();
+    $("#content").children().hide();
+    $("#help").show("fast", function() {
+      // do something when help is shown
+      console.log('help');
+    });
   }
 });
 
@@ -45,7 +57,7 @@ Backbone.history.start();
 
 // navigation links
 $(".top-menu li").click(function (e) {
-  $("#content").children().hide();
+  
   $(".nav li").removeClass("active");
   $(this).addClass("active");
 });

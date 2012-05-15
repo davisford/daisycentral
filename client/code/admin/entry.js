@@ -3,21 +3,21 @@
 window.ss = require('socketstream');
 
 ss.server.on('disconnect', function () {
-	console.log('Connection down :-(');
+  console.log('Connection down :-(');
 });
 
 ss.server.on('reconnect', function () {
-	console.log('Connection back up :-)');
+  console.log('Connection back up :-)');
 });
 
 ss.server.on('ready', function () {
-	jQuery(function () {
+  jQuery(function () {
 
-		// load client modules
-		require('/devices');
-		require('/router');
-		require('/datatables');
-
-		$('#tabs').tab();
-	});
+    // load client modules; order matters here
+    require('/datatables');
+    require('/router');
+    
+    // decorate bootstrap tabs
+    $('#tabs').tab();
+  });
 });
