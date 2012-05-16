@@ -1,6 +1,6 @@
 // in client/code/admin/router.js
 
-var devicesHandler = require('./devices.js');
+var devicesHandler = require('./devices');
 
 var Router = Backbone.Router.extend({
   routes: {
@@ -57,7 +57,6 @@ Backbone.history.start();
 
 // navigation links
 $(".top-menu li").click(function (e) {
-  
   $(".nav li").removeClass("active");
   $(this).addClass("active");
 });

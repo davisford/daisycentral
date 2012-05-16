@@ -17,18 +17,16 @@ exports.actions = function (req, res, ss) {
         } else if (!user) {
           return res(false, msg.message);
         } else {
-          if(req.session.auth) {
-            req.session.auth.userId = user.id;
-          } else {
-            req.session.auth = { userId: user.id };
-          }
+          req.session.auth = { userId: user.id };
           if (user.roles.indexOf('admin') !== -1) {
             req.session.auth.isAdmin = true;
           } else {
             req.session.auth.isAdmin = false;
           }
-          req.session.save();
-          return res(true);
+          req.session.save(function(err) {
+            return res(true);
+          });
+          
         }
       }); // end authenticate
     }, // end login
@@ -47,8 +45,10 @@ exports.actions = function (req, res, ss) {
           } else {
             req.session.auth = { userId: user.id };
           }
-          req.session.save();
-          return res(true);
+          req.session.save(function(err) {
+            return res(true);
+          });
+          
         }
       });
 

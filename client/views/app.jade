@@ -77,12 +77,23 @@ html(lang="en")
               p
                 a.btn(href="#") View details &raquo;
       div.container#devices(style="display:none")
-        h1 This is the Devices Page 1
-        h1 This is the Devices Page 2
-        h1 This is the Devices Page 3
-        h1 This is the Devices Page 4
-        h1 This is the Devices Page 5
-        h1 This is the Devices Page 6
+        h2 Register A New Daisy 
+        p To register a new Daisy, enter the secret key here.  You should have received the secret key when you received your Daisy.  If you don't know the secret key, contact us at  
+          a(href="mailto:support@daisyworks.com") support@daisyworks.com
+        form.well.form-inline
+          input.input#daisySecretKey(type="text", placeholder="secret", style="margin-right:1em;")
+          button.btn.btn-primary#registerDaisy(type="submit") Register
+        h2 My Daisies
+        table.table.table-striped.table-bordered#daisiesTable(style="width:100% important!")
+          thead
+            tr
+              th _id
+              th did
+              th mac
+              th key
+              th lastMod
+              th owners
+          tbody
       div.row-fluid#rules(style="display:none")
         h1 This is the Rules Page
       div#profile(style="display:none")

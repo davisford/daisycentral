@@ -1,36 +1,89 @@
-var Daisies = require('../models/daisies').getModel();
+var Daisies = require('../models/daisies').getModel()
+  , ObjectId = require('mongoose').Schema.ObjectId;
 
 exports.actions = function (req, res, ss) {
-	// you must be logged in and be an admin
-	req.use('session');
-	//req.use('seurity.authenticated');
-	//req.use('security.isAdmin');
+  // you must be logged in and be an admin
+  req.use('session');
 
-	return {
-		get: function(pageNum, pageSize) {
-			Daisies.find({}, function (err, daisies) {
-				console.log('getDevices', daisies);
-				if (err) { return res("An error returned, please try again", null); }
-				else {
-					res(null, daisies);
-				}
-			});
-		},
+  // TODO: USE THIS
+  //req.use('seurity.authenticated');
+  //req.use('security.isAdmin');
 
-		save: function(daisy) {
-			console.log("save => ", daisy);
-			if(!daisy) { return res(false); }
-			Daisies.update({_id: daisy._id}, daisy, function (err, numAffected) {
-			  if (err) { 
-			  	console.log("could not update daisy", err); 
-			  	return res(false); 
-			  }
-			  if (numAffected !== 1) { 
-			  	console.log("we should only have updated ONE, but we modifed: "+numAffected);
-			  }
-			  console.log("update should have been successful");
-			  return res(true);
-			});
-		}
-	}
+  console.log('req =>\n', req);
+  console.log('req.session =>\n', req.session);
+
+  return {
+    get: function(pageNum, pageSize) {
+      console.log('devices.get');
+      Daisies.find({}, function (err, daisies) {
+        console.log('get =>', daisies);
+        if (err) { return res("An error returned, please try again", null); }
+        else {
+          res(null, daisies);
+        }
+      });
+    },
+
+    getmine: function() {
+      var auth = req.session.auth;
+      Daisies.find( {"owners": auth.userId}, function (err, daisies) {
+        if (err) { console.log(err); return res(false, null); }
+        else {
+          return res(null, daisies);
+        }
+      });
+    },
+
+    register: function(secret) {
+      var auth = req.session.auth;
+      console.log('auth in register: ', auth);
+      console.log('devices.register secret =>' + secret);
+      Daisies.findOne({key: secret}, function (err, found) {
+        
+        // database problem
+        if (err) { console.log(err); return res(false); }
+
+        // can't find it
+        if(!found) {
+          console.log("Couldn't find daisy by secret key", secret);
+          return res(false);
+        } else {
+          // update it an save
+          found.owners.push(auth.userId);
+          found.save(function (err) {
+            if (err) { console.log(err); return res(false); }
+            else { return res(true); }
+          });
+        }
+      });
+      res(true);
+    },
+
+    save: function(daisy) {
+      console.log("save => ", daisy);
+
+      // can't pass in and save null
+      if(!daisy) { return res(false); }
+
+      // need to find daisy by id
+      Daisies.findById(daisy._id, function (err, found) {
+        // database problem
+        if (err) { console.log(err); return res(false); }
+
+        // can't find it
+        if(!found) {
+          console.log("Couldn't find daisy by id",daisy);
+          return res(false);
+        } else {
+
+          // update it and save
+          found.key = daisy.key;
+          found.save(function(err) {
+            if (err) { console.log(err); return res(false); }
+            else { return res(true); }
+          });
+        } 
+      });
+    }
+  }
 }

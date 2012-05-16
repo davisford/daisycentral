@@ -1,5 +1,7 @@
 // in client/app/router.js
 
+var devicesHandler = require('./devices');
+
 var Router = Backbone.Router.extend({
   routes: {
     "":  "home",
@@ -10,23 +12,40 @@ var Router = Backbone.Router.extend({
   },
 
   home: function(e, a) {
-    $("#home").show();
+    $("#content").children().hide();
+    $("#home").show("fast", function() {
+      // do something when home is shown
+      console.log('home');
+    });
   },
 
   devices: function(e, a) {
-    $("#devices").show().slideDown();
+    $("#content").children().hide();
+    $("#devices").show("fast", function() {
+      // refresh table data
+      devicesHandler.refresh();
+    });
   },
 
   rules: function() {
-    $("#rules").show();
+    $("#content").children().hide();
+    $("#rules").show("fast", function() {
+      console.log("rules");
+    });
   },
 
   profile: function() {
-    $("#profile").show();
+    $("#content").children().hide();
+    $("#profile").show("fast", function() {
+      console.log("profile");
+    });
   },
 
   help: function() {
-    $("#help").show();
+    $("#content").children().hide();
+    $("#help").show("fast", function() {
+      console.log("help");
+    });
   }
 });
 
@@ -35,7 +54,6 @@ Backbone.history.start();
 
 // navigtation links
 $(".top-menu li").click(function (e) {
-  $("#content").children().hide();
   $(".nav li").removeClass("active");
   $(this).addClass("active");
 });

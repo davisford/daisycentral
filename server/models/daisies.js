@@ -7,9 +7,10 @@ var mongoose = require('mongoose')
 var DaisiesSchema = new Schema({
 	did: { type: String, index: true },
 	mac: { type: String, index: true },
-	owners: { type: [ObjectId], index: true },
+	owners: [{ type: ObjectId, index: true, ref: 'User' }],
 	key: { type: String }
 });
+
 DaisiesSchema.plugin(lastmodified);
 
 var Daisies = function() {

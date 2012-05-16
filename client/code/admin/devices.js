@@ -21,6 +21,7 @@ var Devices = function() {
       { "mDataProp": "did" },
       { "mDataProp": "mac" },
       { "mDataProp": "key", "sClass": "canEdit" },
+      { "mDataProp": "lastMod" },
       { "mDataProp": "owners" }
     ]
   });

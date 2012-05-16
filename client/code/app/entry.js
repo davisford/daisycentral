@@ -17,12 +17,11 @@ ss.server.on('ready', function(){
   jQuery(function(){
     
     // Load chat demo app
-    require('/demo');
-    require('/router');
     require('/login');
+    require('datatables');
+    require('/router');
 
     $("#tabs").tab();
-
   });
 
 });
