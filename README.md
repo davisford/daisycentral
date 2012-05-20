@@ -27,9 +27,16 @@ This is the webapp that runs at http://live.daisyworks.com
 
 ### Ubuntu
 
-#### Install Node
-`HEAD 0.7.x` is unstable so you cannot use it yet.  Use git to checkout `v0.6.14-release`
+#### Install Node 
 
+##### Use Package Manager
+If you don't want to bother building it, you can get it [through aptitude](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager)
+
+##### Build From Latest Source
+`HEAD 0.7.x` is unstable so you cannot use it yet.  [Check node.js release page](https://github.com/joyent/node/tags) to 
+find out what the latest stable release is.  Checkout that version.  
+
+For example, if the latest stable is `v0.6.14-release` then do this:
 ```
 sudo apt-get install -y make git git-core g++ curl libssl-dev apache2-utils python
 git clone https://github.com/joyent/node.git && cd node
@@ -45,9 +52,14 @@ hello, world
 ```
 
 #### Install NPM
-[Read this first](http://npmjs.org/doc/folders.html)
+NPM is the package manager for node.js.  [Read this first](http://npmjs.org/doc/folders.html) so you understand
+about packages / folders, etc.  If you installed node via aptitude, then _I think_ it installs npm for you, so 
+this step would be unnecessary.  Try running `npm` from the command line to see if it is there.
 
-Install libraries that the code will `require()` locally.  Install command line binaries globally with `-g`.
+*pro-tips*
+* If a library/package is just a dependency that this project needs, (i.e. a library that the code will `require()` 
+locally then you want to install it without the `-g` option.  
+* If a package is a command line program that you want to run, then install command line binaries globally with `-g`.
 
 ```
 curl http://npmjs.org/install.sh | sh
@@ -158,4 +170,23 @@ Current version is *0.6.14* but this doesn't work on Ubuntu 11.10 https://github
 sudo npm remove nodemon -g
 sudo npm install nodemon@0.5.7 -g
 ```
+## Increase open file limit on Ubuntu
+By default the number of open files is 1024 for a user.  The live reload features scans all the files under the
+subdir and it will hit this limit and the app will crash.  To fix it, you have to increase the `nofile` limit
+in Ubuntu like this:
+
+```
+$ sudo gedit /etc/security/limits.conf
+```
+
+Now add the lines:
+
+```
+*   hard   nofile   65534
+*   soft   nofile   65534
+```
+
+Now, uncomment the line `session required pam_limits.so` in `/etc/pam.d/su` and reboot your system.
+To test it, after you reboot run `ulimit -n` and you should see 65534.
+
 
