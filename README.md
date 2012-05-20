@@ -108,6 +108,14 @@ $ sudo mkdir -p /data/db
 $ sudo chown `id -u` /data/db
 ```
 
+Now, start mongod: 
+
+```sh
+$ mongod &
+```
+
+It should start without error.
+
 ### Grab The Source 
 ```sh 
 git clone git@github.com:davisford/daisycentral.git
