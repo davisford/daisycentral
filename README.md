@@ -95,6 +95,13 @@ sudo apt-get install redis-server
 #### Install Mongo-DB
 This [http://www.mongodb.org/display/DOCS/Ubuntu+and+Debian+packages] has the instructions for Ubuntu
 
+After you install, you need to create the data directory:
+
+```
+$ sudo mkdir -p /data/db
+$ sudo chown `id -u` /data/db
+```
+
 ### Grab The Source 
 ``` 
 git clone git@github.com:davisford/daisycentral.git
@@ -155,7 +162,7 @@ The bcrypt build output should not be checked into git.
 ## MongoDB Admin
 To start the database server, run `mongod &` or `mongod -dbpath /path/to/data`.  The default path it uses is `/data/`.  You can then start the REPL in another window via `mongo`.
 
-FIXME: the database collection for users is hard-coded to `example`, so after starting the REPL, you'd type `use example`, and then you can find all users via `db.users.find()`
+The database for this app is named `daisycentral` so after you start the client do: `use daisycentral`
 
 ### Add Admin Role To Your User Account
 Example for my email:
