@@ -99,7 +99,8 @@ sudo apt-get install redis-server
 ```
 
 #### Install Mongo-DB
-This [http://www.mongodb.org/display/DOCS/Ubuntu+and+Debian+packages] has the instructions for Ubuntu
+http://www.mongodb.org/display/DOCS/Ubuntu+and+Debian+packages has the instructions for Ubuntu.  You can build from
+source or install the latest stable package from the 10Gen repo.  Latter is recommended.
 
 After you install, you need to create the data directory:
 
@@ -122,7 +123,7 @@ git clone git@github.com:davisford/daisycentral.git
 cd daisycentral && nodemon app.js
 ```
 
-Now open browser to [http://localhost:3000]
+Now open browser to http://localhost:3000
 
 ### Rebuilding Twitter Bootstrap
 This step is not strictly necessary unless you want to rebuild it.  I have already built bootstrap and copied the files needed into the project...however, if we want to tweak bootstrap with a theme or what-not, then this is how to rebuild:
@@ -153,7 +154,7 @@ Now run the app with debug flag
 nodemon --debug app.js
 ```
 
-Now, open browser to [http://0.0.0.0:8080/debug?port=5858] in *Chrome*
+Now, open browser to http://0.0.0.0:8080/debug?port=5858 in *Chrome*
 
 Port 9000 receives Daisy WiFly HTTP data.
 
@@ -199,7 +200,7 @@ db.users.update({email:"davisford@gmail.com"}, {$set: {roles: ["admin"]}})
 ```
 
 Now you have access to /admin section of the app.  To reach the admin section, first login to the main app.  After
-you have logged in go to [http://localhost:3000/admin]
+you have logged in go to http://localhost:3000/admin
 
 ## nodemon on Ubuntu
 Current version is *0.6.14* but this doesn't work on Ubuntu 11.10 https://github.com/remy/nodemon/issues/82, so drop it down:
