@@ -170,4 +170,23 @@ Current version is *0.6.14* but this doesn't work on Ubuntu 11.10 https://github
 sudo npm remove nodemon -g
 sudo npm install nodemon@0.5.7 -g
 ```
+## Increase open file limit on Ubuntu
+By default the number of open files is 1024 for a user.  The live reload features scans all the files under the
+subdir and it will hit this limit and the app will crash.  To fix it, you have to increase the `nofile` limit
+in Ubuntu like this:
+
+```
+$ sudo gedit /etc/security/limits.conf
+```
+
+Now add the lines:
+
+```
+*   hard   nofile   65534
+*   soft   nofile   65534
+```
+
+Now, uncomment the line `session required pam_limits.so` in `/etc/pam.d/su` and reboot your system.
+To test it, after you reboot run `ulimit -n` and you should see 65534.
+
 
