@@ -18,7 +18,7 @@ var Devices = function() {
   });
 
   // initialize daisies DataTable
-  var table = $('#daisiesTable').dataTable( {
+  var table = $('#myDaisiesTable').dataTable( {
     "bPaginate": true,
     "bLengthChange": true,
     "bFilter": true,
@@ -36,9 +36,19 @@ var Devices = function() {
       { "mDataProp": "did", "sClass": "canEdit" },
       { "mDataProp": "mac" },
       { "mDataProp": "key", "sClass": "canEdit", "bVisible": false },
-      { "mDataProp": "lastMod" },
+      { "mDataProp": "lastMod", "bVisible": false },
       { "mDataProp": "owners", "bVisible": false }
     ]
+  });
+
+  // select a table row
+  $('#myDaisiesTable tbody tr').live('click', function (e) {
+    if ($(this).hasClass('row_selected')) {
+      $(this).removeClass('row_selected');
+    } else {
+      table.$('tr.row_selected').removeClass('row_selected');
+      $(this).addClass('row_selected');
+    }
   });
 
   var _refresh = function() {
@@ -63,7 +73,11 @@ var Devices = function() {
   					}
   				});
   				return (val);
-  			}, {type: 'textarea', submit: 'OK' })
+  			}, {
+          type: 'textarea',
+          event: 'dblclick',
+          tooltip: 'Doubleclick to edit...', 
+          submit: 'OK' }) 
   		}
   	});
   }

@@ -26,6 +26,16 @@ var Devices = function() {
     ]
   });
 
+  // select a table row
+  $('#daisiesTable tbody tr').live('click', function (e) {
+    if ($(this).hasClass('row_selected')) {
+      $(this).removeClass('row_selected');
+    } else {
+      table.$('tr.row_selected').removeClass('row_selected');
+      $(this).addClass('row_selected');
+    }
+  });
+
   // refresh data from server
   var _refresh = function() {
     ss.rpc('devices.get', function(err, daisies) {
@@ -48,7 +58,11 @@ var Devices = function() {
             }
           });
           return (val);
-        }, {type: 'textarea', submit: 'OK' })
+        }, {
+          type: 'textarea',
+          event: 'dblclick',
+          tooltip: 'Doubleclick to edit...', 
+          submit: 'OK' })
       }
     })
   }
