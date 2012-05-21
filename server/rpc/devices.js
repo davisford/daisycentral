@@ -2,7 +2,7 @@ var Daisies = require('../models/daisies').getModel()
   , ObjectId = require('mongoose').Schema.ObjectId;
 
 exports.actions = function (req, res, ss) {
-  // you must be logged in and be an admin
+  // populate the session object
   req.use('session');
 
   // TODO: USE THIS
@@ -34,6 +34,9 @@ exports.actions = function (req, res, ss) {
       });
     },
 
+    // registering a new daisy means if they authenticate
+    // with the secret key, we add them to the list of owners
+    // for that daisy and they can use it
     register: function(secret) {
       var auth = req.session.auth;
       console.log('auth in register: ', auth);
@@ -59,6 +62,7 @@ exports.actions = function (req, res, ss) {
       res(true);
     },
 
+    // update a daisy 
     save: function(daisy) {
       console.log("save => ", daisy);
 

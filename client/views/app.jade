@@ -84,6 +84,10 @@ html(lang="en")
           input.input#daisySecretKey(type="text", placeholder="secret", style="margin-right:1em;")
           button.btn.btn-primary#registerDaisy(type="submit") Register
         h2 My Daisies
+        p 
+        | Select a daisy by clicking a row - this will load the sensor data for that Daisy. 
+        | You may edit a Daisy's name by double-clicking the name and typing a new name.
+        p
         table.table.table-striped.table-bordered#myDaisiesTable(style="width:100% important!")
           thead
             tr
@@ -94,6 +98,8 @@ html(lang="en")
               th lastMod
               th owners
           tbody
+        div.container-fluid
+          div#chart(style="height:200px; width:300px;")
       div.row-fluid#rules(style="display:none")
         h1 This is the Rules Page
       div#profile(style="display:none")
