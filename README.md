@@ -37,7 +37,7 @@ If you don't want to bother building it, you can get it [through aptitude](https
 find out what the latest stable release is.  Checkout that version.  
 
 For example, if the latest stable is `v0.6.14-release` then do this:
-```
+```sh
 sudo apt-get install -y make git git-core g++ curl libssl-dev apache2-utils python
 git clone https://github.com/joyent/node.git && cd node
 git checkout v0.6.14-release
@@ -46,7 +46,7 @@ git checkout v0.6.14-release
 
 Test it:
 
-```
+```sh
 node console.log('hello, world'); 
 hello, world
 ```
@@ -61,7 +61,7 @@ this step would be unnecessary.  Try running `npm` from the command line to see 
 locally then you want to install it without the `-g` option.  
 * If a package is a command line program that you want to run, then install command line binaries globally with `-g`.
 
-```
+```sh
 curl http://npmjs.org/install.sh | sh
 ```
 
@@ -69,53 +69,75 @@ curl http://npmjs.org/install.sh | sh
 ##### Install [nodemon](https://github.com/remy/nodemon) 
 Allows you to run node as a daemon that reloads if client or server files change
 
-```npm install nodemon -g```
+```sh
+npm install nodemon -g
+```
 
 ##### Install [ss-console](https://github.com/socketstream/ss-console) 
 Adds REPL support in Chrome devtools console; can call server-side rpc from browser console
 
-```npm install ss-console -g```
+```sh
+npm install ss-console -g
+```
 
 ##### Install [node-inspector](https://github.com/dannycoates/node-inspector) 
 Allows you to breakpoint and debug client and server-side code in Chrome devtools
 
-```npm install node-inspector -g```
+```sh
+npm install node-inspector -g
+```
 
 #### Install SocketStream
-```
+```sh
 git clone https://github.com/socketstream/socketstream.git
 cd socketstream && sudo npm link
 ```
 
 #### Install Redis
-```
+```sh
 sudo apt-get install redis-server
 ```
 
 #### Install Mongo-DB
-This [http://www.mongodb.org/display/DOCS/Ubuntu+and+Debian+packages] has the instructions for Ubuntu
+http://www.mongodb.org/display/DOCS/Ubuntu+and+Debian+packages has the instructions for Ubuntu.  You can build from
+source or install the latest stable package from the 10Gen repo.  Latter is recommended.
+
+After you install, you need to create the data directory:
+
+```sh
+$ sudo mkdir -p /data/db
+$ sudo chown `id -u` /data/db
+```
+
+Now, start mongod: 
+
+```sh
+$ mongod &
+```
+
+It should start without error.
 
 ### Grab The Source 
-``` 
+```sh 
 git clone git@github.com:davisford/daisycentral.git
 cd daisycentral && nodemon app.js
 ```
 
-Now open browser to [http://localhost:3000]
+Now open browser to http://localhost:3000
 
 ### Rebuilding Twitter Bootstrap
 This step is not strictly necessary unless you want to rebuild it.  I have already built bootstrap and copied the files needed into the project...however, if we want to tweak bootstrap with a theme or what-not, then this is how to rebuild:
 
 You need less and uglify-js to build:
-```
+```sh
 npm install less uglify-js -g
 ```
 
 *Warning* I tried installing uglify-js before socketstream and it broke it.  Make sure you install uglify-js after socketstream.
 
-```
+```sh
 git clone https://github.com/twitter/bootstrap/
-cd bootstram && make
+cd bootstrap && make
 ```
 
 Files are under `docs/assets/` -- copied them directly over to the correct foldlers in `daisycentral`
@@ -123,16 +145,16 @@ Files are under `docs/assets/` -- copied them directly over to the correct foldl
 ### Debugging with Breakpoints
 
 Start up node-inspector
-```
+```sh
 root@kafka:/home/davis/git/daisycentral# node-inspector &
 ```
 
 Now run the app with debug flag
-```
+```sh
 nodemon --debug app.js
 ```
 
-Now, open browser to [http://0.0.0.0:8080/debug?port=5858] in *Chrome*
+Now, open browser to http://0.0.0.0:8080/debug?port=5858 in *Chrome*
 
 Port 9000 receives Daisy WiFly HTTP data.
 
@@ -140,7 +162,7 @@ Port 9000 receives Daisy WiFly HTTP data.
 
 To update locally run `sudo npm update` in the project dir.  To update globally run `sudo npm update -g`.  After update, you'll probably need to rebuild socketstream so:
 
-```
+```sh
 cd socketstream
 git pull
 sudo npm update
@@ -150,23 +172,40 @@ sudo npm link
 ### Rebuild Platform Dependent Stuff
 Libraries like `bcrypt` have to be compiled natively, so do it thusly: `sudp npm rebuild bcrypt`
 
-The bcrypt build output should not be checked into git.
+The bcrypt binary build output should not be checked into git.  It is platform specific.
 
 ## MongoDB Admin
 To start the database server, run `mongod &` or `mongod -dbpath /path/to/data`.  The default path it uses is `/data/`.  You can then start the REPL in another window via `mongo`.
 
-FIXME: the database collection for users is hard-coded to `example`, so after starting the REPL, you'd type `use example`, and then you can find all users via `db.users.find()`
+The database for this app is named `daisycentral` so after you start the client by running `mongo` do: `use daisycentral`. Example:
+
+```sh
+davis@pluto:/srv/www/foobar.daisyworks.com$ mongo
+MongoDB shell version: 1.2.2
+url: test
+connecting to: test
+Sun May 20 13:18:19 connection accepted from 127.0.0.1:50232 #1
+type "exit" to exit
+type "help" for help
+> use daisycentral          
+```
 
 ### Add Admin Role To Your User Account
-Example for my email:
-`db.users.update({email:"davisford@gmail.com"}, {$set: {roles: ["admin"]}})`
+After you register on the webapp, you can add yourself to the admin users role so you can access the admin features.  
+I explicitly only allow this by manipulating the database directly to avoid security holes.
 
-Now you have access to /admin section of the app
+Example for my email:
+```javascript
+db.users.update({email:"davisford@gmail.com"}, {$set: {roles: ["admin"]}})
+```
+
+Now you have access to /admin section of the app.  To reach the admin section, first login to the main app.  After
+you have logged in go to http://localhost:3000/admin
 
 ## nodemon on Ubuntu
 Current version is *0.6.14* but this doesn't work on Ubuntu 11.10 https://github.com/remy/nodemon/issues/82, so drop it down:
 
-```
+```sh
 sudo npm remove nodemon -g
 sudo npm install nodemon@0.5.7 -g
 ```
@@ -175,13 +214,13 @@ By default the number of open files is 1024 for a user.  The live reload feature
 subdir and it will hit this limit and the app will crash.  To fix it, you have to increase the `nofile` limit
 in Ubuntu like this:
 
-```
+```sh
 $ sudo gedit /etc/security/limits.conf
 ```
 
 Now add the lines:
 
-```
+```sh
 *   hard   nofile   65534
 *   soft   nofile   65534
 ```
