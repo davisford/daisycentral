@@ -58,8 +58,6 @@ html(lang="en")
               li
                 a(href="#") Click Me 
         div.span9
-          div#user
-            //Logged in with `user.id` #{user.id} - aka `everyauth.user.id` #{everyauth.user.id}
           div.hero-unit
             h1 Hello, world!
             p This is a template for blah blah blah blah
@@ -76,30 +74,47 @@ html(lang="en")
               p onec id elit non mi <abbr title="porta gravida">porta gravida</abbr> at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
               p
                 a.btn(href="#") View details &raquo;
-      div.container#devices(style="display:none")
-        h2 Register A New Daisy 
-        p To register a new Daisy, enter the secret key here.  You should have received the secret key when you received your Daisy.  If you don't know the secret key, contact us at  
-          a(href="mailto:support@daisyworks.com") support@daisyworks.com
-        form.well.form-inline
-          input.input#daisySecretKey(type="text", placeholder="secret", style="margin-right:1em;")
-          button.btn.btn-primary#registerDaisy(type="submit") Register
-        h2 My Daisies
-        p 
-        | Select a daisy by clicking a row - this will load the sensor data for that Daisy. 
-        | You may edit a Daisy's name by double-clicking the name and typing a new name.
-        p
-        table.table.table-striped.table-bordered#myDaisiesTable(style="width:100% important!")
-          thead
-            tr
-              th _id
-              th Name
-              th MAC
-              th key
-              th lastMod
-              th owners
-          tbody
-        div.container-fluid
-          div.span8#chart(style="height:300px;")
+      div.container-fluid#devices(style="display:none")
+        div.row-fluid
+          div.span2
+            div.well.sidebar-nav
+              ul.nav.nav-list
+                li.nav-header Devices
+                li.active
+                  a(href="#daisyList") Daisies
+                li
+                  a(href="#registerDaisy") Register a Daisy
+          div.span10#devicesContent
+            div#registerDaisy(style="display:none")
+              h2 Register A New Daisy 
+              p 
+              | To register a new Daisy, enter the secret key here.  
+              | You should have received the secret key when you 
+              | received your Daisy.  If you don't know the secret key, 
+              | contact us at  
+              a(href="mailto:support@daisyworks.com") support@daisyworks.com
+              form.well.form-inline
+                input.input#daisySecretKey(type="text", placeholder="secret key", style="margin-right:1em;")
+                button.btn.btn-primary#registerDaisy(type="submit") Register
+            div.container-fluid#daisyList
+              h2 My Daisies
+              p 
+              | Select a daisy by clicking a row - this will load the sensor data for that Daisy. 
+              | You may edit a Daisy's name by double-clicking the name and typing a new name.
+              p
+              table.table.table-striped.table-bordered#myDaisiesTable(style="width:100% important!")
+                thead
+                  tr
+                    th _id
+                    th Name
+                    th MAC
+                    th key
+                    th lastMod
+                    th owners
+                tbody
+              h2 Real-Time Data 
+              p The chart shows the most recent data for the Daisy.
+              div.span8#chart(style="height:300px;")
       div.row-fluid#rules(style="display:none")
         h1 This is the Rules Page
       div#profile(style="display:none")

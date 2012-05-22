@@ -8,10 +8,12 @@ var Router = Backbone.Router.extend({
     "devices": "devices",
     "rules": "rules",
     "profile": "profile",
-    "help": "help"
+    "help": "help",
+    "daisyList": "daisyList",
+    "registerDaisy": "registerDaisy"
   },
 
-  home: function(e, a) {
+  home: function() {
     $("#content").children().hide();
     $("#home").show("fast", function() {
       // do something when home is shown
@@ -19,7 +21,7 @@ var Router = Backbone.Router.extend({
     });
   },
 
-  devices: function(e, a) {
+  devices: function() {
     $("#content").children().hide();
     $("#devices").show("fast", function() {
       // refresh table data
@@ -46,6 +48,20 @@ var Router = Backbone.Router.extend({
     $("#help").show("fast", function() {
       console.log("help");
     });
+  },
+
+  daisyList: function() {
+    $("#devicesContent").children().hide();
+    $("#daisyList").show("fast", function() {
+      console.log("daisyList");
+    });
+  },
+
+  registerDaisy: function() {
+    $("#devicesContent").children().hide();
+    $("#registerDaisy").show("fast", function() {
+      console.log("registerDaisy");
+    });
   }
 });
 
@@ -54,6 +70,11 @@ Backbone.history.start();
 
 // navigtation links
 $(".top-menu li").click(function (e) {
-  $(".nav li").removeClass("active");
+  $(".top-menu li").removeClass("active");
   $(this).addClass("active");
 });
+
+$(".sidebar-nav li").click(function (e) {
+  $(".sidebar-nav li").removeClass("active");
+  $(this).addClass("active");
+})
