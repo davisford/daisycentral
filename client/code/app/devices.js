@@ -169,7 +169,7 @@ var Devices = function() {
             color: info.color,
             label: info.name,
             data: _.zip(timestamps, vals),
-            //yaxis: info.yaxis,
+            yaxis: info.yaxis,
             lines: { show: true, steps: true }
           });
         } else {
@@ -177,7 +177,7 @@ var Devices = function() {
             color: info.color,
             label: info.name,
             data: _.zip(timestamps, vals),
-            //yaxis: info.yaxis
+            yaxis: info.yaxis
           });
         }
       }
@@ -188,7 +188,8 @@ var Devices = function() {
   DC.v.Sensors = Backbone.View.extend({
 
     events: {
-      'plothover #chart': 'plotHover'
+      'plothover #chart': 'plotHover',
+      'change .sensor-cb': 'updateChart'
     },
 
     initialize: function (options) {
@@ -303,7 +304,7 @@ var Devices = function() {
           bottom = Math.max(Math.round(pos.top) + $(this).outerHeight(), bottom);
         });
         box = {left: left, top: top, width: 50, height: bottom - top};
-        color = DW.Models.SensorInfo[axis.options.sensor].color;
+        color = DC.m.SensorInfo[axis.options.sensor].color;
         // fixme: first time through box is not right size; resize browser or check/uncheck and it fixes itself
         $('<div class="axisTarget" style="position:absolute;left:' +
            box.left + 'px;top:' +
@@ -322,29 +323,11 @@ var Devices = function() {
     }, // end updateAxes
 
     updateChart: function() {
-      var plot, data = this.collection.flotData(["AD0", "AD1", "AD2", "AD3", "AD4", "AD5", "AD6", "AD7"]);
-      var width = $('#chart').parent().width();
-
-      $('#chart').width(width - 50);
-
-      var sin = [], cos = [];
-      for (var i = 0; i < 14; i += 0.5) {
-          sin.push([i, Math.sin(i)]);
-          cos.push([i, Math.cos(i)]);
-      }
-
-      var stuff = [{
-        data:[
-          [1336697954000, 2240],
-          [1336698434000, 2200]], 
-          label:'RX-I',
-          yaxis: 1
-        
-      }];
-
-      console.log(data);
-      console.log(stuff);
-      //$("#chart").width($(document).width() - 100);
+      var arr = _.pluck($('#sensorButtons :checked'), 'id');
+      console.log(arr);
+      var plot, data = this.collection.flotData(arr);
+      
+      $("#chart").width($('#chart').parent().width() - 25);
       plot = $.plot($("#chart"), data, this.chartOptions);
       this.updateAxes(plot);
     }

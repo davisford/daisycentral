@@ -87,13 +87,14 @@ html(lang="en")
           div.span10#devicesContent
             div#registerDaisy(style="display:none")
               h2 Register A New Daisy 
-              p 
-              | To register a new Daisy, enter the secret key here.  
-              | You should have received the secret key when you 
-              | received your Daisy.  If you don't know the secret key, 
-              | contact us at  
-              a(href="mailto:support@daisyworks.com") support@daisyworks.com
               form.well.form-inline
+                p 
+                | To register a new Daisy, enter the secret key here.  
+                | You should have received the secret key when you 
+                | received your Daisy.  If you don't know the secret key, 
+                | contact us at  
+                a(href="mailto:support@daisyworks.com") support@daisyworks.com
+                hr
                 input.input#daisySecretKey(type="text", placeholder="secret key", style="margin-right:1em;")
                 button.btn.btn-primary#registerDaisy(type="submit") Register
             div.container-fluid#daisyList
@@ -112,7 +113,72 @@ html(lang="en")
                     th lastMod
                     th owners
                 tbody
+              hr
               h2 Real-Time Data 
+              table.table.table-striped.table-condensed#sensorButtons
+                thead
+                  tr
+                    th Sensor
+                    th Enabled
+                    th Hi Value
+                    th Lo Value
+                tbody
+                  tr
+                    td 
+                      img.pull-left(src="images/switch_120v.png")
+                      p Power
+                    td
+                      input#AD1.btn.sensor-cb(type="checkbox", name="cb-power", checked="yes") 
+                    td Off
+                    td On
+                  tr
+                    td
+                      img.pull-left(src="images/draw_convolve.png")
+                      p Leak Detection
+                    td 
+                      input#AD2.btn.sensor-cb(type="checkbox", name="cb-leak")
+                    td Detected
+                    td Not Detected
+                  tr
+                    td
+                      img.pull-left(src="images/magnet.png")
+                      p Magnetic Switch
+                    td
+                      input#AD3.btn.sensor-cb(type="checkbox", name="cb-magnet")
+                    td Magnet Open
+                    td Magnet Closed
+                  tr 
+                    td
+                      img.pull-left(src="images/fog.png")
+                      p Humidity
+                    td
+                      input#AD4.btn.sensor-cb(type="checkbox", name="cb-humidity")
+                    td Lo Humidity
+                    td Hi Humidity
+                  tr
+                    td
+                      img.pull-left(src="images/temperature_3.png")
+                      p Temperature
+                    td
+                      input#AD5.btn.sensor-cb(type="checkbox", name="cb-temperature")
+                    td Hi Temperature
+                    td Lo Temperature
+                  tr
+                    td
+                      img.pull-left(src="images/sun_rain.png")
+                      p Moisture
+                    td
+                      input#AD6.btn.sensor-cb(type="checkbox", name="cb-moisture")
+                    td Moist
+                    td Dry
+                  tr 
+                    td 
+                      img.pull-left(src="images/battery.png")
+                      p Battery
+                    td
+                      input#AD7.btn.sensor-cb(type="checkbox", name="cb-battery")
+                    td Lo Battery
+                    td Hi Battery 
               p The chart shows the most recent data for the Daisy.
               div.span8#chart(style="height:300px;")
       div.row-fluid#rules(style="display:none")
