@@ -59,8 +59,8 @@ var Devices = function() {
           console.log('fetched '+data.length+' sensors!');
           _.each(data, function(datum) {
             sensors.add(new DC.m.Sensor(datum));
-            sensorsView.render();
           });
+          sensorsView.render();
         }
       });
     }
@@ -141,12 +141,14 @@ var Devices = function() {
 
     // convert raw data to format flot expects
     flotData: function (arr) {
-      var data = [], i, j, info, vals, boolSensor, timestamps = _.map(this.pluck('time'), function (num) {
-        // convert GMT time to local timestamp
-        var localNow = new Date().getTimezoneOffset(),
-          min = num / 1000 / 60;
-        return (min - localNow) * 1000 * 60;
-      });
+      var data = [], i, j, info,
+          vals, boolSensor, 
+          timestamps = _.map(this.pluck('timestamp'), function (num) {
+            // convert GMT time to local timestamp
+            var localNow = new Date().getTimezoneOffset(),
+            min = num / 1000 / 60;
+            return (min - localNow) * 1000 * 60;
+          });
 
       for (i = 0; i < arr.length; i += 1) {
         info = DC.m.SensorInfo[arr[i]];
@@ -167,7 +169,7 @@ var Devices = function() {
             color: info.color,
             label: info.name,
             data: _.zip(timestamps, vals),
-            yaxis: info.yaxis,
+            //yaxis: info.yaxis,
             lines: { show: true, steps: true }
           });
         } else {
@@ -175,7 +177,7 @@ var Devices = function() {
             color: info.color,
             label: info.name,
             data: _.zip(timestamps, vals),
-            yaxis: info.yaxis
+            //yaxis: info.yaxis
           });
         }
       }
@@ -185,8 +187,12 @@ var Devices = function() {
 
   DC.v.Sensors = Backbone.View.extend({
 
+    events: {
+      'plothover #chart': 'plotHover'
+    },
+
     initialize: function (options) {
-      _.bindAll(this, 'render', 'updateChart');
+      _.bindAll(this, 'render', 'updateChart', 'plotHover', 'showTooltip');
     },
 
     render: function () {
@@ -239,16 +245,116 @@ var Devices = function() {
       ]
     },
 
+    previousPoint: undefined,
+    plotHover: function (event, pos, item) {
+      if (item) {
+        if (this.previousPoint !== item.dataIndex) {
+          this.previousPoint = item.dataIndex;
+          $("#tooltip").remove();
+          var date = new Date(item.datapoint[0]),
+            y = item.datapoint[1].toFixed(2);
+          this.showTooltip(item.pageX, item.pageY, item.series.label + " at " +
+            date.getHours() + ":" +
+            date.getMinutes() + ":" +
+            date.getSeconds() + ":" +
+            date.getMilliseconds() +
+            " = " + y);
+        }
+      } else {
+        $("#tooltip").remove();
+        this.previousPoint = null;
+      }
+    },
+
+    showTooltip: function (x, y, contents) {
+      $("<div id='tooltip'>" + contents + "</div>").css({
+        position: 'absolute',
+        'font-family': 'Helvetica,Arial,sans-serif',
+        'font-size': '0.75em',
+        display: 'none',
+        top: y + 5,
+        left: x + 5,
+        border: '1px solid #fdd',
+        padding: '2px',
+        'background-color': '#fee',
+        opacity: 0.80
+      }).appendTo("body").fadeIn(200);
+    },
+
+    updateAxes: function (plot) {
+      $.each(plot.getAxes(), function (i, axis) {
+        if (!axis.show || axis.direction === "x" || axis.options.sensor === undefined || axis.options.sensor === "shared") {
+          return;
+        }
+
+        var left = axis.box.left,
+          top = axis.box.top,
+          right = left + axis.box.width,
+          bottom = top + axis.box.height,
+          cls = axis.direction + axis.n + 'Axis',
+          box,
+          color;
+
+        plot.getPlaceholder().find('.' + cls + ' .tickLabel').each(function () {
+          var pos = $(this).position();
+          left = Math.min(pos.left, left);
+          top = Math.min(pos.top, top);
+          right = Math.max(Math.round(pos.left) + $(this).outerWidth(), right);
+          bottom = Math.max(Math.round(pos.top) + $(this).outerHeight(), bottom);
+        });
+        box = {left: left, top: top, width: 50, height: bottom - top};
+        color = DW.Models.SensorInfo[axis.options.sensor].color;
+        // fixme: first time through box is not right size; resize browser or check/uncheck and it fixes itself
+        $('<div class="axisTarget" style="position:absolute;left:' +
+           box.left + 'px;top:' +
+           box.top + 'px;width:' +
+           box.width + 'px;height:' +
+           box.height + 'px"></div>')
+          .data('axis.direction', axis.direction)
+          .data('axis.n', axis.n)
+          .css({ backgroundColor: color, opacity: 0, cursor: "pointer" })
+          .appendTo(plot.getPlaceholder())
+          .hover(
+            function () { $(this).css({ opacity: 0.60 }); },
+            function () { $(this).css({ opacity: 0 }); }
+          );
+      }); // end .each function param
+    }, // end updateAxes
+
     updateChart: function() {
-      var plot, data = this.collection.flotData(["AD0", "AD1"]);
-      //$('#chart').width($(document).width() - 100);
-      plot = $.plot($('#chart'), data, this.chartOptions);
+      var plot, data = this.collection.flotData(["AD0", "AD1", "AD2", "AD3", "AD4", "AD5", "AD6", "AD7"]);
+      var width = $('#chart').parent().width();
+
+      $('#chart').width(width - 50);
+
+      var sin = [], cos = [];
+      for (var i = 0; i < 14; i += 0.5) {
+          sin.push([i, Math.sin(i)]);
+          cos.push([i, Math.cos(i)]);
+      }
+
+      var stuff = [{
+        data:[
+          [1336697954000, 2240],
+          [1336698434000, 2200]], 
+          label:'RX-I',
+          yaxis: 1
+        
+      }];
+
+      console.log(data);
+      console.log(stuff);
+      //$("#chart").width($(document).width() - 100);
+      plot = $.plot($("#chart"), data, this.chartOptions);
+      this.updateAxes(plot);
     }
 
   });
 
   var sensors = new DC.c.Sensors();
   var sensorsView = new DC.v.Sensors({collection: sensors});
+
+  $(window).resize(_.throttle(sensorsView.updateChart, 100));
 
   // functions we export
   return {
