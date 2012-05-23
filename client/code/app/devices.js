@@ -46,18 +46,26 @@ var Devices = function() {
   $('#myDaisiesTable tbody tr').live('click', function (e) {
     if ($(this).hasClass('row_selected')) {
       $(this).removeClass('row_selected');
+      sensors.reset();
+      sensorsView.render();
+      return;
     } else {
       table.$('tr.row_selected').removeClass('row_selected');
       $(this).addClass('row_selected');
     }
+    // find the td with the mac address
     var td = $(this).find('td:last')[0];
     if(td) {
+      // get the mac address text
       var mac = $(td).text();
+      // rpc call to get sensors for that mac address
       ss.rpc('sensors.get', mac, function(err, data) {
         if(err) { alert("failed to get sensor data "+err); return; }
         else {
-          console.log('fetched '+data.length+' sensors!');
+          console.log('fetched '+data.length+' sensors');
+          sensors.reset();
           _.each(data, function(datum) {
+            console.log(datum.localtime);
             sensors.add(new DC.m.Sensor(datum));
           });
           sensorsView.render();
@@ -68,7 +76,6 @@ var Devices = function() {
 
   // refresh function
   var _refresh = function() {
-    console.log("I AM REFRESHING DAISIES NOW");
     ss.rpc('devices.getmine', function(err, daisies) {
       if (err) alert(err);
       else {
@@ -136,7 +143,7 @@ var Devices = function() {
 
     // sort by time
     comparator: function (sensor) {
-      return sensor.get('time');
+      return sensor.get('timestamp');
     },
 
     // convert raw data to format flot expects
@@ -191,6 +198,8 @@ var Devices = function() {
       'plothover #chart': 'plotHover',
       'change .sensor-cb': 'updateChart'
     },
+
+    el: $('#devices'),
 
     initialize: function (options) {
       _.bindAll(this, 'render', 'updateChart', 'plotHover', 'showTooltip');
@@ -335,7 +344,7 @@ var Devices = function() {
   });
 
   var sensors = new DC.c.Sensors();
-  var sensorsView = new DC.v.Sensors({collection: sensors});
+  var sensorsView = new DC.v.Sensors({collection: sensors, el: $('#devices')});
 
   $(window).resize(_.throttle(sensorsView.updateChart, 100));
 

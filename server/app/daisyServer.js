@@ -107,9 +107,6 @@ function onMessage(req, res) {
   });
 
   /* TODO
-     look up mac in database
-       if not exists: create entry and generate random token
-     store data record in database
      if there are subscribers on channel publish
   */
 
