@@ -2,6 +2,18 @@
 
 var Devices = function() {
 
+  ss.event.on('sensorData', function(data, channelName) {
+    console.log('Message received on the '+channelName+' channel', data);
+    sensors.add(new DC.m.Sensor(data));
+    sensorsView.render();
+ /*   if (_.any(sensors, function(sensor) {
+      return data.mac === sensor.mac;
+    })) {
+      sensors.add(new DC.m.Sensor(datum));
+      sensorView.render();
+    } */
+  });
+
   // register a new daisy with secret key
   $('#registerDaisy').click(function(e) {
     e.preventDefault();
@@ -65,7 +77,6 @@ var Devices = function() {
           console.log('fetched '+data.length+' sensors');
           sensors.reset();
           _.each(data, function(datum) {
-            console.log(datum.localtime);
             sensors.add(new DC.m.Sensor(datum));
           });
           sensorsView.render();
@@ -76,10 +87,11 @@ var Devices = function() {
 
   // refresh function
   var _refresh = function() {
-    ss.rpc('devices.getmine', function(err, daisies) {
+    ss.rpc('devices.get', function(err, daisies) {
       if (err) alert(err);
       else {
         table.fnClearTable();
+        console.log(daisies);
         table.fnAddData(daisies);
         // add jEditable to table data
         // only columns with the .canEdit class can be edited
@@ -96,11 +108,12 @@ var Devices = function() {
             }
           });
           return (val);
-        }, {
-          type: 'textarea',
-          event: 'dblclick',
-          tooltip: 'Doubleclick to edit...', 
-          submit: 'OK' }) 
+          }, {
+            type: 'textarea',
+            event: 'dblclick',
+            tooltip: 'Doubleclick to edit...', 
+            submit: 'OK' 
+          }); // end .editable
       }
     });
   }
@@ -148,6 +161,7 @@ var Devices = function() {
 
     // convert raw data to format flot expects
     flotData: function (arr) {
+      console.log('array length: '+arr.length);
       var data = [], i, j, info,
           vals, boolSensor, 
           timestamps = _.map(this.pluck('timestamp'), function (num) {

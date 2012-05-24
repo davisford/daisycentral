@@ -5,7 +5,8 @@ var express = require('express')
   , conf = require('./server/app/conf')
   , deviceServer = require('./server/app/daisyServer.js').init(ss)
   , mongoose = require('mongoose')
-  , mongooseAuth = require('mongoose-auth');
+  , mongooseAuth = require('mongoose-auth')
+  , security = require('./server/middleware/security');
 
 var UserModel = require('./server/models/user').User;
 
@@ -62,48 +63,25 @@ var app = express.createServer(
 mongooseAuth.helpExpress(app);
 
 /* _________________ ROUTES _________________ */
-app.get('/', ensureAuthenticated, function (req, res) {
-  console.log('/ req.user => ', req.user);
-  console.log('req.session =>', req.session);
+app.get('/', security.authenticated, function (req, res) {
   res.serveClient('main');
 });
 
-app.get('/login', function(req, res) {
+app.get('/login', security.validCookie, function(req, res) {
   res.serveClient('login');
 });
 
 app.get('/logout', function (req, res) {
-  console.log('/logout')
   req.session.userId = undefined;
   req.session.destroy();
   req.logout();
-  console.dir(req.session);
   res.redirect('/login');
 });
 
-app.get('/admin', isAdmin, function(req, res, next) {
-  console.log("/admin");
+app.get('/admin', security.isAdmin, function(req, res, next) {
   res.serveClient("admin");
 });
 
 // start socketstream webapp
 app.listen(conf.webserver.port);
 ss.start(app);
-
-// Simple route middleware to ensure user is authenticated.
-// Use this route middleware on any resource that needs to be protected.
-function ensureAuthenticated(req, res, next) {  
-  if (req.session.auth && req.session.auth.userId !== undefined)
-    return next();
-  res.redirect('/login');
-}
-
-function isAdmin(req, res, next) {
-return next();
-/*
-  if (req.session.auth && req.session.auth.userId)
-    if (req.session.auth.isAdmin === true)
-      return next();
-  return next(new Error("You don't have permission to do that")); */
-}
-

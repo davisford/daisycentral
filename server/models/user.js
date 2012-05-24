@@ -146,7 +146,7 @@ UserSchema.plugin(mongooseAuth, {
     , findOrCreateUser: function (session, accessTok, accessTokSecret, twitterUser) {
         var promise = this.Promise()
           , User = this.User()();
-        User.findById(session.auth.userId, function (err, user) {
+        User.findById(session.userId, function (err, user) {
           if (err) return promise.fail(err);
           if (!user) {
             // twitter metadata doesn't have email; so no other way to link up
@@ -176,7 +176,7 @@ UserSchema.plugin(mongooseAuth, {
     , findOrCreateUser: function (session, accessTok, accessTokExtra, googleUser) {
         var promise = this.Promise()
         //, User = this.User()();
-        User.findById(session.auth.userId, function (err, user) {
+        User.findById(session.userId, function (err, user) {
           if (err) return promise.fail(err);
           if (!user) {
             User.where('email', googleUser.email).findOne( function (err, user) {

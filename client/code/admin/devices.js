@@ -38,7 +38,7 @@ var Devices = function() {
 
   // refresh data from server
   var _refresh = function() {
-    ss.rpc('devices.get', function(err, daisies) {
+    ss.rpc('admin.devices.get', function(err, daisies) {
       if (err) alert(err);
       else {
         table.fnClearTable();
@@ -51,7 +51,7 @@ var Devices = function() {
           // we know it is the key property
           obj.key = val;
           console.log(obj);
-          ss.rpc('devices.save', obj, function(ok) {
+          ss.rpc('admin.devices.update', obj, function(ok) {
             if (ok === false) { 
               alert("update failed"); 
               _refresh();

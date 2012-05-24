@@ -1,6 +1,6 @@
 # Stylus (CSS) wrapper for SocketStream 0.3
 
-Allows you to use Stylus files (.styl) in your SocketStream project.
+Allows you to use [Stylus](http://learnboost.github.com/stylus) files (.styl) in your SocketStream project.
 
 
 ### Instructions

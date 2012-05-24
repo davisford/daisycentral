@@ -85,19 +85,6 @@ function onMessage(req, res) {
     data["AD"+i] = parseInt(sensors.substring(i * 4, i * 4 + 4), 16);
   }
 
-  // register the device if not found
-  Daisies.findOne({mac: data.mac}, function (err, doc) {
-    if (err) { return console.log (err); }
-    if (doc) { return; }
-    else {
-      var daisy = new Daisies({did: data.did, mac: data.mac});
-      daisy.save(function (err, doc) {
-        if (err) { console.log(err); }
-        else { console.log("new daisy saved ", doc); }
-      });
-    }
-  })
-
   // save the sensor data
   var SensorDataModel = SensorData.getModel(SensorData.getColName(data.mac));
   var sensors = new SensorDataModel(data);
@@ -106,12 +93,25 @@ function onMessage(req, res) {
     else console.log("New sensor data saved; received at:"+doc.localdate);
   });
 
-  /* TODO
-     if there are subscribers on channel publish
-  */
-
-  // broadcast on flash channel - FIXME
-  module.ss.api.publish.all('flash', sensors.toJSON());
+  // register the device if not found
+  Daisies.findOne({mac: data.mac}, function (err, daisy) {
+    if (err) { return console.log (err); }
+    if (daisy) { 
+      console.log('daisy owners: ', daisy);
+      daisy.owners.forEach(function (userId, idx, arr) {
+        console.log('publishing sensor data to user: '+userId);
+        module.ss.api.publish.user(userId, 'sensorData', sensors);
+      });
+    }
+    else {
+      daisy = new Daisies({did: data.did, mac: data.mac});
+      daisy.save(function (err, doc) {
+        if (err) { console.log(err); }
+        else { console.log("new daisy saved ", doc); }
+      });
+    }
+  });
+  
   res.writeHead(200, {"Content-Type": "text/plain"});
   res.end();
 }

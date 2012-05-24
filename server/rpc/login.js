@@ -17,14 +17,15 @@ exports.actions = function (req, res, ss) {
         } else if (!user) {
           return res(false, msg.message);
         } else {
-          req.session.auth = { userId: user.id };
+          req.session.userId = user.id;
           if (user.roles.indexOf('admin') !== -1) {
-            req.session.auth.isAdmin = true;
+            req.session.isAdmin = true;
           } else {
-            req.session.auth.isAdmin = false;
+            req.session.isAdmin = false;
           }
           req.session.save(function(err) {
-            return res(true);
+            if (err) return res(false);
+            else return res(true);
           });
           
         }
@@ -40,15 +41,11 @@ exports.actions = function (req, res, ss) {
         } else if (!user) {
           return res(false, msg.message);
         } else {
-          if (req.session.auth) {
-            req.session.auth.userId = user.id;
-          } else {
-            req.session.auth = { userId: user.id };
-          }
+          req.session.userId = user.id;
           req.session.save(function(err) {
-            return res(true);
+            if (err) return res(false);
+            else return res(true);
           });
-          
         }
       });
 
