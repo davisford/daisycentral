@@ -2,16 +2,19 @@
 
 var Devices = function() {
 
+  // handler for pub/sub coming from server
+  // on user channel; any devices we claim 
+  // ownership to that are live, the server will
+  // relay live messages to us here
   ss.event.on('sensorData', function(data, channelName) {
-    console.log('Message received on the '+channelName+' channel', data);
-    sensors.add(new DC.m.Sensor(data));
-    sensorsView.render();
- /*   if (_.any(sensors, function(sensor) {
-      return data.mac === sensor.mac;
-    })) {
-      sensors.add(new DC.m.Sensor(datum));
-      sensorView.render();
-    } */
+    // if we received data with mac for the daisy currently selected, we
+    // add it to the collection and refresh the chart
+    if ( sensors.find(function(s) {
+      return s.get('mac') === data.mac;
+    }) ) {
+      sensors.add(new DC.m.Sensor(data));
+      sensorsView.render();
+    }
   });
 
   // register a new daisy with secret key
@@ -87,12 +90,12 @@ var Devices = function() {
 
   // refresh function
   var _refresh = function() {
-    ss.rpc('devices.get', function(err, daisies) {
+    ss.rpc('devices.get', function(err, devices) {
       if (err) alert(err);
       else {
+        // clear the table and add new data
         table.fnClearTable();
-        console.log(daisies);
-        table.fnAddData(daisies);
+        table.fnAddData(devices);
         // add jEditable to table data
         // only columns with the .canEdit class can be edited
         $('.canEdit', table.fnGetNodes()).editable(function (val, settings) {
@@ -113,8 +116,8 @@ var Devices = function() {
             event: 'dblclick',
             tooltip: 'Doubleclick to edit...', 
             submit: 'OK' 
-          }); // end .editable
-      }
+          }); // end .editable 
+      } 
     });
   }
 
@@ -154,14 +157,15 @@ var Devices = function() {
   DC.c.Sensors = Backbone.Collection.extend({
     model: DC.m.Sensor,
 
-    // sort by time
+    // sort models by timestamp
     comparator: function (sensor) {
       return sensor.get('timestamp');
     },
 
     // convert raw data to format flot expects
+    // @param array of sensor names e.g. ['AD1', 'AD2']
+    // returns object with array of coordinates by timestamp
     flotData: function (arr) {
-      console.log('array length: '+arr.length);
       var data = [], i, j, info,
           vals, boolSensor, 
           timestamps = _.map(this.pluck('timestamp'), function (num) {
@@ -224,13 +228,32 @@ var Devices = function() {
       return this;
     },
 
+    weekendAreas: function(axes) {
+      var markings = [];
+      var d = new Date(axes.xaxis.min);
+      // go to the first Saturday
+      d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 1) % 7))
+      d.setUTCSeconds(0);
+      d.setUTCMinutes(0);
+      d.setUTCHours(0);
+      var i = d.getTime();
+      do {
+          // when we don't set yaxis, the rectangle automatically
+          // extends to infinity upwards and downwards
+          markings.push({ xaxis: { from: i, to: i + 2 * 24 * 60 * 60 * 1000 } });
+          i += 7 * 24 * 60 * 60 * 1000;
+      } while (i < axes.xaxis.max);
+
+      return markings;
+    },
+
     chartOptions: {
       legend: {
         show: true,
         margin: 10,
         backgroundOpacity: 0.5
       },
-      grid: { hoverable: true, clickable: true },
+      grid: { hoverable: true, clickable: true, markings: this.weekendAreas },
       points: {
         show: true,
         radius: 3
@@ -242,6 +265,7 @@ var Devices = function() {
         mode: 'time',
         twelveHourClock: true
       },
+      selection: { mode: 'x' },
       yaxes: [
         { labelWidth: 40,
           position: "right",
@@ -278,11 +302,7 @@ var Devices = function() {
           var date = new Date(item.datapoint[0]),
             y = item.datapoint[1].toFixed(2);
           this.showTooltip(item.pageX, item.pageY, item.series.label + " at " +
-            date.getHours() + ":" +
-            date.getMinutes() + ":" +
-            date.getSeconds() + ":" +
-            date.getMilliseconds() +
-            " = " + y);
+            date.toLocaleString() + " = " + y);
         }
       } else {
         $("#tooltip").remove();
@@ -294,7 +314,7 @@ var Devices = function() {
       $("<div id='tooltip'>" + contents + "</div>").css({
         position: 'absolute',
         'font-family': 'Helvetica,Arial,sans-serif',
-        'font-size': '0.75em',
+        'font-size': '1.0em',
         display: 'none',
         top: y + 5,
         left: x + 5,
@@ -346,14 +366,52 @@ var Devices = function() {
     }, // end updateAxes
 
     updateChart: function() {
+      // figure out which sensors are checked
       var arr = _.pluck($('#sensorButtons :checked'), 'id');
-      console.log(arr);
+      // get the raw flot data
       var plot, data = this.collection.flotData(arr);
-      
+      console.log('updateChart => ', data);
+      // resize #chart accordingly
       $("#chart").width($('#chart').parent().width() - 25);
+      // plot it
       plot = $.plot($("#chart"), data, this.chartOptions);
+
+      // create plot overview
+      var overview = $.plot($("#overview"), data, {
+        series: {
+            lines: { show: true, lineWidth: 1 },
+            shadowSize: 0
+        },
+        legend: { show: false },
+        xaxis: { ticks: [], mode: "time" },
+        yaxis: { ticks: [], min: 0, autoscaleMargin: 0.1 },
+        selection: { mode: "x" }
+      });
+
+      // now connect the two
+    
+      $("#chart").bind("plotselected", function (event, ranges) {
+        // do the zooming
+        plot = $.plot($("#chart"), data,
+            $.extend(true, {}, this.chartOptions, {
+                xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
+        }));
+
+        // don't fire event on the overview to prevent eternal loop
+        overview.setSelection(ranges, true);
+
+        // do fancy axes
+        //this.updateAxes(plot);
+      });
+    
+      $("#overview").bind("plotselected", function (event, ranges) {
+        plot.setSelection(ranges);
+      });
+
+      // do fancy axes
       this.updateAxes(plot);
-    }
+
+    } // end updateChart
 
   });
 
