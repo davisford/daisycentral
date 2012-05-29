@@ -15,8 +15,7 @@ exports.actions = function (req, res, ss) {
     // returns only the daisies that the logged in user 
     // claims ownership to
     get: function() {
-      var auth = req.session.auth;
-      Daisies.find( {"owners": auth.userId}, function (err, daisies) {
+      Daisies.find( {"owners": req.session.userId}, function (err, daisies) {
         if (err) { console.log(err); return res(false, null); }
         else {
           return res(null, daisies);

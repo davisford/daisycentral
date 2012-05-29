@@ -2,6 +2,11 @@
 
 var Devices = function() {
 
+  ss.event.on('admin:daisy:status', function (daisy, channelName) {
+    // todo find table row, and update status
+    console.log('daisy status => ',daisy);
+  });
+
   // initialize daisies DataTable
   var table = $('#daisiesTable').dataTable( {
     "bPaginate": true,

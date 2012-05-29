@@ -13,11 +13,16 @@ var callback;
 // after processing data
 var keepAlive;
 
+// the daisy instance this conversation represents
+var daisy;
+
 // dependencies
 var SensorData = require('../models/sensordata')
   , Daisies = require('../models/daisies').getModel()
   , util = require('util')
   , qs   = require('querystring');
+
+
 
 // constructor
 //
@@ -40,7 +45,12 @@ function DaisyConversation(socket, ss) {
 
   // good netizen
   socket.write('HTTP/1.1 200 OK\n');
+
+  // FIXME: avoid null reference if they never send anything
+  module.callback = function() { }
 }
+
+
 
 // Send a list of commands to the Daisy
 // @param commands is an array of string commands
@@ -51,62 +61,69 @@ function DaisyConversation(socket, ss) {
 //   and you will have to wait for the daisy to connect again
 //   before you can issue it commands
 DaisyConversation.prototype.send = function(commands, keepAlive, callback) {
-  callback = callback;
-  keepAlive = keepAlive;
+  module.callback = callback;
+  module.keepAlive = keepAlive;
 
-  // $$$ puts device in command mode
+  // $$$ puts device in command mode; no carriage return
   queue.push({ cmd: '$$$', expected: 'CMD\r\n' });
+
+  // push all the commands on the queue
   commands.forEach(function (command) {
-    if(!command.match(/[\r\n]$/)) {
-      // add carriage return, life feed
-      command = command + '\r\n';
-      console.log('added CR/LF', command);
-    }
+    // each command must end in carriage return for WiFly
+    if(!command.match(/[\r]$/)) { command = command + '\r'; }
     queue.push({ cmd: command });
   });
 
-  // first we have to setup command mode
-  write(queue.shift(1).cmd);
+  // last command exits command mode
+  queue.push({ cmd: 'exit\r', expected: '\r\nEXIT\r\n' });
+
+  // tell the device to enter command mode
+  write(queue[0].cmd);
 }
 
+
+
+// callback handler for socket.on('data')
 // We should get an ascii string b/c we set the encoding
 // TODO: exit command mode
 function onData(data) {
-  process(data);
-  if(queue.length !== 0) {
+  //console.log("received: \t"+data);
 
-    // check if the last command received a valid response
-    var last = queue.shift();
-    if (last && last.hasOwnProperty('expected') ) {
-      if (data !== last.expected) {
-        throw new Error(util.format('expected %s but received %s', last.expected, data));
-      }
-    }
-    if (queue.length !== 0) {
-      // send the next command
-      setTimeout(write, 1000, queue[0].cmd);
-    }
-    
-  } else {
-    if(keepAlive == false) {
-      module.socket.end();
-    } else {
-      console.log('keeping socket open');
-    }
-  }
-}
-
-// Handle the raw response back from the server
-function process(data) {
+  // this is a querystring HTTP GET with sensordata
   if (data.match(/^GET .*/)) {
-    // parse it into the format we want
-    var sensorData = parse(data);
-    // store it in mongo and notify any live users
-    store(sensorData);
-  } else {
-    console.log('Received non-querystring data: \t'+data);
-  }
+    // parse it and store it
+    store(parse(data));
+  } else if(queue.length !== 0) {
+    // wi-fly echoes our commands; ignore these
+    if(data.indexOf(queue[0].cmd) >= 0) { return; }
+
+    // pop the oldest command off the queue
+    var last = queue.shift();
+
+    // verify the expected response
+    if (last && 
+        last.hasOwnProperty('expected') &&
+        data !== last.expected) {
+      // FIXME: what to do?
+      console.log('expected does not match actual response', { expected: last.expected, actual: data });
+    } 
+
+    // do we have another command to send?
+    if (queue.length === 0) {
+      if (module.keepAlive === false) {
+        // we are done; hangup; delay allows time for processing that is not finished
+        setTimeout(function() {
+          module.socket.end();
+          module.callback(null, 'finished');
+        }, 1000);
+      }
+    } else {
+      write(queue[0].cmd);
+    }
+  } 
 }
+
+
 
 // Parses the HTTP GET query string into an object
 // that we can store
@@ -143,6 +160,8 @@ function parse(queryString) {
   return data;
 }
 
+
+
 // Stores the sensor data object in mongo and also
 // Stores the daisy object if it doesn't exist
 // Also notifies any online users about their data if they are
@@ -164,18 +183,25 @@ function store(obj) {
   // register the device if it isn't found in the db
   Daisies.findOne({mac: obj.mac}, function (err, daisy) {
     if (err) { 
-      console.log("Could not look up daisy to register it", err);
+      console.log("Could not look up daisy to create it", err);
       module.callback(err);
     } else {
       // daisy already exists
       if (daisy) {
+        daisy.online = true;
+        module.daisy = daisy;
         // publish the data to any owners (subscribers)
         daisy.owners.forEach(function (userId, index, arr) {
-          module.ss.api.publish.user(userId, 'sensorData', sensors);
+          module.ss.api.publish.user(userId, 'daisy:sensors', sensors);
+          publishDaisyStatus(module.daisy);
+        });
+        // save the status update
+        daisy.save(function (err) {
+          if (err) { console.log(err); }
         });
       } else {
-        // this is the first time; register it
-        daisy = new Daisies({did: data.did, mac: data.mac});
+        // this is the first time; create it
+        daisy = new Daisies({did: obj.did, mac: obj.mac, online:true});
         daisy.save(function (err, doc) {
           if (err) { 
             console.log("Could not save Daisy", err);
@@ -184,13 +210,23 @@ function store(obj) {
           }
         }); // end save
       }
+
+      module.daisy = daisy;
+
+      // publish to admin channel so we can see device status
+      module.ss.api.publish.channel('dw:admin', 'admin:daisy:status', daisy);
     }
   }); // end findOne
 }
 
+// Write the data to the socket
+// @param data the data to write, if it isn't $$$ it must end in a carriage return
+// @delay if you're sending $$$ you need at least a 250ms delay; see WiFly manual
 function write(data) {
-  console.log('writing: \t'+data);
-  module.socket.write(data);
+  setTimeout(function () {
+    module.socket.write(data);
+    console.log("wrote to socket: \t"+data);
+  }, 250);
 }
 
 function onError(err) {
@@ -206,7 +242,42 @@ function onDrain() {
 }
 
 function onClose() {
-  console.log('\t socket:close');
+  console.log('\t socket:close, module.daisy', module.daisy);
+  if(module.daisy) {
+    module.daisy.online = false;
+    Daisies.findOne({mac: module.daisy.mac}, function (err, doc) {
+      if (err) { 
+        // cached version
+        publishDaisyStatus(module.daisy);
+        console.log("Could not look up daisy", module.daisy); 
+      }
+      else {
+        if (doc) {
+          doc.online = false;
+          doc.save(function (err, doc) {
+            if (err) { console.log("Could not update daisy to set status offline", err); }
+          });
+          // fresh version
+          publishDaisyStatus(doc);
+        } else {
+          // cached version
+          publishDaisyStatus(daisy);
+        }
+      }
+    });
+    // regardless of whether we're able to update the db state
+    // we know the device is offline, b/c the socket is closed.
+    module.ss.api.publish.channel('dw:admin', 'daisy:status', module.daisy);
+  } else {
+    console.log("NOT module.daisy");
+  }
+}
+
+function publishDaisyStatus(daisy) {
+  console.log("UPDATE DAISY STATUS: ", daisy.online);
+  daisy.owners.forEach(function (userId, index, arr) {
+    module.ss.api.publish.user(userId, 'daisy:status', daisy);
+  });
 }
 
 // TODO: look at allowHalfOpen

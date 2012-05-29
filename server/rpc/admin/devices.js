@@ -6,6 +6,8 @@ exports.actions = function (req, res, ss) {
 	// populate the session object
 	req.use('session');
 
+  req.session.channel.subscribe('dw:admin');
+
 	// must be admin to use this RPC
 	req.use('security.isAdmin');
 

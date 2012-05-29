@@ -17,10 +17,10 @@ module.exports.init = function(ss) {
     // all the communication to/from each daisyconvo?
 
     // just to see that it is working
-    daisyConvo.send(['get everything', 'get ip', 'get mac'], true, function (err, resp) {
+    daisyConvo.send(['get ip'], false, function (err, resp) {
       if (err) { console.log ("ERROR => ", err); }
       if (resp) { console.log ("Message from DaisyConvo: ", resp); }
-    });
+    }); 
   }).listen(conf.deviceserver.port, function () {
     console.log('server is bound and ready');
   });

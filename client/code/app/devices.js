@@ -6,7 +6,7 @@ var Devices = function() {
   // on user channel; any devices we claim 
   // ownership to that are live, the server will
   // relay live messages to us here
-  ss.event.on('sensorData', function(data, channelName) {
+  ss.event.on('daisy:sensors', function(data, channelName) {
     // if we received data with mac for the daisy currently selected, we
     // add it to the collection and refresh the chart
     if ( sensors.find(function(s) {
@@ -14,6 +14,21 @@ var Devices = function() {
     }) ) {
       sensors.add(new DC.m.Sensor(data));
       sensorsView.render();
+    }
+  });
+
+  ss.event.on('daisy:status', function (daisy, channelName) {
+    // todo find table row, and update status
+    console.log('daisy status => ',daisy);
+    var row = table.$('tr:contains('+daisy.mac+')');
+    if(row) {
+      var td = $(':nth-child(2)', row);
+      $(td).val(daisy.online);
+      if(daisy.online === true) {
+        $(td).removeClass('daisy-offline').addClass('daisy-online');
+      } else {
+        $(td).removeClass('daisy-online').addClass('daisy-offline');
+      }
     }
   });
 
@@ -50,10 +65,11 @@ var Devices = function() {
     "aoColumns": [
       { "mDataProp": "_id", "bVisible": false },
       { "mDataProp": "did", "sClass": "canEdit" },
-      { "mDataProp": "mac" },
       { "mDataProp": "key", "sClass": "canEdit", "bVisible": false },
       { "mDataProp": "lastMod", "bVisible": false },
-      { "mDataProp": "owners", "bVisible": false }
+      { "mDataProp": "owners", "bVisible": false },
+      { "mDataProp": "online" },
+      { "mDataProp": "mac" }
     ]
   });
 
