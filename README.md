@@ -19,6 +19,8 @@ This is the webapp that runs at http://live.daisyworks.com
 * [Twitter Bootstrap](http://twitter.github.com/bootstrap/)
 
 ## Dev Setup
+This Dev setup is for Ubuntu.  I dev on both Mac and Ubuntu.  Mac setup is similar, but you can use 
+[homebrew](http://mxcl.github.com/homebrew/) to install some of the items below instead of Aptitude.
 
 *pro-tips* 
 
@@ -58,7 +60,7 @@ this step would be unnecessary.  Try running `npm` from the command line to see 
 
 *pro-tips*
 * If a library/package is just a dependency that this project needs, (i.e. a library that the code will `require()` 
-locally then you want to install it without the `-g` option.  
+locally then you want to install it **without** the `-g` option.  
 * If a package is a command line program that you want to run, then install command line binaries globally with `-g`.
 
 ```sh
@@ -66,6 +68,8 @@ curl http://npmjs.org/install.sh | sh
 ```
 
 #### Install Debug Tools
+Install these tools with the global `-g` option so you can run them from the command line.
+
 ##### Install [nodemon](https://github.com/remy/nodemon) 
 Allows you to run node as a daemon that reloads if client or server files change
 
@@ -88,6 +92,8 @@ npm install node-inspector -g
 ```
 
 #### Install SocketStream
+SocketStream had not been published to `npm` yet, so I'm building from github `HEAD` and linking it.
+
 ```sh
 git clone https://github.com/socketstream/socketstream.git
 cd socketstream && sudo npm link
@@ -117,9 +123,15 @@ $ mongod &
 
 It should start without error.
 
-### Grab The Source 
+### Grab The Source
+Checkout the source and run `sudo npm install`.  If I've done a good job of keeping the `package.json` file up to date, 
+then `npm install` will install all local dependencies for you.  If you get an error complaining about a particular
+library not being found, then run `npm install "library-name"` and I'll fix the `package.json` file.
+
 ```sh 
 git clone git@github.com:davisford/daisycentral.git
+sudo npm install
+npm socketstream link
 cd daisycentral && nodemon app.js
 ```
 
@@ -140,7 +152,7 @@ git clone https://github.com/twitter/bootstrap/
 cd bootstrap && make
 ```
 
-Files are under `docs/assets/` -- copied them directly over to the correct foldlers in `daisycentral`
+Files are under `docs/assets/` -- copied them directly over to the correct folders in `daisycentral`
 
 ### Debugging with Breakpoints
 
@@ -154,9 +166,9 @@ Now run the app with debug flag
 nodemon --debug app.js
 ```
 
-Now, open browser to http://0.0.0.0:8080/debug?port=5858 in *Chrome*
+Now, open browser to http://0.0.0.0:8080/debug?port=5858 in **Chrome**
 
-Port 9000 receives Daisy WiFly HTTP data.
+Port 9000 receives Daisy WiFly HTTP data.  Port 3000 is the webapp.
 
 ### Updating package dependencies
 
@@ -192,11 +204,13 @@ type "help" for help
 
 ### Add Admin Role To Your User Account
 After you register on the webapp, you can add yourself to the admin users role so you can access the admin features.  
-I explicitly only allow this by manipulating the database directly to avoid security holes.
+I explicitly only allow this by manipulating the database directly to avoid security holes.  You first need to login to 
+the webapp and register with your email address.  Then go to the mongo REPL and do this (substitute your email):
 
 Example for my email:
 ```javascript
-db.users.update({email:"davisford@gmail.com"}, {$set: {roles: ["admin"]}})
+> use daisycentral
+> db.users.update({email:"davisford@gmail.com"}, {$set: {roles: ["admin"]}})
 ```
 
 Now you have access to /admin section of the app.  To reach the admin section, first login to the main app.  After
