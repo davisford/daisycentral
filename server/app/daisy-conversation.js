@@ -28,9 +28,10 @@ var SensorData = require('../models/sensordata')
 //
 // @param socket the Net.Socket
 // @param ss the SocketStream object
-function DaisyConversation(socket, ss) {
+function DaisyConversation(socket, ss, createdCallback) {
   module.socket = socket;
   module.ss = ss;
+  module.createdCallback = createdCallback;
 
   // we always use ascii for daisy wifi
   socket.setEncoding('ascii');
@@ -85,7 +86,6 @@ DaisyConversation.prototype.send = function(commands, keepAlive, callback) {
 
 // callback handler for socket.on('data')
 // We should get an ascii string b/c we set the encoding
-// TODO: exit command mode
 function onData(data) {
   //console.log("received: \t"+data);
 
@@ -108,7 +108,7 @@ function onData(data) {
       console.log('expected does not match actual response', { expected: last.expected, actual: data });
     } 
 
-    // do we have another command to send?
+    // all commands exhausted?
     if (queue.length === 0) {
       if (module.keepAlive === false) {
         // we are done; hangup; delay allows time for processing that is not finished
@@ -119,7 +119,7 @@ function onData(data) {
       }
     } else {
       write(queue[0].cmd);
-    }
+    } // else queue is finished, but leave the socket open for future writes
   } 
 }
 
@@ -156,6 +156,9 @@ function parse(queryString) {
   for (var i = 0; i < 8; i++) {
     data["AD" + i] = parseInt(sensors.substring(i * 4, i * 4 + 4), 16);
   }
+
+  // notify server
+  module.createdCallback(data.mac);
 
   return data;
 }

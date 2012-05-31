@@ -281,7 +281,7 @@ var Devices = function() {
         mode: 'time',
         twelveHourClock: true
       },
-      selection: { mode: 'x' },
+      selection: { mode: 'xy' },
       yaxes: [
         { labelWidth: 40,
           position: "right",
@@ -327,18 +327,11 @@ var Devices = function() {
     },
 
     showTooltip: function (x, y, contents) {
-      $("<div id='tooltip'>" + contents + "</div>").css({
-        position: 'absolute',
-        'font-family': 'Helvetica,Arial,sans-serif',
-        'font-size': '1.0em',
-        display: 'none',
-        top: y + 5,
-        left: x + 5,
-        border: '1px solid #fdd',
-        padding: '2px',
-        'background-color': '#fee',
-        opacity: 0.80
-      }).appendTo("body").fadeIn(200);
+      $(ss.tmpl['devices-tooltip'].render({contents: contents }))
+        .css('top', y + 5)
+        .css('left', x + 5)
+        .appendTo('body')
+        .fadeIn(200);
     },
 
     updateAxes: function (plot) {
@@ -399,9 +392,10 @@ var Devices = function() {
             shadowSize: 0
         },
         legend: { show: false },
-        xaxis: { ticks: [], mode: "time" },
-        yaxis: { ticks: [], min: 0, autoscaleMargin: 0.1 },
-        selection: { mode: "x" }
+        xaxis: { mode: "time", twelveHourClock: true },
+        yaxis: { ticks: []},
+        grid: { color: "#999" },
+        selection: { mode: "xy" }
       });
 
       // now connect the two
