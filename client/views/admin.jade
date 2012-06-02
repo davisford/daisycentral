@@ -89,6 +89,21 @@ html(lang="en")
               th lastMod
               th owners
           tbody
+        div.span8(stype="margin-top: 1em;")
+          form.form-horizontal#console-form
+            fieldset
+              div.control-group
+                label.control-label(for="command-input") Command
+                div.controls
+                  input.input-xlarge#command-input(type="text", value="get ip")
+              div.control-group
+                label.control-label(for="send-button") Send It
+                div.controls
+                  btn.btn.btn-primary#send-button(type="submit") Send It
+              div.control-group
+                label.control-label(for="command-response") Response
+                div.controls
+                  textarea.input-xlarge#command-response(rows="3")
       div.row-fluid#rules(style="display:none")
         h1 This is the Rules Page
       div#profile(style="display:none")

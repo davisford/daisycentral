@@ -2,6 +2,47 @@
 
 var Devices = function() {
 
+ // Backbone namespace DC is global object
+ DC = {
+    /* models */
+    m: {},
+    /* collections */
+    c: {},
+    /* views */
+    v: {},
+    /* templates */
+    t: {}
+  };
+
+ DC.m.Daisy = Backbone.Model.extend({
+
+ });
+
+ DC.c.Daisies = Backbone.Collection.extend({
+  model: DC.m.Daisy
+ });
+
+ DC.v.ConsoleView = Backbone.View.extend({
+  el: $('#console-form')
+ });
+
+ $('#send-button').click(function (e) {
+  e.preventDefault();
+    // find the td with the mac address
+    var selected = table.$('.row_selected');
+    if (!selected) { return; }
+
+    var td = $(selected).find('td:nth-child(3)')[0];
+    if(td) {
+      // get the mac address text
+      var mac = $(td).text();
+      var cmd = $('#command-input').val();
+      ss.rpc('admin.devices.sendCommand', mac, cmd, function (err, res) {
+        $('#command-response').val(res);
+      });
+    }
+ });
+
   ss.event.on('admin:daisy:status', function (daisy, channelName) {
     // todo find table row, and update status
     console.log('daisy status => ',daisy);
@@ -39,6 +80,8 @@ var Devices = function() {
       table.$('tr.row_selected').removeClass('row_selected');
       $(this).addClass('row_selected');
     }
+
+
   });
 
   // refresh data from server

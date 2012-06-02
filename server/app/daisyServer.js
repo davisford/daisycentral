@@ -4,28 +4,54 @@ var conf = require('./conf')
   , net  = require('net')
   , DaisyConversation = require('./daisy-conversation');
 
-module.convos = {};
+// singleton
+var DaisyServer = (function () {
+  var server, ss, convos = {};
 
-module.exports.init = function(ss) {
-  module.ss = ss;
+  function daisyConvoReady(mac, daisyConvo) {
+    convos[mac] = daisyConvo;
+  }
 
-  var server = net.createServer(function (socket) {
-    console.log('connection was made to daisy server');
-    var daisyConvo = new DaisyConversation(socket, ss, function (mac) {
-      module.convos.mac = daisyConvo;
+  function daisyConvoClosed(mac) {
+    convos[mac] = undefined;
+  }
+
+  function createServer(ss) {
+    var server = net.createServer( function (socket) {
+      console.log('new connection made on daisy server');
+      var daisyConvo = new DaisyConversation(socket, ss);
+
+      daisyConvo.on('dc:initialized', daisyConvoReady);
+      daisyConvo.on('dc:closed', daisyConvoClosed);
+
+    }).listen(conf.deviceserver.port, function () {
+      console.log('daisy server listening on port '+conf.deviceserver.port);
     });
 
-    // REMOVE ME: just to see that it is working
-    daisyConvo.send(['get ip'], false, function (err, resp) {
-      if (err) { console.log ("ERROR => ", err); }
-      if (resp) { console.log ("Message from DaisyConvo: ", resp); }
-    }); 
-  }).listen(conf.deviceserver.port, function () {
-    console.log('server is bound and ready');
-  });
-}
+    return server;
+  }
 
-module.exports.getConvo = function(mac) {
-  return module.convos[mac];
-}
+  return {
+    init: function (ss) {
+      if (!ss) { throw new Error("must pass SocketStream object"); }
+      this.ss = ss;
+      return this;
+    },
+
+    start: function() {
+      if (!this.ss) { throw new Error("Server has not been initialized yet"); }
+      this.server = createServer(this.ss);
+      return this;
+    },
+
+    getConvo: function(mac) {
+      return convos[mac];
+    }
+  }
+})();
+
+
+module.exports = DaisyServer;
+
+
 
