@@ -38,6 +38,7 @@ var Devices = function() {
       var mac = $(td).text();
       var cmd = $('#command-input').val();
       ss.rpc('admin.devices.sendCommand', mac, cmd, function (err, res) {
+        console.log('sendCommand rpc callback: err, res =>', err, res);
         $('#command-response').val(res);
       });
     }
@@ -68,6 +69,7 @@ var Devices = function() {
       { "mDataProp": "mac" },
       { "mDataProp": "key", "sClass": "canEdit" },
       { "mDataProp": "lastMod" },
+      { "mDataProp": "online" },
       { "mDataProp": "owners" }
     ]
   });
@@ -84,9 +86,17 @@ var Devices = function() {
 
   });
 
+  var printStack = function() {
+    try { i.dont.exist += 0; }
+    catch(e) {
+      console.log(e.stack);
+    }
+  }
+
   // refresh data from server
   var _refresh = function() {
     ss.rpc('admin.devices.get', function(err, daisies) {
+      printStack();
       if (err) alert(err);
       else {
         table.fnClearTable();

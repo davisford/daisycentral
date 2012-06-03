@@ -24,12 +24,10 @@ exports.isAdmin = function() {
     if(req.session.isAdmin === true) {
       console.log("middleware => security.isAdmin: TRUE");
       return next();
-    }
-    console.log("middlware => security.isAdmin: FALSE");
-    if(res.redirect)
-      return res.redirect('/login');
-    else
-      return res(new Error('unauthorized'));
+    } else {
+      console.log("middlware => security.isAdmin: FALSE");
+      throw new Error('unauthorized');
+    } 
   };
 }();
 

@@ -10,7 +10,7 @@ exports.actions = function (req, res, ss) {
   //req.session.channel.subscribe('dw:admin');
 
 	// must be admin to use this RPC
-	req.use('security.isAdmin');
+	//req.use('security.isAdmin');
 
 	return {
 
@@ -18,9 +18,11 @@ exports.actions = function (req, res, ss) {
     // get all devices
 		get: function (pageNum, pageSize) {
       Daisies.find({}, function (err, daisies) {
-        if (err) { return res("An error occurred, please try again", null); console.log(err); }
+        if (err) { 
+          console.log(err);
+          return res("An error occurred, please try again", null);  }
         else {
-          res(null, daisies);
+          return res(null, daisies);
         }
       });
 		},
@@ -54,15 +56,18 @@ exports.actions = function (req, res, ss) {
       if (!mac) { return res("Cannot send to null/empty daisy", null); }
       if (!command) { return res("Cannot send null/empty command", null); }
 
-      console.log('server? ', server);
       var daisyConvo = server.getConvo(mac);
-      console.log('daisyConvo? ', daisyConvo);
       if (!daisyConvo) { return res("That Daisy doesn't appear to be online at the moment", null); }
 
-      daisyConvo.DaisyConversation.send([command], true, function (err, result) {
-        if (err) { return res ("Error: "+err, null); }
-        return res (null, result);
-      });
+      var results = [];
+      daisyConvo.send([command], true, function (err, result) {
+        console.log('callback from send: ', err, result);
+        results.push(result);
+        if(result.match(/EXIT/)) {
+          res(err, results.join('\n'));
+        }
+        
+      }); 
     }
 
 	} // end return

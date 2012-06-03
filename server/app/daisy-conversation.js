@@ -145,6 +145,9 @@ function DaisyConversation(socket, ss) {
       // parse it and store it
       me.storeData(me.parseData(data));
     } else if(me.queue.length !== 0) {
+      console.log('data received from daisy =>', data);
+      me.callback(undefined, data);
+
       // wi-fly echoes our commands; ignore these
       if(data.indexOf(me.queue[0].cmd) >= 0) { return; }
 
@@ -169,7 +172,7 @@ function DaisyConversation(socket, ss) {
           }, 1000);
         }
       } else {
-        write(me.queue[0].cmd);
+        this.write(me.queue[0].cmd);
       } // else queue is finished, but leave the socket open for future writes
     }
   } // end this.onData
@@ -179,6 +182,7 @@ function DaisyConversation(socket, ss) {
    * @param {string} [command]
    */
   this.write = function(command) {
+    // daisy needs at least a 250ms spacer after $$$
     setTimeout(function () {
       me.socket.write(command);
       console.log('written to socket: \t'+command);
@@ -279,6 +283,7 @@ function DaisyConversation(socket, ss) {
 DaisyConversation.prototype.send = function(commands, keepAlive, callback) {
   this.callback = callback;
   this.keepAlive = keepAlive;
+  var queue = this.queue;
 
   // $$$ puts device in command mode; no carriage return
   queue.push({ cmd: '$$$', expected: 'CMD\r\n' });
@@ -294,7 +299,7 @@ DaisyConversation.prototype.send = function(commands, keepAlive, callback) {
   queue.push({ cmd: 'exit\r', expected: '\r\nEXIT\r\n' });
 
   // tell the device to enter command mode
-  write(queue[0].cmd);
+  this.write(queue[0].cmd);
 }
 
 module.exports = DaisyConversation;
