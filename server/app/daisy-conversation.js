@@ -23,7 +23,7 @@ function DaisyConversation(socket, ss) {
   this.ss = ss;
   this.keepAlive = true;
   this.queue = [];
-  this.callback = function(err, res) { };
+  this.callback = function(err, res) { console.log('dummy callback, err, res', err, res); };
   var me = this;
 
   // we always use ascii for daisy wifi
@@ -144,36 +144,8 @@ function DaisyConversation(socket, ss) {
     if (data.match(/^GET .*/)) {
       // parse it and store it
       me.storeData(me.parseData(data));
-    } else if(me.queue.length !== 0) {
-      console.log('data received from daisy =>', data);
-      me.callback(undefined, data);
-
-      // wi-fly echoes our commands; ignore these
-      if(data.indexOf(me.queue[0].cmd) >= 0) { return; }
-
-      // pop the oldest command off the queue
-      var last = me.queue.shift();
-
-      // verify the expected response
-      if (last && 
-          last.hasOwnProperty('expected') &&
-          data !== last.expected) {
-        // FIXME: what to do?
-        console.log('expected does not match actual response', { expected: last.expected, actual: data });
-      } 
-
-      // all commands exhausted?
-      if (me.queue.length === 0) {
-        if (me.keepAlive === false) {
-          // we are done; hangup; delay allows time for processing that is not finished
-          setTimeout(function() {
-            me.socket.end();
-            me.callback(null, 'finished');
-          }, 1000);
-        }
-      } else {
-        this.write(me.queue[0].cmd);
-      } // else queue is finished, but leave the socket open for future writes
+    } else {
+      me.callback(null, data);
     }
   } // end this.onData
 
@@ -272,7 +244,7 @@ function DaisyConversation(socket, ss) {
 
 /**
  * Send a list of commands to the Daisy
- * @param {Array} [commands] an array of string commands
+ * @param {string} [command] a string command to give the Daisy
  * @param {Boolean} [keepAlive] whether to close the socket after sending the commands
  * @param {Function} [callback] => function (err, res) { } standard Node callback 
  *
@@ -280,26 +252,22 @@ function DaisyConversation(socket, ss) {
  * If you close the socket, you won't be able to communicate with the Daisy until the
  * next time it connects.
  */
-DaisyConversation.prototype.send = function(commands, keepAlive, callback) {
+DaisyConversation.prototype.send = function(command, callback) {
+  console.log('daisy convo.send: command, callback', command, callback);
   this.callback = callback;
-  this.keepAlive = keepAlive;
-  var queue = this.queue;
 
-  // $$$ puts device in command mode; no carriage return
-  queue.push({ cmd: '$$$', expected: 'CMD\r\n' });
+  if(!this.daisy) {
+    return this.callback("Daisy is not connected yet", null);
+  }
 
-  // push all the commands on the queue
-  commands.forEach(function (command) {
-    // each command must end in carriage return for WiFly
+  // $$$ command must not have any trailing characters
+  if(command.match(/\$\$\$/)) {
+    this.write('$$$');
+  } else {
+    // all other commands need carriage return
     if(!command.match(/[\r]$/)) { command = command + '\r'; }
-    queue.push({ cmd: command });
-  });
-
-  // last command exits command mode
-  queue.push({ cmd: 'exit\r', expected: '\r\nEXIT\r\n' });
-
-  // tell the device to enter command mode
-  this.write(queue[0].cmd);
+    this.write(command);
+  }
 }
 
 module.exports = DaisyConversation;

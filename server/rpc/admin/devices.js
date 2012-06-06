@@ -53,21 +53,31 @@ exports.actions = function (req, res, ss) {
     sendCommand: function (mac, command) {
       console.log('mac:'+mac+", command:"+command);
 
-      if (!mac) { return res("Cannot send to null/empty daisy", null); }
-      if (!command) { return res("Cannot send null/empty command", null); }
+      if (!mac) { 
+        console.log("mac is not valid: "+mac);
+        return res("Cannot send to null/empty daisy", null); 
+      }
+      if (!command) { 
+        console.log("command is not valid: "+command);
+        return res("Cannot send null/empty command", null); 
+      }
 
       var daisyConvo = server.getConvo(mac);
-      if (!daisyConvo) { return res("That Daisy doesn't appear to be online at the moment", null); }
+      if (!daisyConvo) { 
+        console.log("Daisy Convo is not available for mac: " + mac);
+        return res("That Daisy doesn't appear to be online at the moment", null); 
+      }
 
-      var results = [];
-      daisyConvo.send([command], true, function (err, result) {
-        console.log('callback from send: ', err, result);
-        results.push(result);
-        if(result.match(/EXIT/)) {
-          res(err, results.join('\n'));
+      var cmd = command;
+      daisyConvo.send(command, function (err, result) {
+        if (result && result.indexOf(cmd) === 0) {
+          console.log("Ignore echo command: "+result);
+        } else {
+          console.log("responding to RPC with "+result);
+          res(err, result);
         }
-        
       }); 
+      console.log('command should be sent');
     }
 
 	} // end return
