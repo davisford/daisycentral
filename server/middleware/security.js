@@ -15,7 +15,7 @@ exports.authenticated = function() {
     else
       return res(new Error('unauthorized'));
   };
-}();
+};
 
 // only let user through if they are admin
 exports.isAdmin = function() {
@@ -29,7 +29,7 @@ exports.isAdmin = function() {
       throw new Error('unauthorized');
     } 
   };
-}();
+};
 
 // if the user is authenticated, redirect them to /
 // else let them pass through -- to be used for /login route only
@@ -43,5 +43,5 @@ exports.validCookie = function() {
     console.log('middleware => security.validCookie: FALSE');
     return next();
   };
-}();
+};
 

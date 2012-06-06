@@ -10,7 +10,7 @@ exports.actions = function (req, res, ss) {
   //req.session.channel.subscribe('dw:admin');
 
 	// must be admin to use this RPC
-	//req.use('security.isAdmin');
+	req.use('security.isAdmin');
 
 	return {
 
