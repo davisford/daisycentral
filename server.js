@@ -63,11 +63,11 @@ var app = express.createServer(
 mongooseAuth.helpExpress(app);
 
 /* _________________ ROUTES _________________ */
-app.get('/', security.authenticated, function (req, res) {
+app.get('/', security.authenticated(), function (req, res) {
   res.serveClient('main');
 });
 
-app.get('/login', security.validCookie, function(req, res) {
+app.get('/login', security.validCookie(), function(req, res) {
   res.serveClient('login');
 });
 
@@ -78,7 +78,7 @@ app.get('/logout', function (req, res) {
   res.redirect('/login');
 });
 
-app.get('/admin', security.isAdmin, function(req, res, next) {
+app.get('/admin', security.isAdmin(), function(req, res, next) {
   res.serveClient("admin");
 });
 
