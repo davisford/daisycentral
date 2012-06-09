@@ -2,6 +2,187 @@
 
 var Devices = function() {
 
+  // Backbone namespace DC 
+  DC = {
+    /* models */
+    m: {},
+    /* collections */
+    c: {},
+    /* views */
+    v: {},
+    /* templates */
+    t: {}
+  }
+
+  /***********************************************************
+   * Model: Daisy
+   ***********************************************************/
+  DC.m.Daisy = Backbone.Model.extend();
+
+  /***********************************************************
+   * Model: Sensor
+   ***********************************************************/
+  DC.m.Sensor = Backbone.Model.extend();
+
+  /***********************************************************
+   * Sensor Model constants
+   ***********************************************************/
+  DC.m.SensorInfo = {
+    AD0: { name: "RX-I", bool: false, yaxis: -1, color: "#000" },
+    AD1: { name: "Power", bool: true, yaxis: 1, color: "#CB4B4B" },
+    AD2: { name: "Leak Detection", bool: true, yaxis: 1, color: "#4DA74D" },
+    AD3: { name: "Magnetic Switch", bool: true, yaxis: 1, color: "#9440ED" },
+    AD4: { name: "Humidity", bool: false, yaxis: 2, color: "#BD9B33" },
+    AD5: { name: "Temperature", bool: false, yaxis: 3, color: "#8CACC6" },
+    AD6: { name: "Moisture", bool: false, yaxis: 4, color: "#A23C3C" },
+    AD7: { name: "Battery", bool: false, yaxis: 5, color: "#3D853D" }
+  };
+
+  /***********************************************************
+   * Collection: Daisies
+   ***********************************************************/
+  DC.c.Daisies = Backbone.Collection.extend({
+    
+    model: DC.m.Daisy,
+
+    // override Backbone.Collection.fetch()
+    "fetch": function(options) {
+      var collection = this;
+      var success = options.success;
+      options.success = function(resp, status, xhr) {
+        collection.reset(resp, options);
+        if (success) success(collection, resp);
+      };
+      options.error = Backbone.wrapError(options.error, collection, options);
+      ss.rpc('devices.get', function(err, arr) {
+        if (err) { return options.error(err); }
+        return options.success(arr);
+      })
+      return;
+    }
+  });
+
+  /**********************************************************
+   * View: TableView
+   **********************************************************/
+  DC.v.TableView = Backbone.View.extend({
+    el: $('#daisies'),
+
+    events: {
+      'click #daisiesTable tbody tr': 'selectRow'
+    },
+
+    initialize: function(options) {
+      _.bindAll(this, 'render', 'selectRow');
+      this.bus = options.bus;
+
+      // create dataTable once
+      this.table = $('#daisiesTable').dataTable({
+        "bPaginate": true,
+        "bLengthChange": true,
+        "bFilter": true,
+        "bSort": true,
+        "bInfo": true,
+        "bAutoWidth": false,
+        "bProcessing": true,
+        "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
+        "sPaginationType": "bootstrap",
+        "oLanguage": {
+          "sLengthMenu": "_MENU_ records per page"
+        },
+        "aoColumns": [
+          { "mDataProp": "_id", "bVisible": false },
+          { "mDataProp": "did", "sClass": "canEdit" },
+          { "mDataProp": "key", "sClass": "canEdit", "bVisible": false },
+          { "mDataProp": "lastMod", "bVisible": false },
+          { "mDataProp": "owners", "bVisible": false },
+          { "mDataProp": "online" },
+          { "mDataProp": "mac" }
+        ]
+      });
+    },
+
+    render: function() {
+      var table = this.table;
+      table.fnClearTable();
+      table.fnAddData(this.collection.toJSON());
+
+      // add jEditable to table data; only .canEdit class are editable
+      $('.canEdit', table.fnGetNodes()).editable(function (val, settings) {
+          // get the object for this row
+          var obj = table.fnGetData(table.fnGetPosition(this)[0]);
+          // we know it is the did property
+          obj.did = val;
+          console.log(obj);
+          ss.rpc('devices.save', obj, function(ok) {
+            if (ok === false) {
+              alert("update failed");
+              _refresh();
+            }
+          });
+          return (val);
+          }, {
+            type: 'textarea',
+            event: 'dblclick',
+            tooltip: 'Doubleclick to edit...', 
+            submit: 'OK' 
+          }
+      ); // end .editable 
+    },
+
+    selectRow: function(e) {
+      var row = $(e.currentTarget);
+      // toggle selected style on row
+      if (row.hasClass('row_selected')) {
+        row.removeClass('row_selected');
+      } else {
+        this.table.$('tr.row_selected').removeClass('row_selected');
+        row.addClass('row_selected');
+      }
+      // broadcast event about daisy that is selected
+      this.bus.trigger('daisySelected', this.table._('.row_selected'));
+    }
+  });
+
+  /**********************************************************
+   * View: ChartView
+   **********************************************************/
+  DC.v.ChartView = Backbone.View.extend({
+    el: $('#chart-div'),
+
+    events: { },
+
+    initialize: function(options) {
+      this.bus = options.bus;
+      _.bindAll(this, 'render', 'daisySelected');
+      this.bus.bind('daisySelected', this.daisySelected);
+    },
+
+    render: function() {
+
+    },
+
+    daisySelected: function(daisy) {
+      if (daisy) {
+        this.model = daisy;
+        // rpc call to get sensors for that mac address
+        ss.rpc('sensors.get', this.model.get('mac'), function(err, data) {
+        if(err) { alert("failed to get sensor data "+err); return; }
+        else {
+          console.log('fetched '+data.length+' sensors');
+  /*        sensors.reset();
+          _.each(data, function(datum) {
+            sensors.add(new DC.m.Sensor(datum));
+          });
+          sensorsView.render(); */
+        }
+      });
+      }
+    }
+
+  });
+
+
   // handler for pub/sub coming from server
   // on user channel; any devices we claim 
   // ownership to that are live, the server will
@@ -139,36 +320,7 @@ var Devices = function() {
 
 
 
- // DC is global object
- DC = {
-    /* models */
-    m: {},
-    /* collections */
-    c: {},
-    /* views */
-    v: {},
-    /* templates */
-    t: {}
-  };
 
-  DC.m.Daisy = Backbone.Model.extend({
-
-  });
-
-  DC.m.Sensor = Backbone.Model.extend({
-
-  });
-
-  DC.m.SensorInfo = {
-    AD0: { name: "RX-I", bool: false, yaxis: -1, color: "#000" },
-    AD1: { name: "Power", bool: true, yaxis: 1, color: "#CB4B4B" },
-    AD2: { name: "Leak Detection", bool: true, yaxis: 1, color: "#4DA74D" },
-    AD3: { name: "Magnetic Switch", bool: true, yaxis: 1, color: "#9440ED" },
-    AD4: { name: "Humidity", bool: false, yaxis: 2, color: "#BD9B33" },
-    AD5: { name: "Temperature", bool: false, yaxis: 3, color: "#8CACC6" },
-    AD6: { name: "Moisture", bool: false, yaxis: 4, color: "#A23C3C" },
-    AD7: { name: "Battery", bool: false, yaxis: 5, color: "#3D853D" }
-  };
 
   DC.c.Sensors = Backbone.Collection.extend({
     model: DC.m.Sensor,
