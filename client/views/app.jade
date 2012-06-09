@@ -76,7 +76,7 @@ html(lang="en")
                 a.btn(href="#") View details &raquo;
       div.container-fluid#devices(style="display:none")
         div.row-fluid
-          div.span3
+          div.span3#sidebar-view
             div.well.sidebar-nav
               ul.nav.nav-list
                 li.nav-header Devices
@@ -134,7 +134,7 @@ html(lang="en")
                           td
                             input#AD7.btn.sensor-cb(type="checkbox", name="cb-battery")
           div.span9#devicesContent
-            div#registerDaisy(style="display:none")
+            div#register-view(style="display:none")
               h2 Register A New Daisy 
               form.well.form-inline
                 p 
@@ -145,14 +145,14 @@ html(lang="en")
                 a(href="mailto:support@daisyworks.com") support@daisyworks.com
                 hr
                 input.input#daisySecretKey(type="text", placeholder="secret key", style="margin-right:1em;")
-                button.btn.btn-primary#registerDaisy(type="submit") Register
-            div.container-fluid#daisyList
+                button.btn.btn-primary#register-button(type="submit") Register
+            div.container-fluid#table-view
               h2 My Daisies
               p 
               | Select a daisy by clicking a row - this will load the sensor data for that Daisy. 
               | You may edit a Daisy's name by double-clicking the name and typing a new name.
               p
-              table.table.table-striped.table-bordered#myDaisiesTable(style="width:100% important!")
+              table.table.table-striped.table-bordered#daisies-table(style="width:100% important!")
                 thead
                   tr
                     th _id
@@ -164,12 +164,13 @@ html(lang="en")
                     th MAC
                 tbody
               hr
-              h2 Real-Time Data 
-              p The chart shows the most recent data for the Daisy.
-              // flot data chart
-              div.span8#chart(style="height:300px;")
-              // flot chart overview
-              div.span4#overview(style="margin-left:50px;margin-top:20px;width:400px;height:50px")
+              div.#realtime-view
+                h2 Real-Time Data 
+                p The chart shows the most recent data for the Daisy.
+                // flot data chart
+                div.span8#chart(style="height:300px;")
+                // flot chart overview
+                div.span4#overview(style="margin-left:50px;margin-top:20px;width:400px;height:50px")
       div.row-fluid#rules(style="display:none")
         h1 This is the Rules Page
       div#profile(style="display:none")

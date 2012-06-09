@@ -53,33 +53,6 @@ var Devices = function() {
       'click #daisiesTable tbody tr': 'selectRow'
     },
 
-    render: function() {
-      var table = this.table;
-
-      table.fnClearTable();
-      table.fnAddData(this.collection.toJSON());
-
-      // add jEditable to table data; only .canEdit class are editable
-      $('.canEdit', table.fnGetNodes()).editable(function (val, settings) {
-        // get the object for this row
-        var obj = table.fnGetData(table.fnGetPosition(this)[0]);
-        // we know it is the key property; FIXME: this.collection.models is out of sync
-        obj.key = val;
-        ss.rpc('admin.devices.update', obj, function(ok) {
-          if (ok === false) { 
-            alert("update failed"); 
-            _refresh();
-          }
-        });
-        return (val);
-      }, {
-        type: 'textarea',
-        event: 'dblclick',
-        tooltip: 'Doubleclick to edit...', 
-        submit: 'OK' }
-      );
-    },
-
     initialize: function(options) {
       _.bindAll(this, 'render', 'selectRow');
       this.bus = options.bus;
@@ -108,6 +81,32 @@ var Devices = function() {
           { "mDataProp": "owners" }
         ]
       });
+    },
+
+    render: function() {
+      var table = this.table;
+      table.fnClearTable();
+      table.fnAddData(this.collection.toJSON());
+
+      // add jEditable to table data; only .canEdit class are editable
+      $('.canEdit', table.fnGetNodes()).editable(function (val, settings) {
+        // get the object for this row
+        var obj = table.fnGetData(table.fnGetPosition(this)[0]);
+        // we know it is the key property; FIXME: this.collection.models is out of sync
+        obj.key = val;
+        ss.rpc('admin.devices.update', obj, function(ok) {
+          if (ok === false) { 
+            alert("update failed"); 
+            _refresh();
+          }
+        });
+        return (val);
+      }, {
+        type: 'textarea',
+        event: 'dblclick',
+        tooltip: 'Doubleclick to edit...', 
+        submit: 'OK' }
+      ); // end .editable
     },
 
     selectRow: function(e) {

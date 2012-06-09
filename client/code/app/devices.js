@@ -62,11 +62,19 @@ var Devices = function() {
     }
   });
 
+  DC.c.Sensors = Backbone.Collection.extend({
+    model: DC.m.SensorData,
+
+    "fetch": function(options) {
+
+    }
+  });
+
   /**********************************************************
    * View: TableView
    **********************************************************/
   DC.v.TableView = Backbone.View.extend({
-    el: $('#daisies'),
+    el: $('#table-view'),
 
     events: {
       'click #daisiesTable tbody tr': 'selectRow'
@@ -121,12 +129,11 @@ var Devices = function() {
             }
           });
           return (val);
-          }, {
-            type: 'textarea',
-            event: 'dblclick',
-            tooltip: 'Doubleclick to edit...', 
-            submit: 'OK' 
-          }
+        }, {
+          type: 'textarea',
+          event: 'dblclick',
+          tooltip: 'Doubleclick to edit...', 
+          submit: 'OK'  }
       ); // end .editable 
     },
 
@@ -147,8 +154,8 @@ var Devices = function() {
   /**********************************************************
    * View: ChartView
    **********************************************************/
-  DC.v.ChartView = Backbone.View.extend({
-    el: $('#chart-div'),
+  DC.v.RealTimeView = Backbone.View.extend({
+    el: $('#realtime-view'),
 
     events: { },
 
@@ -181,6 +188,41 @@ var Devices = function() {
     }
 
   });
+
+  /********************************************************
+   * View: RegisterView
+   ********************************************************/
+  DC.v.RegisterView = Backbone.View.extend({
+    el: $('#register-view'),
+
+    events: { },
+
+    initialize: function(options) {
+      _.bindAll(this, 'render');
+    },
+
+    render: function() {
+
+    }
+
+  });
+
+  /********************************************************
+   * View: SidebarView
+   ********************************************************/
+  DC.v.SidebarView = Backbone.View.extend({
+    el: $('#sidebar-view'),
+
+    events: { },
+
+    initialize: function(options) {
+      _.bindAll(this, 'render');
+    },
+
+    render: function() {
+
+    }
+  })
 
 
   // handler for pub/sub coming from server
@@ -287,7 +329,10 @@ var Devices = function() {
 
   // refresh function
   var _refresh = function() {
-    ss.rpc('devices.get', function(err, devices) {
+    // fetch the latest daisies
+    daisies.fetch({success: tableView.render});
+
+    /*ss.rpc('devices.get', function(err, devices) {
       if (err) alert(err);
       else {
         // clear the table and add new data
@@ -315,10 +360,23 @@ var Devices = function() {
             submit: 'OK' 
           }); // end .editable 
       } 
-    });
+    }); */
   }
 
-
+  // event bus
+  var bus = _.extend({}, Backbone.Events);
+  // collection of daisies
+  var daisies = new DC.c.Daisies();
+  // daisies table view
+  var tableView = new DC.v.TableView({collection: daisies, bus: bus});
+  // collection of sensors
+  var sensors = new DC.c.Sensors();
+  // realtime charting view
+  var realtimeView = new DC.v.RealTimeView({collection: sensors, bus: bus});
+  // register view
+  var registerView = new DC.v.RegisterView();
+  // sidebar nav view
+  var sidebarView = new DC.v.SideBarView({bus: bus});
 
 
 
