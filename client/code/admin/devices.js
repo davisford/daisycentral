@@ -38,7 +38,7 @@ var Devices = function() {
       ss.rpc('admin.devices.get', function(err, arr) {
         if (err) { return options.error(err); }
         return options.success(arr);
-      })
+      });
       return;
     }
   });

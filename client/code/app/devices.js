@@ -62,11 +62,76 @@ var Devices = function() {
     }
   });
 
+  /**********************************************************
+   * Collection: Sensors
+   **********************************************************/
   DC.c.Sensors = Backbone.Collection.extend({
     model: DC.m.SensorData,
 
-    "fetch": function(options) {
+    comparator: function (sensor) {
+      return sensor.get('timestamp');
+    },
 
+    "fetch": function(options) {
+      var collection = this;
+      var success = options.success;
+      options.success = function(resp, status, xhr) {
+        collection.reset(resp, options);
+        if (success) success(collection, resp);
+      };
+      options.error = Backbone.wrapError(options.error, collection, options);
+      ss.rpc('sensors.get', options.mac, function(err, arr) {
+        if (err) { return options.error(err); }
+        return options.success(arr);
+      });
+      return;
+    },
+
+    // convert raw data to format flot expects
+    // @param array of sensor names e.g. ['AD1', 'AD2']
+    // returns object with array of coordinates by timestamp
+    flotData: function (arr) {
+      var data = [], i, j, info,
+          vals, boolSensor, 
+          timestamps = _.map(this.pluck('timestamp'), function (num) {
+            // convert GMT time to local timestamp
+            var localNow = new Date().getTimezoneOffset(),
+            min = num / 1000 / 60;
+            return (min - localNow) * 1000 * 60;
+          });
+
+      for (i = 0; i < arr.length; i += 1) {
+        info = DC.m.SensorInfo[arr[i]];
+        vals = this.pluck(arr[i]);
+        boolSensor = _.any(["Power", "Leak Detection", "Magnetic Switch"], function (sensor) {
+          return sensor === info.name;
+        });
+
+        if (boolSensor) {
+          // boolean sensors have the raw values converted to 0 or 1 based on midpoint between 0-65534
+          for (j = 0; j < vals.length; j += 1) {
+            if (vals[j] > (65534 / 2)) {
+              vals[j] = 1;
+            } else { vals[j] = 0; }
+          }
+          // boolean sensors all share the same yaxis, and have line steps
+          data.push({
+            color: info.color,
+            label: info.name,
+            data: _.zip(timestamps, vals),
+            yaxis: info.yaxis,
+            lines: { show: true, steps: true }
+          });
+        } else {
+          data.push({
+            color: info.color,
+            label: info.name,
+            data: _.zip(timestamps, vals),
+            yaxis: info.yaxis
+          });
+        }
+      }
+      return data;
     }
   });
 
@@ -157,11 +222,14 @@ var Devices = function() {
   DC.v.RealTimeView = Backbone.View.extend({
     el: $('#realtime-view'),
 
-    events: { },
+    events: { 
+      'plothover #chart': 'plotHover',
+
+    },
 
     initialize: function(options) {
       this.bus = options.bus;
-      _.bindAll(this, 'render', 'daisySelected');
+      _.bindAll(this, 'render', 'daisySelected', 'plotHover');
       this.bus.bind('daisySelected', this.daisySelected);
     },
 
@@ -172,19 +240,13 @@ var Devices = function() {
     daisySelected: function(daisy) {
       if (daisy) {
         this.model = daisy;
-        // rpc call to get sensors for that mac address
-        ss.rpc('sensors.get', this.model.get('mac'), function(err, data) {
-        if(err) { alert("failed to get sensor data "+err); return; }
-        else {
-          console.log('fetched '+data.length+' sensors');
-  /*        sensors.reset();
-          _.each(data, function(datum) {
-            sensors.add(new DC.m.Sensor(datum));
-          });
-          sensorsView.render(); */
-        }
-      });
+        this.collection.fetch({mac: daisy.get('mac'), 
+          success: this.render});
       }
+    },
+
+    plotHover: function() {
+      
     }
 
   });
@@ -213,13 +275,20 @@ var Devices = function() {
   DC.v.SidebarView = Backbone.View.extend({
     el: $('#sidebar-view'),
 
-    events: { },
+    events: { 
+      'change .sensor-cb': 'sensorSelected'
+    },
 
     initialize: function(options) {
-      _.bindAll(this, 'render');
+      this.bus = options.bus;
+      _.bindAll(this, 'render', 'sensorSelected');
     },
 
     render: function() {
+
+    },
+
+    sensorSelected: function() {
 
     }
   })
@@ -229,7 +298,7 @@ var Devices = function() {
   // on user channel; any devices we claim 
   // ownership to that are live, the server will
   // relay live messages to us here
-  ss.event.on('daisy:sensors', function(data, channelName) {
+/*  ss.event.on('daisy:sensors', function(data, channelName) {
     // if we received data with mac for the daisy currently selected, we
     // add it to the collection and refresh the chart
     if ( sensors.find(function(s) {
@@ -269,10 +338,10 @@ var Devices = function() {
         }
       });
     }
-  });
+  }); */
 
   // initialize daisies DataTable
-  var table = $('#myDaisiesTable').dataTable( {
+/*  var table = $('#myDaisiesTable').dataTable( {
     "bPaginate": true,
     "bLengthChange": true,
     "bFilter": true,
@@ -325,7 +394,7 @@ var Devices = function() {
         }
       });
     }
-  });
+  }); */
 
   // refresh function
   var _refresh = function() {
@@ -379,7 +448,7 @@ var Devices = function() {
   var sidebarView = new DC.v.SideBarView({bus: bus});
 
 
-
+/*
   DC.c.Sensors = Backbone.Collection.extend({
     model: DC.m.Sensor,
 
@@ -434,7 +503,7 @@ var Devices = function() {
       }
       return data;
     }
-  });
+  }); */
 
   DC.v.Sensors = Backbone.View.extend({
 
