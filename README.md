@@ -17,6 +17,8 @@ This is the webapp that runs at http://live.daisyworks.com
 * [nib](https://github.com/visionmedia/nib)
 * [stylus](http://learnboost.github.com/stylus/)
 * [Twitter Bootstrap](http://twitter.github.com/bootstrap/)
+* [Flot](http://code.google.com/p/flot/)
+* [DataTables](http://datatables.net/)
 
 ## Dev Setup
 This Dev setup is for Ubuntu.  I dev on both Mac and Ubuntu.  Mac setup is similar, but you can use 
@@ -242,4 +244,11 @@ Now add the lines:
 Now, uncomment the line `session required pam_limits.so` in `/etc/pam.d/su` and reboot your system.
 To test it, after you reboot run `ulimit -n` and you should see 65534.
 
+## Modified Libs
 
+### Flot
+The original maintainer got too busy, but this proved to be the best charting tool after looking at some alternatives.  There are a couple people picking up as maintainers for flot, but I forked it myself:
+
+https://github.com/davisford/flot
+
+I made some changes to it, so that is the version used in DaisyCentral

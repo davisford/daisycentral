@@ -370,9 +370,8 @@ var Devices = function() {
       },
       xaxis: {
         mode: 'time',
-        timezone: 'browser',
         twelveHourClock: true,
-        labelAngle: 90
+        labelAngle: -45
       },
       selection: { mode: 'x' },
       yaxes: [
@@ -418,12 +417,13 @@ var Devices = function() {
 
       events: { 
         'plothover #chart': 'plotHover',
-        'plotselected #chart': 'plotSelected'
+        'plotselected #chart': 'plotSelected',
+        'plotunselected #chart': 'plotUnselected'
       },
 
       initialize: function(options) {
         bus = options.bus;
-        _.bindAll(this, 'render', 'daisySelected', 'sensorSelected', 'plotHover', 'plotSelected');
+        _.bindAll(this, 'render', 'daisySelected', 'sensorSelected', 'plotHover', 'plotSelected', 'plotUnselected');
         bus.bind('daisySelected', this.daisySelected);
         bus.bind('sensorSelected', this.sensorSelected);
         chart = this.$('#chart');
@@ -481,14 +481,30 @@ var Devices = function() {
       },
 
       plotSelected: function(e, ranges) {
-        plot = $.plot( chart, this.collection.getCached(),
-          $.extend(true, {}, chartOptions, { 
-            xaxis: { 
-              min: ranges.xaxis.from, 
-              max: ranges.xaxis.to 
-            } 
-          }) 
-        ); 
+        if (ranges) {
+          this.ranges = ranges;
+          plot = $.plot( chart, this.collection.getCached(),
+            $.extend(true, {}, chartOptions, { 
+              xaxis: { 
+                min: ranges.xaxis.from, 
+                max: ranges.xaxis.to 
+              } 
+            }) 
+          ); 
+        }
+      },
+
+      plotUnselected: function(e) {
+        if (this.ranges) {
+          plot = $.plot( chart, this.collection.getCached(),
+            $.extend(true, {}, chartOptions, { 
+              xaxis: { 
+                min: this.ranges.xaxis.from, 
+                max: this.ranges.xaxis.to 
+              } 
+            }) 
+          ); 
+        }
       },
 
       updateAxes: function (plot) {
@@ -529,6 +545,8 @@ var Devices = function() {
               function () { $(this).css({ opacity: 0 }); }
             );
         }); // end .each function param
+
+        console.log(plot.getAxes().xaxis);
       }, // end updateAxes
 
     });
