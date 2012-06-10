@@ -45,19 +45,22 @@ var Devices = function() {
     t: {}
   }
 
-  /***********************************************************
-   * Model: Daisy
-   ***********************************************************/
+
+  /*---------------------------------------------------------------------------
+     Model: Daisy
+   --------------------------------------------------------------------------*/
   DC.m.Daisy = Backbone.Model.extend();
 
-  /***********************************************************
-   * Model: Sensor
-   ***********************************************************/
+
+  /*---------------------------------------------------------------------------
+     Model: Sensor
+   --------------------------------------------------------------------------*/
   DC.m.Sensor = Backbone.Model.extend();
 
-  /***********************************************************
-   * Sensor Model constants
-   ***********************************************************/
+
+  /*---------------------------------------------------------------------------
+     SensorInfo: constants; could move this somewhere else
+   --------------------------------------------------------------------------*/
   DC.m.SensorInfo = {
     AD0: { name: "RX-I", bool: false, yaxis: -1, color: "#000" },
     AD1: { name: "Power", bool: true, yaxis: 1, color: "#CB4B4B" },
@@ -69,9 +72,11 @@ var Devices = function() {
     AD7: { name: "Battery", bool: false, yaxis: 5, color: "#3D853D" }
   };
 
-  /***********************************************************
-   * Collection: Daisies
-   ***********************************************************/
+
+  /*---------------------------------------------------------------------------
+     Collection: Daisies
+       Holds the collection of Daisies assigned to this user
+   --------------------------------------------------------------------------*/
   DC.c.Daisies = Backbone.Collection.extend({
     
     model: DC.m.Daisy,
@@ -94,9 +99,11 @@ var Devices = function() {
     }
   });
 
-  /**********************************************************
-   * Collection: Sensors
-   **********************************************************/
+
+  /*---------------------------------------------------------------------------
+     Collection: Sensors
+       Holds the sensor data for a particular Daisy
+   --------------------------------------------------------------------------*/
   DC.c.Sensors = Backbone.Collection.extend({
     model: DC.m.Sensor,
 
@@ -179,9 +186,11 @@ var Devices = function() {
     }
   });
 
-  /********************************************************
-   * View: SidebarView
-   ********************************************************/
+
+  /*---------------------------------------------------------------------------
+     View: SideBarView
+       Handles sidebar navigation and checkbox selection
+   --------------------------------------------------------------------------*/
   DC.v.SideBarView = Backbone.View.extend({
     el: $('#sidebar-view'),
 
@@ -206,9 +215,11 @@ var Devices = function() {
     }
   });
 
-  /********************************************************
-   * View: RegisterView
-   ********************************************************/
+
+  /*---------------------------------------------------------------------------
+     View: RegisterView
+       Handles registration of secret key for user to claim Daisy ownership
+   --------------------------------------------------------------------------*/
   DC.v.RegisterView = Backbone.View.extend({
     el: $('#register-view'),
 
@@ -242,9 +253,9 @@ var Devices = function() {
   });
 
 
-  /**********************************************************
-   * View: TableView
-   **********************************************************/
+  /*---------------------------------------------------------------------------
+     View: TableView
+   --------------------------------------------------------------------------*/
   DC.v.TableView = Backbone.View.extend({
     el: $('#table-view'),
 
@@ -549,189 +560,9 @@ var Devices = function() {
   // sidebar nav view
   var sidebarView = new DC.v.SideBarView({bus: bus});
 
-/*
-  DC.v.Sensors = Backbone.View.extend({
-
-    events: {
-      'plothover #chart': 'plotHover',
-      'change .sensor-cb': 'updateChart'
-    },
-
-    el: $('#devices'),
-
-    initialize: function (options) {
-      _.bindAll(this, 'render', 'updateChart', 'plotHover', 'showTooltip');
-    },
-
-    render: function () {
-      this.updateChart();
-      return this;
-    },
-
-    weekendAreas: function(axes) {
-      var markings = [];
-      var d = new Date(axes.xaxis.min);
-      // go to the first Saturday
-      d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 1) % 7))
-      d.setUTCSeconds(0);
-      d.setUTCMinutes(0);
-      d.setUTCHours(0);
-      var i = d.getTime();
-      do {
-          // when we don't set yaxis, the rectangle automatically
-          // extends to infinity upwards and downwards
-          markings.push({ xaxis: { from: i, to: i + 2 * 24 * 60 * 60 * 1000 } });
-          i += 7 * 24 * 60 * 60 * 1000;
-      } while (i < axes.xaxis.max);
-
-      return markings;
-    },
-
-    chartOptions: {
-      legend: {
-        show: true,
-        margin: 10,
-        backgroundOpacity: 0.5
-      },
-      grid: { hoverable: true, clickable: true, markings: this.weekendAreas },
-      points: {
-        show: true,
-        radius: 3
-      },
-      lines: {
-        show: true
-      },
-      xaxis: {
-        mode: 'time',
-        twelveHourClock: true
-      },
-      selection: { mode: 'xy' },
-      yaxes: [
-        { labelWidth: 40,
-          position: "right",
-          sensor: "shared",
-          ticks: [[0.0, "OFF"], [1.0, "ON"]] }, // power,leak,magnet
-        { labelWidth: 40,
-          position: "left",
-          sensor: "AD4",
-          color: DC.m.SensorInfo.AD4.color,
-          tickFormatter: function (n, obj) { return n + "%"; } },  // humidity
-        { labelWidth: 40,
-          position: "left",
-          sensor: "AD5",
-          color: DC.m.SensorInfo.AD5.color,
-          tickFormatter: function (n, obj) { return n + "F"; } },  // temp
-        { labelWidth: 40,
-          position: "left",
-          sensor: "AD6",
-          color: DC.m.SensorInfo.AD6.color },  // moisture
-        { labelWidth: 40,
-          position: "left",
-          sensor: "AD7",
-          color: DC.m.SensorInfo.AD7.color,
-          tickFormatter: function (n, obj) { return n + "V"; } }  // battery
-      ]
-    },
-
-    
-
-    updateAxes: function (plot) {
-      $.each(plot.getAxes(), function (i, axis) {
-        if (!axis.show || axis.direction === "x" || axis.options.sensor === undefined || axis.options.sensor === "shared") {
-          return;
-        }
-
-        var left = axis.box.left,
-          top = axis.box.top,
-          right = left + axis.box.width,
-          bottom = top + axis.box.height,
-          cls = axis.direction + axis.n + 'Axis',
-          box,
-          color;
-
-        plot.getPlaceholder().find('.' + cls + ' .tickLabel').each(function () {
-          var pos = $(this).position();
-          left = Math.min(pos.left, left);
-          top = Math.min(pos.top, top);
-          right = Math.max(Math.round(pos.left) + $(this).outerWidth(), right);
-          bottom = Math.max(Math.round(pos.top) + $(this).outerHeight(), bottom);
-        });
-        box = {left: left, top: top, width: 50, height: bottom - top};
-        color = DC.m.SensorInfo[axis.options.sensor].color;
-        // fixme: first time through box is not right size; resize browser or check/uncheck and it fixes itself
-        $('<div class="axisTarget" style="position:absolute;left:' +
-           box.left + 'px;top:' +
-           box.top + 'px;width:' +
-           box.width + 'px;height:' +
-           box.height + 'px"></div>')
-          .data('axis.direction', axis.direction)
-          .data('axis.n', axis.n)
-          .css({ backgroundColor: color, opacity: 0, cursor: "pointer" })
-          .appendTo(plot.getPlaceholder())
-          .hover(
-            function () { $(this).css({ opacity: 0.60 }); },
-            function () { $(this).css({ opacity: 0 }); }
-          );
-      }); // end .each function param
-    }, // end updateAxes
-
-    updateChart: function() {
-      // figure out which sensors are checked
-      var arr = _.pluck($('#sensorButtons :checked'), 'id');
-      // get the raw flot data
-      var plot, data = this.collection.flotData(arr);
-      console.log('updateChart => ', data);
-      // resize #chart accordingly
-      $("#chart").width($('#chart').parent().width() - 25);
-      // plot it
-      plot = $.plot($("#chart"), data, this.chartOptions);
-
-      // create plot overview
-      var overview = $.plot($("#overview"), data, {
-        series: {
-            lines: { show: true, lineWidth: 1 },
-            shadowSize: 0
-        },
-        legend: { show: false },
-        xaxis: { mode: "time", twelveHourClock: true },
-        yaxis: { ticks: []},
-        grid: { color: "#999" },
-        selection: { mode: "xy" }
-      });
-
-      // now connect the two
-    
-      $("#chart").bind("plotselected", function (event, ranges) {
-        // do the zooming
-        plot = $.plot($("#chart"), data,
-            $.extend(true, {}, this.chartOptions, {
-                xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
-        }));
-
-        // don't fire event on the overview to prevent eternal loop
-        overview.setSelection(ranges, true);
-
-        // do fancy axes
-        //this.updateAxes(plot);
-      });
-    
-      $("#overview").bind("plotselected", function (event, ranges) {
-        plot.setSelection(ranges);
-      });
-
-      // do fancy axes
-      this.updateAxes(plot);
-
-    } // end updateChart
-
-  });
-
-  var sensors = new DC.c.Sensors();
-  var sensorsView = new DC.v.Sensors({collection: sensors, el: $('#devices')});
-*/
-
-
-  // functions we export
+  /*---------------------------------------------------------------------------
+    This module's public methods 
+   --------------------------------------------------------------------------*/
   return {
     refresh: _refresh
   };
