@@ -8,6 +8,7 @@
 
 // Main
 
+// DataTables styles here - need these to jive with Bootstrap
 div.dataTables_length label 
   float left
   text-align left
@@ -61,12 +62,14 @@ table#sensorButtons td
     margin-left -25px !important
     margin-right 10px !important
 
+// online / offline daisy status in the table
 .daisy-online
   background-color: rgba(0, 255, 0, 0.3) !important
 
 .daisy-offline
   background-color: rgba(255, 0, 0, 0.3) !important
 
+// flot chart tooltip style
 #tooltip
   position absolute
   font-family 'Helvetica,Arial,sans-serif'
@@ -76,4 +79,10 @@ table#sensorButtons td
   padding 25px
   background-color #fee
   opacity 0.80
+
+// flot chart xaxis rotate
+.xAxis > .tickLabel
+  margin-top 30px
+  transform:rotate(-90deg)
+  
 

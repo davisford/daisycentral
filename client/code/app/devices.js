@@ -2,6 +2,37 @@
 
 var Devices = function() {
 
+  // TODO TIE IN SS EVENT HANDLERS
+    // handler for pub/sub coming from server
+  // on user channel; any devices we claim 
+  // ownership to that are live, the server will
+  // relay live messages to us here
+/*  ss.event.on('daisy:sensors', function(data, channelName) {
+    // if we received data with mac for the daisy currently selected, we
+    // add it to the collection and refresh the chart
+    if ( sensors.find(function(s) {
+      return s.get('mac') === data.mac;
+    }) ) {
+      sensors.add(new DC.m.Sensor(data));
+      sensorsView.render();
+    }
+  });
+
+  ss.event.on('daisy:status', function (daisy, channelName) {
+    // todo find table row, and update status
+    console.log('daisy status => ',daisy);
+    var row = table.$('tr:contains('+daisy.mac+')');
+    if(row) {
+      var td = $(':nth-child(2)', row);
+      $(td).val(daisy.online);
+      if(daisy.online === true) {
+        $(td).removeClass('daisy-offline').addClass('daisy-online');
+      } else {
+        $(td).removeClass('daisy-online').addClass('daisy-offline');
+      }
+    }
+  });  */
+
   // Backbone namespace DC 
   DC = {
     /* models */
@@ -293,25 +324,26 @@ var Devices = function() {
     }
   });
 
-  /**********************************************************
-   * View: ChartView
-   **********************************************************/
-  DC.v.RealTimeView = Backbone.View.extend({
-   
-    // current named sensors that are checked in SubNav
-    visibleSensors: [],
-   
-    // page event bus
-    bus: null,
-    
-    // where flot puts its stuff
-    chart: this.$('#chart'),
-    
-    // the $.plot object
-    plot: null,
-    
-    // the options to flot
-    chartOptions: {
+  /*---------------------------------------------------------------------------
+     View: RealTimeView - basically a wrapper around a Flot chart for sensors
+        We wrap it in a self-invoking closure so we can make use of private
+        vars and we don't have to write this.property all the time.
+   --------------------------------------------------------------------------*/
+  DC.v.RealTimeView = (function() {
+
+    // current named sensors that are checke on SubNav View
+    var checkedSensors = [];
+
+    var bus = null;
+
+    // the div that holds the Flot graph
+    var chart = $('#chart');
+
+    // the Flot Plot
+    var plot = null;
+
+    // configures Flot
+    var chartOptions = {
       legend: {
         show: true,
         margin: 10,
@@ -328,7 +360,8 @@ var Devices = function() {
       xaxis: {
         mode: 'time',
         timezone: 'browser',
-        twelveHourClock: true
+        twelveHourClock: true,
+        labelAngle: 90
       },
       selection: { mode: 'x' },
       yaxes: [
@@ -366,171 +399,134 @@ var Devices = function() {
         cursor: "move",      // CSS mouse cursor value used when dragging, e.g. "pointer"
         frameRate: 20
       }
-    },
+    };
 
-    el: $('#realtime-view'),
+    return Backbone.View.extend({
+   
+      el: $('#realtime-view'),
 
-    events: { 
-      'plothover #chart': 'plotHover',
-      'plotselected #chart': 'plotSelected'
-    },
+      events: { 
+        'plothover #chart': 'plotHover',
+        'plotselected #chart': 'plotSelected'
+      },
 
-    initialize: function(options) {
-      bus = options.bus;
-      _.bindAll(this, 'render', 'daisySelected', 'sensorSelected', 'plotHover', 'plotSelected');
-      bus.bind('daisySelected', this.daisySelected);
-      bus.bind('sensorSelected', this.sensorSelected);
-      chart = this.$('#chart');
-      plot = $.plot(chart, [], this.chartOptions);
+      initialize: function(options) {
+        bus = options.bus;
+        _.bindAll(this, 'render', 'daisySelected', 'sensorSelected', 'plotHover', 'plotSelected');
+        bus.bind('daisySelected', this.daisySelected);
+        bus.bind('sensorSelected', this.sensorSelected);
+        chart = this.$('#chart');
+        plot = $.plot(chart, [], chartOptions);
+        checkedSensors = _.pluck($('#sensorButtons :checked'), 'id');
+      },
 
-      visibleSensors = _.pluck($('#sensorButtons :checked'), 'id');
-    },
+      render: function() {
+        var points = this.collection.flotData(checkedSensors);
+        plot = $.plot(chart, points, chartOptions);
+        this.updateAxes(plot);
+      },
 
-    render: function() {
-      var points = this.collection.flotData(visibleSensors);
-      plot = $.plot(chart, points, this.chartOptions);
-    },
-
-    /* daisy was selected in the table, fetch it's sensor data */
-    daisySelected: function(daisy) {
-      if (daisy) {
-        this.model = daisy;
-        this.collection.fetch({mac: daisy.mac, 
-          success: this.render});
-      } else {
-        this.collection.reset();
-        plot = $.plot(this.chart, [], this.chartOptions);
-      }
-    },
-
-    sensorSelected: function(arr) {
-      visibleSensors = arr;
-      this.render();
-    },
-
-
-
-
-    plotHover: function() {
-      
-    },
-
-    plotSelected: function(e, ranges) {
-      this.plot = $.plot( this.chart, this.collection.getCached(),
-        $.extend(true, {}, this.chartOptions, { 
-          xaxis: { 
-            min: ranges.xaxis.from, 
-            max: ranges.xaxis.to 
-          } }) ); 
-    }
-
-  });
-
-
-
-
-
-  // handler for pub/sub coming from server
-  // on user channel; any devices we claim 
-  // ownership to that are live, the server will
-  // relay live messages to us here
-/*  ss.event.on('daisy:sensors', function(data, channelName) {
-    // if we received data with mac for the daisy currently selected, we
-    // add it to the collection and refresh the chart
-    if ( sensors.find(function(s) {
-      return s.get('mac') === data.mac;
-    }) ) {
-      sensors.add(new DC.m.Sensor(data));
-      sensorsView.render();
-    }
-  });
-
-  ss.event.on('daisy:status', function (daisy, channelName) {
-    // todo find table row, and update status
-    console.log('daisy status => ',daisy);
-    var row = table.$('tr:contains('+daisy.mac+')');
-    if(row) {
-      var td = $(':nth-child(2)', row);
-      $(td).val(daisy.online);
-      if(daisy.online === true) {
-        $(td).removeClass('daisy-offline').addClass('daisy-online');
-      } else {
-        $(td).removeClass('daisy-online').addClass('daisy-offline');
-      }
-    }
-  });
-
-  // register a new daisy with secret key
-  $('#registerDaisy').click(function(e) {
-    e.preventDefault();
-    var secret = $('#daisySecretKey').val();
-    if(!secret) {
-      return;
-    } else {
-      ss.rpc('devices.register', secret, function(err) {
-        if (err) alert(err);
-        else {
-          _refresh();
+      /* daisy was selected in the table, fetch it's sensor data */
+      daisySelected: function(daisy) {
+        if (daisy) {
+          this.model = daisy;
+          this.collection.fetch({mac: daisy.mac, 
+            success: this.render});
+        } else {
+          this.collection.reset();
+          plot = $.plot(chart, [], chartOptions);
         }
-      });
-    }
-  }); */
+      },
 
-  // initialize daisies DataTable
-/*  var table = $('#myDaisiesTable').dataTable( {
-    "bPaginate": true,
-    "bLengthChange": true,
-    "bFilter": true,
-    "bSort": true,
-    "bInfo": true,
-    "bAutoWidth": false,
-    "bProcessing": true,
-    "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
-    "sPaginationType": "bootstrap",
-    "oLanguage": {
-      "sLengthMenu": "_MENU_ records per page"
-    },
-    "aoColumns": [
-      { "mDataProp": "_id", "bVisible": false },
-      { "mDataProp": "did", "sClass": "canEdit" },
-      { "mDataProp": "key", "sClass": "canEdit", "bVisible": false },
-      { "mDataProp": "lastMod", "bVisible": false },
-      { "mDataProp": "owners", "bVisible": false },
-      { "mDataProp": "online" },
-      { "mDataProp": "mac" }
-    ]
-  });
+      sensorSelected: function(arr) {
+        checkedSensors = arr;
+        this.render();
+      },
 
-  // select a table row
-  $('#myDaisiesTable tbody tr').live('click', function (e) {
-    if ($(this).hasClass('row_selected')) {
-      $(this).removeClass('row_selected');
-      sensors.reset();
-      sensorsView.render();
-      return;
-    } else {
-      table.$('tr.row_selected').removeClass('row_selected');
-      $(this).addClass('row_selected');
-    }
-    // find the td with the mac address
-    var td = $(this).find('td:last')[0];
-    if(td) {
-      // get the mac address text
-      var mac = $(td).text();
-      // rpc call to get sensors for that mac address
-      ss.rpc('sensors.get', mac, function(err, data) {
-        if(err) { alert("failed to get sensor data "+err); return; }
-        else {
-          console.log('fetched '+data.length+' sensors');
-          sensors.reset();
-          _.each(data, function(datum) {
-            sensors.add(new DC.m.Sensor(datum));
+      previousPoint: null,
+
+      plotHover: function (event, pos, item) {
+        if (item) {
+          if (this.previousPoint !== item.dataIndex) {
+            this.previousPoint = item.dataIndex;
+            $("#tooltip").remove();
+            var date = new Date(item.datapoint[0]),
+              y = item.datapoint[1].toFixed(2);
+            this.showTooltip(item.pageX, item.pageY, item.series.label + " at " +
+              date.toLocaleString() + " = " + y);
+          }
+        } else {
+          $("#tooltip").remove();
+          this.previousPoint = null;
+        }
+      },
+
+      showTooltip: function (x, y, contents) {
+        $(ss.tmpl['devices-tooltip'].render({contents: contents }))
+          .css('top', y + 5)
+          .css('left', x + 5)
+          .appendTo('body')
+          .fadeIn(200);
+      },
+
+      plotSelected: function(e, ranges) {
+        plot = $.plot( chart, this.collection.getCached(),
+          $.extend(true, {}, chartOptions, { 
+            xaxis: { 
+              min: ranges.xaxis.from, 
+              max: ranges.xaxis.to 
+            } 
+          }) 
+        ); 
+      },
+
+      updateAxes: function (plot) {
+        $.each(plot.getAxes(), function (i, axis) {
+          if (!axis.show || axis.direction === "x" || axis.options.sensor === undefined || axis.options.sensor === "shared") {
+            return;
+          }
+
+          var left = axis.box.left,
+            top = axis.box.top,
+            right = left + axis.box.width,
+            bottom = top + axis.box.height,
+            cls = axis.direction + axis.n + 'Axis',
+            box,
+            color;
+
+          plot.getPlaceholder().find('.' + cls + ' .tickLabel').each(function () {
+            var pos = $(this).position();
+            left = Math.min(pos.left, left);
+            top = Math.min(pos.top, top);
+            right = Math.max(Math.round(pos.left) + $(this).outerWidth(), right);
+            bottom = Math.max(Math.round(pos.top) + $(this).outerHeight(), bottom);
           });
-          sensorsView.render();
-        }
-      });
-    }
-  }); */
+          box = {left: left, top: top, width: 50, height: bottom - top};
+          color = DC.m.SensorInfo[axis.options.sensor].color;
+          // fixme: first time through box is not right size; resize browser or check/uncheck and it fixes itself
+          $('<div class="axisTarget" style="position:absolute;left:' +
+             box.left + 'px;top:' +
+             box.top + 'px;width:' +
+             box.width + 'px;height:' +
+             box.height + 'px"></div>')
+            .data('axis.direction', axis.direction)
+            .data('axis.n', axis.n)
+            .css({ backgroundColor: color, opacity: 0, cursor: "pointer" })
+            .appendTo(plot.getPlaceholder())
+            .hover(
+              function () { $(this).css({ opacity: 0.60 }); },
+              function () { $(this).css({ opacity: 0 }); }
+            );
+        }); // end .each function param
+      }, // end updateAxes
+
+    });
+  })();
+  
+
+  /*---------------------------------------------------------------------------
+    This module's private methods and variable initialization 
+   --------------------------------------------------------------------------*/
 
   // refresh function
   var _refresh = function() {
@@ -553,63 +549,6 @@ var Devices = function() {
   // sidebar nav view
   var sidebarView = new DC.v.SideBarView({bus: bus});
 
-
-/*
-  DC.c.Sensors = Backbone.Collection.extend({
-    model: DC.m.Sensor,
-
-    // sort models by timestamp
-    comparator: function (sensor) {
-      return sensor.get('timestamp');
-    },
-
-    // convert raw data to format flot expects
-    // @param array of sensor names e.g. ['AD1', 'AD2']
-    // returns object with array of coordinates by timestamp
-    flotData: function (arr) {
-      var data = [], i, j, info,
-          vals, boolSensor, 
-          timestamps = _.map(this.pluck('timestamp'), function (num) {
-            // convert GMT time to local timestamp
-            var localNow = new Date().getTimezoneOffset(),
-            min = num / 1000 / 60;
-            return (min - localNow) * 1000 * 60;
-          });
-
-      for (i = 0; i < arr.length; i += 1) {
-        info = DC.m.SensorInfo[arr[i]];
-        vals = this.pluck(arr[i]);
-        boolSensor = _.any(["Power", "Leak Detection", "Magnetic Switch"], function (sensor) {
-          return sensor === info.name;
-        });
-
-        if (boolSensor) {
-          // boolean sensors have the raw values converted to 0 or 1 based on midpoint between 0-65534
-          for (j = 0; j < vals.length; j += 1) {
-            if (vals[j] > (65534 / 2)) {
-              vals[j] = 1;
-            } else { vals[j] = 0; }
-          }
-          // boolean sensors all share the same yaxis, and have line steps
-          data.push({
-            color: info.color,
-            label: info.name,
-            data: _.zip(timestamps, vals),
-            yaxis: info.yaxis,
-            lines: { show: true, steps: true }
-          });
-        } else {
-          data.push({
-            color: info.color,
-            label: info.name,
-            data: _.zip(timestamps, vals),
-            yaxis: info.yaxis
-          });
-        }
-      }
-      return data;
-    }
-  }); */
 /*
   DC.v.Sensors = Backbone.View.extend({
 
@@ -694,30 +633,7 @@ var Devices = function() {
       ]
     },
 
-    previousPoint: undefined,
-    plotHover: function (event, pos, item) {
-      if (item) {
-        if (this.previousPoint !== item.dataIndex) {
-          this.previousPoint = item.dataIndex;
-          $("#tooltip").remove();
-          var date = new Date(item.datapoint[0]),
-            y = item.datapoint[1].toFixed(2);
-          this.showTooltip(item.pageX, item.pageY, item.series.label + " at " +
-            date.toLocaleString() + " = " + y);
-        }
-      } else {
-        $("#tooltip").remove();
-        this.previousPoint = null;
-      }
-    },
-
-    showTooltip: function (x, y, contents) {
-      $(ss.tmpl['devices-tooltip'].render({contents: contents }))
-        .css('top', y + 5)
-        .css('left', x + 5)
-        .appendTo('body')
-        .fadeIn(200);
-    },
+    
 
     updateAxes: function (plot) {
       $.each(plot.getAxes(), function (i, axis) {
