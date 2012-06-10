@@ -100,13 +100,13 @@ html(lang="en")
                         tr
                           td
                             img.pull-left(src="images/draw_convolve.png")
-                            p Leak Detection
+                            p Leak
                           td 
                             input#AD2.btn.sensor-cb(type="checkbox", name="cb-leak")
                         tr
                           td
                             img.pull-left(src="images/magnet.png")
-                            p Magnetic Switch
+                            p Magnet
                           td
                             input#AD3.btn.sensor-cb(type="checkbox", name="cb-magnet")
                         tr 
@@ -118,7 +118,7 @@ html(lang="en")
                         tr
                           td
                             img.pull-left(src="images/temperature_3.png")
-                            p Temperature
+                            p Temp
                           td
                             input#AD5.btn.sensor-cb(type="checkbox", name="cb-temperature")
                         tr
@@ -168,10 +168,8 @@ html(lang="en")
                 h2 Real-Time Data 
                 p The chart shows the most recent data for the Daisy.
                 // flot data chart
-                div.span8#chart(style="height:300px; width:600px;")
-                  p foo
-                // flot chart overview
-                div.span4#overview(style="margin-left:50px;margin-top:20px;width:400px;height:50px")
+                div.span8#chart(style="height:400px; width:95%;")
+                div#placeholder(style="height:300px; width:600px;")
       div.row-fluid#rules(style="display:none")
         h1 This is the Rules Page
       div#profile(style="display:none")

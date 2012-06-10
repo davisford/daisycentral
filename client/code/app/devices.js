@@ -88,6 +88,10 @@ var Devices = function() {
       return;
     },
 
+    getCached: function () {
+      return this.cached || [];
+    },
+
     /**
      * Converts the models in this collection to a format flot expects
      * @param {Array} [arr] an array naming the sensors that should be shown; other
@@ -139,6 +143,7 @@ var Devices = function() {
           });
         }
       }
+      this.cached = data;
       return data;
     }
   });
@@ -292,67 +297,27 @@ var Devices = function() {
    * View: ChartView
    **********************************************************/
   DC.v.RealTimeView = Backbone.View.extend({
-    el: $('#realtime-view'),
-
-    events: { 
-      'plothover #chart': 'plotHover',
-
-    },
-
-    initialize: function(options) {
-      this.bus = options.bus;
-      _.bindAll(this, 'render', 'daisySelected', 'sensorSelected', 'plotHover');
-      this.bus.bind('daisySelected', this.daisySelected);
-      this.bus.bind('sensorSelected', this.sensorSelected);
-      //this.plot = $.plot($("#chart"), [], this.chartOptions);
-      this.visibleSensors = _.pluck($('#sensorButtons :checked'), 'id');
-      console.log('visible sensors initialize: ', this.visibleSensors);
-  //    $(window).resize(_.throttle(this.plot.draw, 100));
-    },
-
-    render: function() {
-      console.log('visible sensors render, collection: ', this.visibleSensors, this.collection);
-      var points = this.collection.flotData(this.visibleSensors);
-      console.log('render: after flotData: ', points);
-      Flotr.draw($('#chart').get()[0], points, this.flotrOptions);
-    },
-
-    /* daisy was selected in the table, fetch it's sensor data */
-    daisySelected: function(daisy) {
-      if (daisy) {
-        this.model = daisy;
-        this.collection.fetch({mac: daisy.mac, 
-          success: this.render});
-      }
-    },
-
-    sensorSelected: function(arr) {
-      this.visibleSensors = arr;
-      this.render();
-    },
-
-    flotrOptions: {
-      title: 'Real-Time Daisy Data',
-      xaxis: { mode: 'time' },
-      y2axis: {
-        color: '#FF0000', max: 500, title: 'y = x^3'
-      },
-      y3axis: {
-        labelWidth: 40,
-          position: "left",
-          sensor: "AD5",
-          color: DC.m.SensorInfo.AD5.color,
-          tickFormatter: function (n, obj) { return n + "F"; }
-      }
-    },
-
+   
+    // current named sensors that are checked in SubNav
+    visibleSensors: [],
+   
+    // page event bus
+    bus: null,
+    
+    // where flot puts its stuff
+    chart: this.$('#chart'),
+    
+    // the $.plot object
+    plot: null,
+    
+    // the options to flot
     chartOptions: {
       legend: {
         show: true,
         margin: 10,
         backgroundOpacity: 0.5
       },
-      grid: { hoverable: true, clickable: true, markings: this.weekendAreas },
+      grid: { hoverable: true, clickable: true },
       points: {
         show: true,
         radius: 3
@@ -362,9 +327,10 @@ var Devices = function() {
       },
       xaxis: {
         mode: 'time',
+        timezone: 'browser',
         twelveHourClock: true
       },
-      selection: { mode: 'xy' },
+      selection: { mode: 'x' },
       yaxes: [
         { labelWidth: 40,
           position: "right",
@@ -389,12 +355,73 @@ var Devices = function() {
           sensor: "AD7",
           color: DC.m.SensorInfo.AD7.color,
           tickFormatter: function (n, obj) { return n + "V"; } }  // battery
-      ]
+      ],
+      zoom: {
+        interactive: false,
+        trigger: "dblclick", // or "click" for single click
+        amount: 0.1       // 2 = 200% (zoom in), 0.5 = 50% (zoom out)
+      },
+      pan: {
+        interactive: false,
+        cursor: "move",      // CSS mouse cursor value used when dragging, e.g. "pointer"
+        frameRate: 20
+      }
     },
+
+    el: $('#realtime-view'),
+
+    events: { 
+      'plothover #chart': 'plotHover',
+      'plotselected #chart': 'plotSelected'
+    },
+
+    initialize: function(options) {
+      bus = options.bus;
+      _.bindAll(this, 'render', 'daisySelected', 'sensorSelected', 'plotHover', 'plotSelected');
+      bus.bind('daisySelected', this.daisySelected);
+      bus.bind('sensorSelected', this.sensorSelected);
+      chart = this.$('#chart');
+      plot = $.plot(chart, [], this.chartOptions);
+
+      visibleSensors = _.pluck($('#sensorButtons :checked'), 'id');
+    },
+
+    render: function() {
+      var points = this.collection.flotData(visibleSensors);
+      plot = $.plot(chart, points, this.chartOptions);
+    },
+
+    /* daisy was selected in the table, fetch it's sensor data */
+    daisySelected: function(daisy) {
+      if (daisy) {
+        this.model = daisy;
+        this.collection.fetch({mac: daisy.mac, 
+          success: this.render});
+      } else {
+        this.collection.reset();
+        plot = $.plot(this.chart, [], this.chartOptions);
+      }
+    },
+
+    sensorSelected: function(arr) {
+      visibleSensors = arr;
+      this.render();
+    },
+
+
 
 
     plotHover: function() {
       
+    },
+
+    plotSelected: function(e, ranges) {
+      this.plot = $.plot( this.chart, this.collection.getCached(),
+        $.extend(true, {}, this.chartOptions, { 
+          xaxis: { 
+            min: ranges.xaxis.from, 
+            max: ranges.xaxis.to 
+          } }) ); 
     }
 
   });
@@ -509,37 +536,7 @@ var Devices = function() {
   var _refresh = function() {
     // fetch the latest daisies
     daisies.fetch({success: tableView.render});
-
-    /*ss.rpc('devices.get', function(err, devices) {
-      if (err) alert(err);
-      else {
-        // clear the table and add new data
-        table.fnClearTable();
-        table.fnAddData(devices);
-        // add jEditable to table data
-        // only columns with the .canEdit class can be edited
-        $('.canEdit', table.fnGetNodes()).editable(function (val, settings) {
-          // get the object for this row
-          var obj = table.fnGetData(table.fnGetPosition(this)[0]);
-          // we know it is the did property
-          obj.did = val;
-          console.log(obj);
-          ss.rpc('devices.save', obj, function(ok) {
-            if (ok === false) {
-              alert("update failed");
-              _refresh();
-            }
-          });
-          return (val);
-          }, {
-            type: 'textarea',
-            event: 'dblclick',
-            tooltip: 'Doubleclick to edit...', 
-            submit: 'OK' 
-          }); // end .editable 
-      } 
-    }); */
-  }
+  };
 
   // event bus
   var bus = _.extend({}, Backbone.Events);
@@ -816,13 +813,12 @@ var Devices = function() {
   var sensors = new DC.c.Sensors();
   var sensorsView = new DC.v.Sensors({collection: sensors, el: $('#devices')});
 */
-  
 
 
   // functions we export
   return {
     refresh: _refresh
-  }
+  };
   
 }();
 module.exports = Devices;
