@@ -52,15 +52,15 @@ var Router = Backbone.Router.extend({
 
   daisyList: function() {
     $("#devicesContent").children().hide();
-    $("#daisyList").show("fast", function() {
+    $("#table-view").show("fast", function() {
       console.log("daisyList");
     });
   },
 
   registerDaisy: function() {
     $("#devicesContent").children().hide();
-    $("#registerDaisy").show("fast", function() {
-      console.log("registerDaisy");
+    $("#register-view").show("fast", function() {
+      console.log("register-view");
     });
   }
 });

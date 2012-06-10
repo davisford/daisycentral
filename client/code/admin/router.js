@@ -22,8 +22,6 @@ var Router = Backbone.Router.extend({
   devices: function () {
     $("#content").children().hide();
     $("#devices").show("fast", function() {
-      // refresh table data
-      console.log("I've been asked to refresh the devices page");
       devicesHandler.refresh();
     });
   },

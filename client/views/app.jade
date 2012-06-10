@@ -164,11 +164,12 @@ html(lang="en")
                     th MAC
                 tbody
               hr
-              div.#realtime-view
+              div#realtime-view
                 h2 Real-Time Data 
                 p The chart shows the most recent data for the Daisy.
                 // flot data chart
-                div.span8#chart(style="height:300px;")
+                div.span8#chart(style="height:300px; width:600px;")
+                  p foo
                 // flot chart overview
                 div.span4#overview(style="margin-left:50px;margin-top:20px;width:400px;height:50px")
       div.row-fluid#rules(style="display:none")

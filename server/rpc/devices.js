@@ -8,7 +8,7 @@ exports.actions = function (req, res, ss) {
   req.use('session');
 
   // you must be authenticated 
-  req.use('seurity.authenticated');
+  req.use('security.authenticated');
 
   return {
     
@@ -16,6 +16,7 @@ exports.actions = function (req, res, ss) {
     // claims ownership to
     get: function() {
       Daisies.find( {"owners": req.session.userId}, function (err, daisies) {
+        console.log('RPC.get daisies: ', daisies);
         if (err) { console.log(err); return res(false, null); }
         else {
           return res(null, daisies);
@@ -38,7 +39,7 @@ exports.actions = function (req, res, ss) {
           return res(false);
         } else {
           // update it an save
-          found.owners.push(auth.userId);
+          found.owners.push(req.session.userId);
           found.save(function (err) {
             if (err) { console.log(err); return res(false); }
             else { return res(true); }

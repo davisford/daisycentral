@@ -55,6 +55,7 @@ var Devices = function() {
       };
       options.error = Backbone.wrapError(options.error, collection, options);
       ss.rpc('devices.get', function(err, arr) {
+        console.log('fetched daisies: ', err, arr);
         if (err) { return options.error(err); }
         return options.success(arr);
       })
@@ -66,7 +67,7 @@ var Devices = function() {
    * Collection: Sensors
    **********************************************************/
   DC.c.Sensors = Backbone.Collection.extend({
-    model: DC.m.SensorData,
+    model: DC.m.Sensor,
 
     comparator: function (sensor) {
       return sensor.get('timestamp');
@@ -78,7 +79,7 @@ var Devices = function() {
       options.success = function(resp, status, xhr) {
         collection.reset(resp, options);
         if (success) success(collection, resp);
-      };
+      }; 
       options.error = Backbone.wrapError(options.error, collection, options);
       ss.rpc('sensors.get', options.mac, function(err, arr) {
         if (err) { return options.error(err); }
@@ -87,11 +88,14 @@ var Devices = function() {
       return;
     },
 
-    // convert raw data to format flot expects
-    // @param array of sensor names e.g. ['AD1', 'AD2']
-    // returns object with array of coordinates by timestamp
+    /**
+     * Converts the models in this collection to a format flot expects
+     * @param {Array} [arr] an array naming the sensors that should be shown; other
+     *    sensors will be filtered out.  e.g. ['AD0', 'AD1']
+     * @return an array of data for flot
+     */
     flotData: function (arr) {
-      var data = [], i, j, info,
+      var arr, data = [], i, j, info,
           vals, boolSensor, 
           timestamps = _.map(this.pluck('timestamp'), function (num) {
             // convert GMT time to local timestamp
@@ -120,6 +124,8 @@ var Devices = function() {
             label: info.name,
             data: _.zip(timestamps, vals),
             yaxis: info.yaxis,
+            clickable: true,
+            hoverable: true,
             lines: { show: true, steps: true }
           });
         } else {
@@ -127,6 +133,8 @@ var Devices = function() {
             color: info.color,
             label: info.name,
             data: _.zip(timestamps, vals),
+            clickable: true,
+            hoverable: true,
             yaxis: info.yaxis
           });
         }
@@ -135,6 +143,69 @@ var Devices = function() {
     }
   });
 
+  /********************************************************
+   * View: SidebarView
+   ********************************************************/
+  DC.v.SideBarView = Backbone.View.extend({
+    el: $('#sidebar-view'),
+
+    events: { 
+      'change .sensor-cb': 'sensorSelected'
+    },
+
+    initialize: function(options) {
+      this.bus = options.bus;
+      _.bindAll(this, 'render', 'sensorSelected');
+    },
+
+    render: function() {
+
+    },
+
+    sensorSelected: function() {
+      console.log('sensorSelected');
+      // broadcast event about sensors that are checked
+      var arr = _.pluck($('#sensorButtons :checked'), 'id');
+      this.bus.trigger('sensorSelected', arr);
+    }
+  });
+
+  /********************************************************
+   * View: RegisterView
+   ********************************************************/
+  DC.v.RegisterView = Backbone.View.extend({
+    el: $('#register-view'),
+
+    events: { 
+      'click #register-button': 'register'
+    },
+
+    initialize: function(options) {
+      _.bindAll(this, 'render', 'register');
+    },
+
+    render: function() {
+
+    },
+
+    register: function(e) {
+      console.log('register');
+      e.preventDefault();
+      var secret = $('#daisySecretKey').val();
+      if(!secret) {
+        return;
+      } else {
+        ss.rpc('devices.register', secret, function(err) {
+          if (err) alert(err);
+          else {
+           _refresh();
+          }
+        });
+      }
+    }
+  });
+
+
   /**********************************************************
    * View: TableView
    **********************************************************/
@@ -142,7 +213,7 @@ var Devices = function() {
     el: $('#table-view'),
 
     events: {
-      'click #daisiesTable tbody tr': 'selectRow'
+      'click #daisies-table tbody tr': 'selectRow'
     },
 
     initialize: function(options) {
@@ -150,7 +221,7 @@ var Devices = function() {
       this.bus = options.bus;
 
       // create dataTable once
-      this.table = $('#daisiesTable').dataTable({
+      this.table = this.$('#daisies-table').dataTable({
         "bPaginate": true,
         "bLengthChange": true,
         "bFilter": true,
@@ -211,8 +282,9 @@ var Devices = function() {
         this.table.$('tr.row_selected').removeClass('row_selected');
         row.addClass('row_selected');
       }
+      var daisy = this.table._('.row_selected')[0];
       // broadcast event about daisy that is selected
-      this.bus.trigger('daisySelected', this.table._('.row_selected'));
+      this.bus.trigger('daisySelected', daisy);
     }
   });
 
@@ -229,21 +301,97 @@ var Devices = function() {
 
     initialize: function(options) {
       this.bus = options.bus;
-      _.bindAll(this, 'render', 'daisySelected', 'plotHover');
+      _.bindAll(this, 'render', 'daisySelected', 'sensorSelected', 'plotHover');
       this.bus.bind('daisySelected', this.daisySelected);
+      this.bus.bind('sensorSelected', this.sensorSelected);
+      //this.plot = $.plot($("#chart"), [], this.chartOptions);
+      this.visibleSensors = _.pluck($('#sensorButtons :checked'), 'id');
+      console.log('visible sensors initialize: ', this.visibleSensors);
+  //    $(window).resize(_.throttle(this.plot.draw, 100));
     },
 
     render: function() {
-
+      console.log('visible sensors render, collection: ', this.visibleSensors, this.collection);
+      var points = this.collection.flotData(this.visibleSensors);
+      console.log('render: after flotData: ', points);
+      Flotr.draw($('#chart').get()[0], points, this.flotrOptions);
     },
 
+    /* daisy was selected in the table, fetch it's sensor data */
     daisySelected: function(daisy) {
       if (daisy) {
         this.model = daisy;
-        this.collection.fetch({mac: daisy.get('mac'), 
+        this.collection.fetch({mac: daisy.mac, 
           success: this.render});
       }
     },
+
+    sensorSelected: function(arr) {
+      this.visibleSensors = arr;
+      this.render();
+    },
+
+    flotrOptions: {
+      title: 'Real-Time Daisy Data',
+      xaxis: { mode: 'time' },
+      y2axis: {
+        color: '#FF0000', max: 500, title: 'y = x^3'
+      },
+      y3axis: {
+        labelWidth: 40,
+          position: "left",
+          sensor: "AD5",
+          color: DC.m.SensorInfo.AD5.color,
+          tickFormatter: function (n, obj) { return n + "F"; }
+      }
+    },
+
+    chartOptions: {
+      legend: {
+        show: true,
+        margin: 10,
+        backgroundOpacity: 0.5
+      },
+      grid: { hoverable: true, clickable: true, markings: this.weekendAreas },
+      points: {
+        show: true,
+        radius: 3
+      },
+      lines: {
+        show: true
+      },
+      xaxis: {
+        mode: 'time',
+        twelveHourClock: true
+      },
+      selection: { mode: 'xy' },
+      yaxes: [
+        { labelWidth: 40,
+          position: "right",
+          sensor: "shared",
+          ticks: [[0.0, "OFF"], [1.0, "ON"]] }, // power,leak,magnet
+        { labelWidth: 40,
+          position: "left",
+          sensor: "AD4",
+          color: DC.m.SensorInfo.AD4.color,
+          tickFormatter: function (n, obj) { return n + "%"; } },  // humidity
+        { labelWidth: 40,
+          position: "left",
+          sensor: "AD5",
+          color: DC.m.SensorInfo.AD5.color,
+          tickFormatter: function (n, obj) { return n + "F"; } },  // temp
+        { labelWidth: 40,
+          position: "left",
+          sensor: "AD6",
+          color: DC.m.SensorInfo.AD6.color },  // moisture
+        { labelWidth: 40,
+          position: "left",
+          sensor: "AD7",
+          color: DC.m.SensorInfo.AD7.color,
+          tickFormatter: function (n, obj) { return n + "V"; } }  // battery
+      ]
+    },
+
 
     plotHover: function() {
       
@@ -251,47 +399,8 @@ var Devices = function() {
 
   });
 
-  /********************************************************
-   * View: RegisterView
-   ********************************************************/
-  DC.v.RegisterView = Backbone.View.extend({
-    el: $('#register-view'),
 
-    events: { },
 
-    initialize: function(options) {
-      _.bindAll(this, 'render');
-    },
-
-    render: function() {
-
-    }
-
-  });
-
-  /********************************************************
-   * View: SidebarView
-   ********************************************************/
-  DC.v.SidebarView = Backbone.View.extend({
-    el: $('#sidebar-view'),
-
-    events: { 
-      'change .sensor-cb': 'sensorSelected'
-    },
-
-    initialize: function(options) {
-      this.bus = options.bus;
-      _.bindAll(this, 'render', 'sensorSelected');
-    },
-
-    render: function() {
-
-    },
-
-    sensorSelected: function() {
-
-    }
-  })
 
 
   // handler for pub/sub coming from server
@@ -504,7 +613,7 @@ var Devices = function() {
       return data;
     }
   }); */
-
+/*
   DC.v.Sensors = Backbone.View.extend({
 
     events: {
@@ -706,8 +815,9 @@ var Devices = function() {
 
   var sensors = new DC.c.Sensors();
   var sensorsView = new DC.v.Sensors({collection: sensors, el: $('#devices')});
+*/
+  
 
-  $(window).resize(_.throttle(sensorsView.updateChart, 100));
 
   // functions we export
   return {
