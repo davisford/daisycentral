@@ -429,23 +429,54 @@ var Devices = function() {
         chart = this.$('#chart');
         plot = $.plot(chart, [], chartOptions);
         checkedSensors = _.pluck($('#sensorButtons :checked'), 'id');
+
+        var me = this;
+
+        ss.event.on('daisy:sensors', function(data, channelName) {
+          // if we received data with mac for the daisy currently selected, we
+          // add it to the collection and refresh the chart
+          if ( me.collection.find( function(s) {
+            return s.get('mac') === data.mac;
+            }) ) {
+            console.log('new datapoint timestamp: '+data.timestamp);
+            console.log('adding new datapoint to collection at '+new Date(data.timestamp), data);
+            me.collection.add(data);
+            me.render();
+          }
+        });
       },
 
       render: function() {
         var points = this.collection.flotData(checkedSensors);
-        plot = $.plot(chart, points, chartOptions);
-        this.updateAxes(plot);
+
+        console.log('render: this.ranges', this.ranges);
+        if (this.ranges) {
+          // keep zoom level the same
+          
+          var last = this.collection.pluck('timestamp')[this.collection.length-1];
+          var xaxis = { xaxis: { min: this.ranges.xaxis.from, max: last + 100 }};
+          plot = $.plot(chart, points, 
+              $.extend(true, {}, chartOptions, xaxis) );
+        } else {
+          console.log('NEW PLOT HAPPENS');
+          plot = $.plot(chart, points, chartOptions);
+          this.updateAxes(plot);
+        }
+        
       },
 
       /* daisy was selected in the table, fetch it's sensor data */
       daisySelected: function(daisy) {
+        this.ranges = undefined;
         if (daisy) {
           this.model = daisy;
           this.collection.fetch({mac: daisy.mac, 
             success: this.render});
+          this.$('#realtime-header').html('Real-Time Data: '+daisy.did);
         } else {
           this.collection.reset();
           plot = $.plot(chart, [], chartOptions);
+          this.$('#realtime-header').html('Real-Time Data');
         }
       },
 
@@ -483,27 +514,18 @@ var Devices = function() {
       plotSelected: function(e, ranges) {
         if (ranges) {
           this.ranges = ranges;
+          var xaxis = { xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }};
           plot = $.plot( chart, this.collection.getCached(),
-            $.extend(true, {}, chartOptions, { 
-              xaxis: { 
-                min: ranges.xaxis.from, 
-                max: ranges.xaxis.to 
-              } 
-            }) 
-          ); 
+            $.extend(true, {}, chartOptions, xaxis) ); 
         }
       },
 
       plotUnselected: function(e) {
+        console.log('plotUnselected: ', this.ranges);
+        var xaxis = { xaxis: { min: this.min, max: this.max } };
         if (this.ranges) {
           plot = $.plot( chart, this.collection.getCached(),
-            $.extend(true, {}, chartOptions, { 
-              xaxis: { 
-                min: this.ranges.xaxis.from, 
-                max: this.ranges.xaxis.to 
-              } 
-            }) 
-          ); 
+            $.extend(true, {}, chartOptions, xaxis) ); 
         }
       },
 
@@ -546,7 +568,8 @@ var Devices = function() {
             );
         }); // end .each function param
 
-        console.log(plot.getAxes().xaxis);
+        this.minx = plot.getAxes().xaxis.min;
+        this.maxx = plot.getAxes().xaxis.max;
       }, // end updateAxes
 
     });

@@ -92,7 +92,7 @@ function DaisyConversation(socket, ss) {
         console.log("Could not save sensor data", err);
         me.callback(err);
       } else {
-        console.log("New sensor data saved at "+doc.localdate);
+        console.log("New sensor data saved at (localdate) "+doc.date);
       }
     });
 
