@@ -38,12 +38,17 @@ exports.actions = function (req, res, ss) {
           console.log("Couldn't find daisy by secret key", secret);
           return res(false);
         } else {
-          // update it an save
-          found.owners.push(req.session.userId);
-          found.save(function (err) {
-            if (err) { console.log(err); return res(false); }
-            else { return res(true); }
-          });
+          if(found.owners.indexOf(req.session.userId) < 0) {
+            // update and save
+            found.owners.push(req.session.userId);
+            found.save(function (err) {
+              if (err) { console.log(err); return res(false); }
+              else { return res(true); }
+            });
+          } else {
+            // we are already an owner of this daisy
+            return res(true);
+          }
         }
       });
       res(true);
