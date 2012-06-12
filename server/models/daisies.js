@@ -9,7 +9,7 @@ var DaisiesSchema = new Schema({
 	mac: { type: String, index: true },
   online: { type: Boolean, index: true },
 	owners: [{ type: ObjectId, index: true, ref: 'User' }],
-	key: { type: String }
+	key: { type: String, unique: true }
 });
 
 DaisiesSchema.plugin(lastmodified);
