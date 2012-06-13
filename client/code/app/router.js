@@ -6,11 +6,11 @@ var Router = Backbone.Router.extend({
   routes: {
     "":  "home",
     "devices": "devices",
+    "devices/register": "devicesRegister",
+    "devices/daisies": "devicesDaisies",
     "rules": "rules",
     "profile": "profile",
     "help": "help",
-    "daisyList": "daisyList",
-    "registerDaisy": "registerDaisy"
   },
 
   home: function() {
@@ -26,6 +26,30 @@ var Router = Backbone.Router.extend({
     $("#devices").show("fast", function() {
       // refresh table data
       devicesHandler.refresh();
+    });
+  },
+
+  devicesDaisies: function() {
+    $('#devices-content').children().hide();
+    $('#table-view').show('fast', function() {
+      if ( !$('#devices').is(':visible') ) {
+        $('#content').children().hide();
+        $('#devices').show('fast', function() {
+          devicesHandler.refresh();
+        });
+      }
+    });
+  },
+
+  devicesRegister: function() {
+    $('#devices-content').children().hide();
+    $('#register-view').show('fast', function() {
+      if ( !$('#devices').is(':visible') ) {
+        $('#content').children().hide();
+        $('#devices').show('fast', function() {
+          devicesHandler.refresh();
+        });
+      }
     });
   },
 
@@ -47,20 +71,6 @@ var Router = Backbone.Router.extend({
     $("#content").children().hide();
     $("#help").show("fast", function() {
       console.log("help");
-    });
-  },
-
-  daisyList: function() {
-    $("#devicesContent").children().hide();
-    $("#table-view").show("fast", function() {
-      console.log("daisyList");
-    });
-  },
-
-  registerDaisy: function() {
-    $("#devicesContent").children().hide();
-    $("#register-view").show("fast", function() {
-      console.log("register-view");
     });
   }
 });

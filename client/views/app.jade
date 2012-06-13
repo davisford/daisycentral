@@ -64,11 +64,11 @@ block body
           div.span3#sidebar-view
             div.well.sidebar-nav
               ul.nav.nav-list
-                li.active
-                  a(href="#daisyList") Daisies
-                li
-                  a(href="#registerDaisy") Register a Daisy
-              table.table.table-striped.table-condensed#sensorButtons(disabled="disabled")
+                li.active#daisies-li
+                  a(href="#devices/daisies") Daisies
+                li#register-li
+                  a(href="#devices/register") Register a Daisy
+              table.table.table-striped.table-condensed#sensor-cb-table(disabled="disabled")
                 thead
                   tr
                     th(colspan="2") Sensor
@@ -80,7 +80,7 @@ block body
                       td
                         p Power
                       td
-                        input#AD1.btn.sensor-cb(type="checkbox", name="cb-power", checked="yes") 
+                        input#AD1.btn.sensor-cb(type="checkbox", name="cb-power") 
                     tr
                       td
                         img.pull-left(src="images/draw_convolve.png")
@@ -122,8 +122,8 @@ block body
                       td
                         p Battery
                       td
-                        input#AD7.btn.sensor-cb(type="checkbox", name="cb-battery")
-          div.span9#devicesContent
+                        input#AD7.btn.sensor-cb(type="checkbox", name="cb-battery", checked="yes")
+          div.span9#devices-content
             div#register-view(style="display:none")
               h2 Register A New Daisy 
               form.well.form-inline
@@ -134,7 +134,7 @@ block body
                 | contact us at  
                 a(href="mailto:support@daisyworks.com") support@daisyworks.com
                 hr
-                input.input#daisySecretKey(type="text", placeholder="secret key", style="margin-right:1em;")
+                input.input#secret-key(type="text", placeholder="secret key", style="margin-right:1em;")
                 button.btn.btn-primary#register-button(type="submit") Register
             div.container-fluid#table-view
               h2 My Daisies

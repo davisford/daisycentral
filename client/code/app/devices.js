@@ -7,17 +7,7 @@ var Devices = function() {
   // on user channel; any devices we claim 
   // ownership to that are live, the server will
   // relay live messages to us here
-/*  ss.event.on('daisy:sensors', function(data, channelName) {
-    // if we received data with mac for the daisy currently selected, we
-    // add it to the collection and refresh the chart
-    if ( sensors.find(function(s) {
-      return s.get('mac') === data.mac;
-    }) ) {
-      sensors.add(new DC.m.Sensor(data));
-      sensorsView.render();
-    }
-  });
-
+/*
   ss.event.on('daisy:status', function (daisy, channelName) {
     // todo find table row, and update status
     console.log('daisy status => ',daisy);
@@ -196,33 +186,43 @@ var Devices = function() {
 
     events: { 
       'change .sensor-cb': 'sensorSelected',
-      'click a': 'submenuClick'
+      'click a': 'menuClicked'
     },
 
     initialize: function(options) {
       this.bus = options.bus;
-      _.bindAll(this, 'render', 'sensorSelected');
+      _.bindAll(this, 'render', 'sensorSelected', 'fadeSensorButtons');
     },
 
     render: function() {
-
+      this.fadeSensorButtons(location.hash);
     },
 
     sensorSelected: function() {
       console.log('sensorSelected');
       // broadcast event about sensors that are checked
-      var arr = _.pluck($('#sensorButtons :checked'), 'id');
+      var arr = _.pluck($('#sensor-cb-table :checked'), 'id');
       this.bus.trigger('sensorSelected', arr);
     },
 
-    submenuClick: function(e) {
-      var sensorButtons$ = this.$('#sensorButtons');
-      if (e.currentTarget.hash === "#registerDaisy") {
+    menuClicked: function(e) {
+      this.fadeSensorButtons(e.currentTarget.hash);
+    },
+
+    fadeSensorButtons: function(hash) {
+      var sensorButtons$ = this.$('#sensor-cb-table');
+      if (hash === "#devices/register") {
+        // we have to do this b/c they can come in straight on the URL
+        this.$('#register-li').addClass('active');
+        this.$('#daisies-li').removeClass('active');
         sensorButtons$.fadeTo(500, 0.25);
       } else {
         sensorButtons$.fadeTo(500, 1.0);
+        this.$('#register-li').removeClass('active');
+        this.$('#daisies-li').addClass('active');
       }
     }
+
   });
 
 
@@ -248,7 +248,7 @@ var Devices = function() {
     register: function(e) {
       e.preventDefault();
       this.$('.alert').remove();
-      var secret = $('#daisySecretKey').val();
+      var secret = $('#secret-key').val();
       if(!secret) {
         return;
       } else {
@@ -441,7 +441,7 @@ var Devices = function() {
         bus.bind('sensorSelected', this.sensorSelected);
         chart = this.$('#chart');
         plot = $.plot(chart, [], chartOptions);
-        checkedSensors = _.pluck($('#sensorButtons :checked'), 'id');
+        checkedSensors = _.pluck($('#sensor-cb-table :checked'), 'id');
 
         var me = this;
 
@@ -592,7 +592,7 @@ var Devices = function() {
 
   // refresh function
   var _refresh = function() {
-    // fetch the latest daisies
+    sidebarView.render();
     daisies.fetch({success: tableView.render});
   };
 
