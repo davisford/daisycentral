@@ -521,14 +521,6 @@ var Devices = function() {
         }
       },
 
-      showTooltip: function (x, y, contents) {
-        $(ss.tmpl['devices-tooltip'].render({contents: contents }))
-          .css('top', y + 5)
-          .css('left', x + 5)
-          .appendTo('body')
-          .fadeIn(200);
-      },
-
       plotSelected: function(e, ranges) {
         if (ranges) {
           this.ranges = ranges;
