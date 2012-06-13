@@ -216,7 +216,12 @@ var Devices = function() {
     },
 
     submenuClick: function(e) {
-      console.log('submenu click ', e);
+      var sensorButtons$ = this.$('#sensorButtons');
+      if (e.currentTarget.hash === "#registerDaisy") {
+        sensorButtons$.fadeTo(500, 0.25);
+      } else {
+        sensorButtons$.fadeTo(500, 1.0);
+      }
     }
   });
 
@@ -500,10 +505,15 @@ var Devices = function() {
           if (this.previousPoint !== item.dataIndex) {
             this.previousPoint = item.dataIndex;
             $("#tooltip").remove();
-            var date = new Date(item.datapoint[0]),
-              y = item.datapoint[1].toFixed(2);
-            this.showTooltip(item.pageX, item.pageY, item.series.label + " at " +
-              date.toLocaleString() + " = " + y);
+            $(ss.tmpl['devices-tooltip'].render({
+              sensor: item.series.label + ': ' + item.datapoint[1].toFixed(2),
+              timestamp: new Date(item.datapoint[0])
+            }))
+            .css('top', item.pageY + 5)
+            .css('left', item.pageX + 5)
+            .css('background-color', item.series.color)
+            .appendTo('body')
+            .fadeIn(200);
           }
         } else {
           $("#tooltip").remove();
