@@ -31,27 +31,26 @@ exports.actions = function (req, res, ss) {
       Daisies.findOne({key: secret}, function (err, found) {
         
         // database problem
-        if (err) { console.log(err); return res(false); }
+        if (err) { console.log(err); return res("Registration error; please try again", false); }
 
         // can't find it
         if(!found) {
           console.log("Couldn't find daisy by secret key", secret);
-          return res(false);
+          return res("Registration was not successful - are you sure you have the right key? ", false);
         } else {
           if(found.owners.indexOf(req.session.userId) < 0) {
             // update and save
             found.owners.push(req.session.userId);
             found.save(function (err) {
-              if (err) { console.log(err); return res(false); }
-              else { return res(true); }
+              if (err) { console.log(err); return res("Registration error; please try again", false); }
+              else { return res("Registration was successful", true); }
             });
           } else {
             // we are already an owner of this daisy
-            return res(true);
+            return res("You've already registered that Daisy", true);
           }
         }
       });
-      res(true);
     }
 
   } // end return

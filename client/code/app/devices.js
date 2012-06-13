@@ -195,7 +195,8 @@ var Devices = function() {
     el: $('#sidebar-view'),
 
     events: { 
-      'change .sensor-cb': 'sensorSelected'
+      'change .sensor-cb': 'sensorSelected',
+      'click a': 'submenuClick'
     },
 
     initialize: function(options) {
@@ -212,6 +213,10 @@ var Devices = function() {
       // broadcast event about sensors that are checked
       var arr = _.pluck($('#sensorButtons :checked'), 'id');
       this.bus.trigger('sensorSelected', arr);
+    },
+
+    submenuClick: function(e) {
+      console.log('submenu click ', e);
     }
   });
 
@@ -236,17 +241,20 @@ var Devices = function() {
     },
 
     register: function(e) {
-      console.log('register');
       e.preventDefault();
+      this.$('.alert').remove();
       var secret = $('#daisySecretKey').val();
       if(!secret) {
         return;
       } else {
-        ss.rpc('devices.register', secret, function(err) {
-          if (err) alert(err);
-          else {
-           _refresh();
+        var me = this, html;
+        ss.rpc('devices.register', secret, function(err, res) {
+          if(true === res) {
+            html = ss.tmpl['devices-register-true'].render({message:err});
+          } else {
+            html = ss.tmpl['devices-register-false'].render({message:err});
           }
+          $(html).hide().appendTo(me.el).slideDown();
         });
       }
     }
@@ -287,7 +295,7 @@ var Devices = function() {
           { "mDataProp": "key", "sClass": "canEdit", "bVisible": false },
           { "mDataProp": "lastMod", "bVisible": false },
           { "mDataProp": "owners", "bVisible": false },
-          { "mDataProp": "online" },
+          { "mDataProp": "online", "sDefaultContent": "false"},
           { "mDataProp": "mac" }
         ]
       });

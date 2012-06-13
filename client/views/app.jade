@@ -79,60 +79,65 @@ html(lang="en")
           div.span3#sidebar-view
             div.well.sidebar-nav
               ul.nav.nav-list
-                li.nav-header Devices
                 li.active
                   a(href="#daisyList") Daisies
                 li
                   a(href="#registerDaisy") Register a Daisy
-                li.nav-header Sensors
-                  table.table.table-striped.table-condensed#sensorButtons
-                    thead
-                      tr
-                        th 
-                        th Enabled
-                      tbody
-                        tr
-                          td 
-                            img.pull-left(src="images/switch_120v.png")
-                            p Power
-                          td
-                            input#AD1.btn.sensor-cb(type="checkbox", name="cb-power", checked="yes") 
-                        tr
-                          td
-                            img.pull-left(src="images/draw_convolve.png")
-                            p Leak
-                          td 
-                            input#AD2.btn.sensor-cb(type="checkbox", name="cb-leak")
-                        tr
-                          td
-                            img.pull-left(src="images/magnet.png")
-                            p Magnet
-                          td
-                            input#AD3.btn.sensor-cb(type="checkbox", name="cb-magnet")
-                        tr 
-                          td
-                            img.pull-left(src="images/fog.png")
-                            p Humidity
-                          td
-                            input#AD4.btn.sensor-cb(type="checkbox", name="cb-humidity")
-                        tr
-                          td
-                            img.pull-left(src="images/temperature_3.png")
-                            p Temp
-                          td
-                            input#AD5.btn.sensor-cb(type="checkbox", name="cb-temperature")
-                        tr
-                          td
-                            img.pull-left(src="images/sun_rain.png")
-                            p Moisture
-                          td
-                            input#AD6.btn.sensor-cb(type="checkbox", name="cb-moisture")
-                        tr 
-                          td 
-                            img.pull-left(src="images/battery.png")
-                            p Battery
-                          td
-                            input#AD7.btn.sensor-cb(type="checkbox", name="cb-battery")
+              table.table.table-striped.table-condensed#sensorButtons
+                thead
+                  tr
+                    th(colspan="2") Sensor
+                    th Enabled
+                  tbody
+                    tr
+                      td 
+                        img.pull-left(src="images/switch_120v.png")
+                      td
+                        p Power
+                      td
+                        input#AD1.btn.sensor-cb(type="checkbox", name="cb-power", checked="yes") 
+                    tr
+                      td
+                        img.pull-left(src="images/draw_convolve.png")
+                      td
+                        p Leak
+                      td 
+                        input#AD2.btn.sensor-cb(type="checkbox", name="cb-leak")
+                    tr
+                      td
+                        img.pull-left(src="images/magnet.png")
+                      td
+                        p Magnet
+                      td
+                        input#AD3.btn.sensor-cb(type="checkbox", name="cb-magnet")
+                    tr 
+                      td
+                        img.pull-left(src="images/fog.png")
+                      td
+                        p Humidity
+                      td
+                        input#AD4.btn.sensor-cb(type="checkbox", name="cb-humidity")
+                    tr
+                      td
+                        img.pull-left(src="images/temperature_3.png")
+                      td
+                        p Temp
+                      td
+                        input#AD5.btn.sensor-cb(type="checkbox", name="cb-temperature")
+                    tr
+                      td
+                        img.pull-left(src="images/sun_rain.png")
+                      td
+                        p Moisture
+                      td
+                        input#AD6.btn.sensor-cb(type="checkbox", name="cb-moisture")
+                    tr 
+                      td 
+                        img.pull-left(src="images/battery.png")
+                      td
+                        p Battery
+                      td
+                        input#AD7.btn.sensor-cb(type="checkbox", name="cb-battery")
           div.span9#devicesContent
             div#register-view(style="display:none")
               h2 Register A New Daisy 
