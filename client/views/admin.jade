@@ -1,21 +1,7 @@
-!!! 5
-html(lang="en")
-  head
-    != SocketStream
-    meta(charset="utf-8")
-    title Daisy Central Admin
-    meta(name="viewport", content="width=device-width,initial-scale=1.0")
-    meta(name="description", content="TODO")
-    meta(name="author", content="DaisyWorks, Inc.")
-
-    // if lt IE 9
-      script(src="http://html5shim.googlecode.com/svn/trunk/html5.js")
-
-    link(rel="shortcut icon", href="ico/favicon.ico")
-    link(rel="apple-touch-icon-precomposed", sizes="114x114", href="ico/apple-touch-icon-114-precomposed.png")
-    link(rel="apple-touch-icon-precomposed", sizes="72x72", href="ico/apple-touch-icon-72-precomposed.png")
-    link(rel="apple-touch-icon-precomposed", href="ico/apple-touch-icon-57-precomposed.png")
-
+extends layout
+block title
+  title Daisy Central Admin
+block body
   body
     // navbar 
     div.navbar.navbar-fixed-top
@@ -58,8 +44,6 @@ html(lang="en")
               li
                 a(href="#") Click Me 
         div.span9
-          div#user
-            //Logged in with `user.id` #{user.id} - aka `everyauth.user.id` #{everyauth.user.id}
           div.hero-unit
             h1 Hello, world!
             p This is a template for blah blah blah blah
@@ -109,6 +93,3 @@ html(lang="en")
       div#help(style="display:none")
         h1 This is the Help Page
   hr 
-
-  footer 
-    p &copy; DaisyWorks, Inc. 2012

@@ -18,14 +18,16 @@ var UserSchema = new Schema({
     first: { type: String },
     last: { type: String }
   },
-  email: { type: String, unique: true, index: true },
+  email: { type: String, unique: true },
   hash: { type: String }
 });
 
-// virtual get/set on password to encrypt
-// FIXME using synchronous bcrypt here
-// switch to async using setPassword function
-// see https://github.com/LearnBoost/mongoose/issues/517
+/**
+ * Virtual get/set on password to encrypt
+ * FIXME currently using synch bcrypt here = BAD
+ *   switch to async bcrypt using setPassword function
+ *   https://github.com/LearnBoost/mongoose/issues/517
+ */
 UserSchema
   .virtual('password')
   .get(function (){
@@ -36,16 +38,34 @@ UserSchema
     this.hash = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
   });
 
-// verify password method
+/**
+ * Returns a string handle for the user.  Returns their name if
+ * it exists, otherwise, returns their email address.
+ */
+UserSchema
+  .virtual('handle')
+  .get(function (){
+    if (this.name.first || this.name.last) {
+      return this.name.first + " " + this.name.last;
+    } else {
+      return this.email;
+    }
+  });
+
+/**
+ * Uses bcrypt to verify a password against the hash
+ */
 UserSchema.method('verifyPassword', function (password, cb) {
   if(typeof(password) === "undefined" || password === null) return cb(null, false);
   return bcrypt.compare(password, this.hash, cb);
 });
 
-// Static authenticate method 
-// @param {email} the email address
-// @param {password} the password
-// @param {cb} callback function(error, user, message);
+/**
+ * Static authenticate method
+ * @param {email} [string] the email address
+ * @param {password} [string] the password
+ * @param {cb} [Function] callback function(err, user, message)
+ */
 UserSchema.static('authenticate', function (email, password, cb) {
   this.findOne( {email: email}, function (err, user) {
     if (err) {
@@ -114,6 +134,17 @@ UserSchema.static('findByEmail', function(email, cb) {
 UserSchema.plugin(lastmodified);
 
 // mongoose-auth plugin for twit, fb, goog; decorates schema
+//
+// I removed Twitter OAuth support b/c Twitter does not provide
+// the user's email address.  Email is unique index, and thus
+// we have no way to either link it up to a previously registered
+// user or prevent duplicate key index errors b/c the email will
+// be null every time.
+//
+// I removed Facebook Oauth support b/c I hate FB..well, anyway
+// FB was giving me a hassle registering as a dev. on their site
+// ...kept claiming I was not real and wanted me to scan and upload
+// my driver's license - I AM NOT KIDDING.  FB can go F themselves.
 UserSchema.plugin(mongooseAuth, {
   everymodule: {
     everyauth: {
@@ -129,43 +160,6 @@ UserSchema.plugin(mongooseAuth, {
       }
     }
   }
-, facebook: {
-    everyauth: {
-      myHostname: conf.fb.myHostname
-    , appId: conf.fb.appId
-    , appSecret: conf.fb.appSecret
-    , redirectPath: '/'
-    } // end everyauth
-  } // end facebook
-, twitter: {
-    everyauth: {
-      myHostname: conf.twit.myHostname
-    , consumerKey: conf.twit.consumerKey
-    , consumerSecret: conf.twit.consumerSecret
-    , redirectPath: '/'
-    , findOrCreateUser: function (session, accessTok, accessTokSecret, twitterUser) {
-        var promise = this.Promise()
-          , User = this.User()();
-        User.findById(session.userId, function (err, user) {
-          if (err) return promise.fail(err);
-          if (!user) {
-            // twitter metadata doesn't have email; so no other way to link up
-            User.createWithTwitter(twitterUser, accessTok, accessTokSecret, function (err, createdUser) {
-              if (err) return promise.fail(err);
-              return promise.fulfill(createdUser);
-            }); // end createWithTwitter
-          } else {
-            assignTwitterDataToUser(user, accessTok, accessTokSecret, twitterUser);
-            User.save(function (err, user) {
-              if (err) return promise.fail(err);
-              return promise.fulfill(user);
-            });
-          }
-        }); // end findById
-        return promise;
-      } // end findOrCreateuser
-    } // end everyauth
-  } // end twitter
 , google: {
     everyauth: {
       myHostname: conf.google.myHostname
@@ -174,33 +168,51 @@ UserSchema.plugin(mongooseAuth, {
     , redirectPath: '/'
     , scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
     , findOrCreateUser: function (session, accessTok, accessTokExtra, googleUser) {
-        var promise = this.Promise()
-        //, User = this.User()();
+
+        var promise = this.Promise();
+      
+        // if the user is already logged in, we can find them by session.userId
         User.findById(session.userId, function (err, user) {
-          if (err) return promise.fail(err);
+      
+          if (err) { 
+            console.log("error finding user by id: ", err);
+            return promise.fail(err);
+          } 
+      
           if (!user) {
+
+            // let's see if this user has registered already
             User.where('email', googleUser.email).findOne( function (err, user) {
-              if (err) return promise.fail(err);
+              
+              if (err) {
+                console.log("error finding user by email: ", err);
+                return promise.fail(err);
+              } 
+
               if (!user) {
+
+                // let everyauth create the user
                 User.createWithGoogle(googleUser, accessTok, accessTokExtra.expires, function (err, createdUser) {
-                  if (err) return promise.fail(err);
-                  return promise.fulfill(createdUser);
+                  if (err) {
+                    console.log("error trying to create google user: ", err);
+                    return promise.fail(err);
+                  } else {
+                    // sign them in =>
+                    session.userId = createdUser._id;
+                    return promise.fulfill(createdUser);
+                  }
                 });
+
               } else {
-                //user = user.toObject({getters: true, virtuals: true});
-                assignGoogleDataToUser(user, accessTok, accessTokExtra, googleUser);
-                user.save( function (err, user) {
-                  if (err) return promise.fail(err);
-                  promise.fulfill(user);
-                });
+                // user already registered with same email
+                // copy google properties over and save to db
+                saveGoogleUserData(session, promise, user, accessTok, accessTokExtra, googleUser);
               }
-            });
+            }); // end find by email
           } else {
-            assignGoogleDataToUser(user, accessTok, accessTokExtra, googleUser);
-            user.save( function(err, user) {
-              if (err) return promise.fail(err);
-              promise.fulfill(user);
-            });
+            // we did find the user by session.userId
+            // copy google properties over and save to db
+            saveGoogleUserData(session, promise, user, accessTok, accessTokExtra, googleUser);
           }
         }); // end findById
         return promise;
@@ -209,29 +221,45 @@ UserSchema.plugin(mongooseAuth, {
   } // end google
 });
 
+// you have to set this on everyauth for things to work
 everyauth.everymodule.findUserById(function (userId, callback) {
-  console.log('findUserById: '+userId);
   User.findById(userId, callback);
 });
 
+/**
+ * Validates an email against a RegEx
+ * @return true if ok, false if email is no good
+ */
 function validateEmail(email) {
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(email);
 }
 
+/**
+ * Validate a password against our _strict_ password requirements
+ * @return an error || undefined if passwords are ok
+ */
 function validatePassword(one, two) {
   if(typeof(one) === "undefined" || one === null) { return "Password cannot be null or empty"; }
   if(one !== two) { return "Passwords do not match"; }
   if(one.length < 6) { return "Password should be at least 6 characters long"; }
 }
 
-function assignGoogleDataToUser(user, token, tokenExtra, googleUser) {
-  console.log("\n user => \n", user);
-  console.log("\n google user metadata => \n", googleUser);
-  console.log("\n token => ", token);
-  console.log("\n tokenExtra => ", tokenExtra);
-  console.log("user.google", user.google);
-  console.log("user.google.accessToken", user.google.accessToken);
+/**
+ * 1) Copy the properties from Google OAuth user metadata to our User
+ * 2) Save to database
+ * 3) Update session.userId to sign them in
+ * @param {session} [object] the session object
+ * @param {promise} [object] the Promise object
+ * @param {token} [object] the OAuth token object
+ * @param {tokenExtra} [object] extra OAuth token info (e.g. expiration date)
+ * @param {googleUser} [object] google user metadata
+ */
+function saveGoogleUserData(session, promise, user, token, tokenExtra, googleUser) {
+  user.email = googleUser.email;
+  user.name.first = googleUser.given_name;
+  user.name.last = googleUser.family_name;
+
   user.google['accessToken'] = token;
   user.google.expires = tokenExtra.expires;
   user.google.refreshToken = googleUser.refreshToken;
@@ -247,28 +275,16 @@ function assignGoogleDataToUser(user, token, tokenExtra, googleUser) {
   user.google.picture = googleUser.picture;
   user.google.gender = googleUser.gender;
   user.google.locale = googleUser.locale;
-}
 
-function assignTwitterDataToUser(user, token, tokenExtra, twitterUser) {
-  console.log("\n twitter user metadata => \n", twitterUser);
-  user.twit.accessToken = token;
-  user.twit.accessTokenSecret = tokenExtra;
-  user.twit.id = twitterUser.id;
-  user.twit.name = twitterUser.name;
-  user.twit.screenName = twitterUser.screen_name;
-  user.twit.location = twitterUser.location;
-  user.twit.description = twitterUser.description;
-  user.twit.profileImageUrl = twitterUser.profile_image_url;
-  user.twit.url = twitterUser.url;
-  user.twit.protected = twitterUser.protected;
-  user.twit.followersCount = twitterUser.followersCount;
-  user.twit.friendsCount = twitterUser.friends_count;
-  user.twit.utcOffset = twitterUser.utc_offset;
-  user.twit.timeZone = twitterUser.time_zone;
-  user.twit.profileBackgroundImageUrl = twitterUser.profile_background_image_url;
-  user.twit.verified = twitterUser.verified;
-  user.twit.statusesCount = twitterUser.statuses_count;
-  user.twit.lang = twitterUser.lang;
+  user.save( function (err, user) {
+    if (err) {
+      console.log("error trying to save updated user: ", err);
+      return promise.fail(err);
+    } else {
+      session.userId = user._id;
+      return promise.fulfill(user);
+    }
+  });
 }
 
 var User = mongoose.model('User', UserSchema);
