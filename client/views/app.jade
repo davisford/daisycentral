@@ -1,168 +1,167 @@
 extends layout
 
-block body
-  body
-    // navbar 
-    div.navbar.navbar-fixed-top
-      div.navbar-inner
-        div.container
-          a.btn.btn-navbar(data-toggle="collapse", data-target=".nav-collapse")
-            span.icon-bar
-            span.icon-bar
-            span.icon-bar
-          a.brand(href="#") Daisy Central
-          div.nav-collapse
-            ul.nav.top-menu 
-              li.active
-                a(href="#") Home
-              li
-                a(href="#devices") Devices 
-              li
-                a(href="#rules") Rules
-              li 
-                a(href="#profile") Profile
-              li
-                a(href="#help") Help
-              li 
-                a(href="/logout") Logout
-    // fluid container
-    div.container-fluid#content
-      div.container-fluid#home
-       div.row-fluid
-        div.span3
+block content
+  // navbar 
+  div.navbar.navbar-fixed-top
+    div.navbar-inner
+      div.container
+        a.btn.btn-navbar(data-toggle="collapse", data-target=".nav-collapse")
+          span.icon-bar
+          span.icon-bar
+          span.icon-bar
+        a.brand(href="#") Daisy Central
+        div.nav-collapse
+          ul.nav.top-menu 
+            li.active
+              a(href="#") Home
+            li
+              a(href="#devices") Devices 
+            li
+              a(href="#rules") Rules
+            li 
+              a(href="#profile") Profile
+            li
+              a(href="#help") Help
+            li 
+              a(href="/logout") Logout
+  // fluid container
+  div.container-fluid#content
+    div.container-fluid#home
+     div.row-fluid
+      div.span3
+        div.well.sidebar-nav
+          ul.nav.nav-list
+            li.nav-header Sidebar 
+            li.active
+              a(href="#") Some Link 
+            li 
+              a(href="#") Another Link
+            li.nav-header Another Section
+            li 
+              a(href="#") Yet More Links
+            li
+              a(href="#") Click Me 
+      div.span9
+        div.hero-unit
+          h1 Hello, world!
+          p This is a template for blah blah blah blah
+          p 
+            a.btn.btn-primary.btn-large Learn more &raquo;
+        div.row-fluid
+          div.span4
+            h2 Heading
+            p onec id elit non mi <em>porta gravida</em> at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+            p 
+              a.btn(href="#") View details &raquo;
+          div.span4
+            h2 Heading
+            p onec id elit non mi <abbr title="porta gravida">porta gravida</abbr> at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+            p
+              a.btn(href="#") View details &raquo;
+    div.container-fluid#devices(style="display:none")
+      div.row-fluid
+        div.span3#sidebar-view
           div.well.sidebar-nav
             ul.nav.nav-list
-              li.nav-header Sidebar 
-              li.active
-                a(href="#") Some Link 
-              li 
-                a(href="#") Another Link
-              li.nav-header Another Section
-              li 
-                a(href="#") Yet More Links
-              li
-                a(href="#") Click Me 
-        div.span9
-          div.hero-unit
-            h1 Hello, world!
-            p This is a template for blah blah blah blah
-            p 
-              a.btn.btn-primary.btn-large Learn more &raquo;
-          div.row-fluid
-            div.span4
-              h2 Heading
-              p onec id elit non mi <em>porta gravida</em> at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-              p 
-                a.btn(href="#") View details &raquo;
-            div.span4
-              h2 Heading
-              p onec id elit non mi <abbr title="porta gravida">porta gravida</abbr> at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-              p
-                a.btn(href="#") View details &raquo;
-      div.container-fluid#devices(style="display:none")
-        div.row-fluid
-          div.span3#sidebar-view
-            div.well.sidebar-nav
-              ul.nav.nav-list
-                li.active#daisies-li
-                  a(href="#devices/daisies") Daisies
-                li#register-li
-                  a(href="#devices/register") Register a Daisy
-              table.table.table-striped.table-condensed#sensor-cb-table(disabled="disabled")
-                thead
-                  tr
-                    th(colspan="2") Sensor
-                    th Enabled
-                  tbody
-                    tr
-                      td 
-                        img.pull-left(src="images/switch_120v.png")
-                      td
-                        p Power
-                      td
-                        input#AD1.btn.sensor-cb(type="checkbox", name="cb-power") 
-                    tr
-                      td
-                        img.pull-left(src="images/draw_convolve.png")
-                      td
-                        p Leak
-                      td 
-                        input#AD2.btn.sensor-cb(type="checkbox", name="cb-leak")
-                    tr
-                      td
-                        img.pull-left(src="images/magnet.png")
-                      td
-                        p Magnet
-                      td
-                        input#AD3.btn.sensor-cb(type="checkbox", name="cb-magnet")
-                    tr 
-                      td
-                        img.pull-left(src="images/fog.png")
-                      td
-                        p Humidity
-                      td
-                        input#AD4.btn.sensor-cb(type="checkbox", name="cb-humidity")
-                    tr
-                      td
-                        img.pull-left(src="images/temperature_3.png")
-                      td
-                        p Temp
-                      td
-                        input#AD5.btn.sensor-cb(type="checkbox", name="cb-temperature")
-                    tr
-                      td
-                        img.pull-left(src="images/sun_rain.png")
-                      td
-                        p Moisture
-                      td
-                        input#AD6.btn.sensor-cb(type="checkbox", name="cb-moisture")
-                    tr 
-                      td 
-                        img.pull-left(src="images/battery.png")
-                      td
-                        p Battery
-                      td
-                        input#AD7.btn.sensor-cb(type="checkbox", name="cb-battery", checked="yes")
-          div.span9#devices-content
-            div#register-view(style="display:none")
-              h2 Register A New Daisy 
-              form.well.form-inline
-                p 
-                | To register a new Daisy, enter the secret key here.  
-                | You should have received the secret key when you 
-                | received your Daisy.  If you don't know the secret key, 
-                | contact us at  
-                a(href="mailto:support@daisyworks.com") support@daisyworks.com
-                hr
-                input.input#secret-key(type="text", placeholder="secret key", style="margin-right:1em;")
-                button.btn.btn-primary#register-button(type="submit") Register
-            div.container-fluid#table-view
-              h2 My Daisies
-              p 
-              | Select a daisy by clicking a row - this will load the sensor data for that Daisy. 
-              | You may edit a Daisy's name by double-clicking the name and typing a new name.
-              p
-              table.table.table-striped.table-bordered#daisies-table(style="width:100% important!")
-                thead
-                  tr
-                    th _id
-                    th Name
-                    th key
-                    th lastMod
-                    th owners
-                    th Online?
-                    th MAC
+              li.active#daisies-li
+                a(href="#devices/daisies") Daisies
+              li#register-li
+                a(href="#devices/register") Register a Daisy
+            table.table.table-striped.table-condensed#sensor-cb-table(disabled="disabled")
+              thead
+                tr
+                  th(colspan="2") Sensor
+                  th Enabled
                 tbody
+                  tr
+                    td 
+                      img.pull-left(src="images/switch_120v.png")
+                    td
+                      p Power
+                    td
+                      input#AD1.btn.sensor-cb(type="checkbox", name="cb-power") 
+                  tr
+                    td
+                      img.pull-left(src="images/draw_convolve.png")
+                    td
+                      p Leak
+                    td 
+                      input#AD2.btn.sensor-cb(type="checkbox", name="cb-leak")
+                  tr
+                    td
+                      img.pull-left(src="images/magnet.png")
+                    td
+                      p Magnet
+                    td
+                      input#AD3.btn.sensor-cb(type="checkbox", name="cb-magnet")
+                  tr 
+                    td
+                      img.pull-left(src="images/fog.png")
+                    td
+                      p Humidity
+                    td
+                      input#AD4.btn.sensor-cb(type="checkbox", name="cb-humidity")
+                  tr
+                    td
+                      img.pull-left(src="images/temperature_3.png")
+                    td
+                      p Temp
+                    td
+                      input#AD5.btn.sensor-cb(type="checkbox", name="cb-temperature")
+                  tr
+                    td
+                      img.pull-left(src="images/sun_rain.png")
+                    td
+                      p Moisture
+                    td
+                      input#AD6.btn.sensor-cb(type="checkbox", name="cb-moisture")
+                  tr 
+                    td 
+                      img.pull-left(src="images/battery.png")
+                    td
+                      p Battery
+                    td
+                      input#AD7.btn.sensor-cb(type="checkbox", name="cb-battery", checked="yes")
+        div.span9#devices-content
+          div#register-view(style="display:none")
+            h2 Register A New Daisy 
+            form.well.form-inline
+              p 
+              | To register a new Daisy, enter the secret key here.  
+              | You should have received the secret key when you 
+              | received your Daisy.  If you don't know the secret key, 
+              | contact us at  
+              a(href="mailto:support@daisyworks.com") support@daisyworks.com
               hr
-              div#realtime-view
-                h2#realtime-header Real-Time Data 
-                p Select a section of the graph to zoom in.  Click to zoom back out.
-                // flot data chart
-                div.span8#chart(style="height:400px; width:95%;")
-      div.row-fluid#rules(style="display:none")
-        h1 This is the Rules Page
-      div#profile(style="display:none")
-        h1 This is the Profile Page
-      div#help(style="display:none")
-        h1 This is the Help Page
-  hr 
+              input.input#secret-key(type="text", placeholder="secret key", style="margin-right:1em;")
+              button.btn.btn-primary#register-button(type="submit") Register
+          div.container-fluid#table-view
+            h2 My Daisies
+            p 
+            | Select a daisy by clicking a row - this will load the sensor data for that Daisy. 
+            | You may edit a Daisy's name by double-clicking the name and typing a new name.
+            p
+            table.table.table-striped.table-bordered#daisies-table(style="width:100% important!")
+              thead
+                tr
+                  th _id
+                  th Name
+                  th key
+                  th lastMod
+                  th owners
+                  th Online?
+                  th MAC
+              tbody
+            hr
+            div#realtime-view
+              h2#realtime-header Real-Time Data 
+              p Select a section of the graph to zoom in.  Click to zoom back out.
+              // flot data chart
+              div.span8#chart(style="height:400px; width:95%;")
+    div.row-fluid#rules(style="display:none")
+      h1 This is the Rules Page
+    div#profile(style="display:none")
+      h1 This is the Profile Page
+    div#help(style="display:none")
+      h1 This is the Help Page
+hr 

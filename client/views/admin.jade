@@ -1,95 +1,94 @@
 extends layout
 block title
   title Daisy Central Admin
-block body
-  body
-    // navbar 
-    div.navbar.navbar-fixed-top
-      div.navbar-inner
-        div.container
-          a.btn.btn-navbar(data-toggle="collapse", data-target=".nav-collapse")
-            span.icon-bar
-            span.icon-bar
-            span.icon-bar
-          a.brand(href="#") Daisy Central Admin
-          div.nav-collapse
-            ul.nav.top-menu 
-              li.active
-                a(href="#") Home
-              li
-                a(href="#devices") Devices 
-              li
-                a(href="#rules") Rules
-              li 
-                a(href="#profile") Profile
-              li
-                a(href="#help") Help
-              li 
-                a(href="/logout") Logout
-    // fluid container
-    div.container-fluid#content
-      div.container-fluid#home
-       div.row-fluid
-        div.span3
-          div.well.sidebar-nav
-            ul.nav.nav-list
-              li.nav-header Sidebar 
-              li.active
-                a(href="#") Some Link 
-              li 
-                a(href="#") Another Link
-              li.nav-header Another Section
-              li 
-                a(href="#") Yet More Links
-              li
-                a(href="#") Click Me 
-        div.span9
-          div.hero-unit
-            h1 Hello, world!
-            p This is a template for blah blah blah blah
+block content
+  // navbar 
+  div.navbar.navbar-fixed-top
+    div.navbar-inner
+      div.container
+        a.btn.btn-navbar(data-toggle="collapse", data-target=".nav-collapse")
+          span.icon-bar
+          span.icon-bar
+          span.icon-bar
+        a.brand(href="#") Daisy Central Admin
+        div.nav-collapse
+          ul.nav.top-menu 
+            li.active
+              a(href="#") Home
+            li
+              a(href="#devices") Devices 
+            li
+              a(href="#rules") Rules
+            li 
+              a(href="#profile") Profile
+            li
+              a(href="#help") Help
+            li 
+              a(href="/logout") Logout
+  // fluid container
+  div.container-fluid#content
+    div.container-fluid#home
+     div.row-fluid
+      div.span3
+        div.well.sidebar-nav
+          ul.nav.nav-list
+            li.nav-header Sidebar 
+            li.active
+              a(href="#") Some Link 
+            li 
+              a(href="#") Another Link
+            li.nav-header Another Section
+            li 
+              a(href="#") Yet More Links
+            li
+              a(href="#") Click Me 
+      div.span9
+        div.hero-unit
+          h1 Hello, world!
+          p This is a template for blah blah blah blah
+          p 
+            a.btn.btn-primary.btn-large Learn more &raquo;
+        div.row-fluid
+          div.span4
+            h2 Heading
+            p onec id elit non mi <em>porta gravida</em> at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
             p 
-              a.btn.btn-primary.btn-large Learn more &raquo;
-          div.row-fluid
-            div.span4
-              h2 Heading
-              p onec id elit non mi <em>porta gravida</em> at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-              p 
-                a.btn(href="#") View details &raquo;
-            div.span4
-              h2 Heading
-              p onec id elit non mi <abbr title="porta gravida">porta gravida</abbr> at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-              p
-                a.btn(href="#") View details &raquo;
-      div.container#devices(style="display:none")
-        h2 All Daisies
-        p Any Daisy that has ever contacted the server
-        div#daisies
-          table.table.table-striped.table-bordered#daisiesTable
-            thead
-              tr
-                th _id
-                th did
-                th mac
-                th key
-                th lastMod
-                th online
-                th owners
-            tbody
-        div.well.span8(stylse="margin-top: 2em;")
-          form.form-vertical#console-form
-            fieldset
-              div.control-group
-                label.control-label(for="command") Command
-                div.controls
-                  input.disabled#command(type="text", disabled="disabled")
-              div.control-group
-                label.control-label(for="response") Response
-                div.controls
-                  textarea.disabled.span8.input-xlarge#response(rows="10", disabled="disabled")
-      div.row-fluid#rules(style="display:none")
-        h1 This is the Rules Page
-      div#profile(style="display:none")
-        h1 This is the Profile Page
-      div#help(style="display:none")
-        h1 This is the Help Page
-  hr 
+              a.btn(href="#") View details &raquo;
+          div.span4
+            h2 Heading
+            p onec id elit non mi <abbr title="porta gravida">porta gravida</abbr> at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+            p
+              a.btn(href="#") View details &raquo;
+    div.container#devices(style="display:none")
+      h2 All Daisies
+      p Any Daisy that has ever contacted the server
+      div#daisies
+        table.table.table-striped.table-bordered#daisiesTable
+          thead
+            tr
+              th _id
+              th did
+              th mac
+              th key
+              th lastMod
+              th online
+              th owners
+          tbody
+      div.well.span8(stylse="margin-top: 2em;")
+        form.form-vertical#console-form
+          fieldset
+            div.control-group
+              label.control-label(for="command") Command
+              div.controls
+                input.disabled#command(type="text", disabled="disabled")
+            div.control-group
+              label.control-label(for="response") Response
+              div.controls
+                textarea.disabled.span8.input-xlarge#response(rows="10", disabled="disabled")
+    div.row-fluid#rules(style="display:none")
+      h1 This is the Rules Page
+    div#profile(style="display:none")
+      h1 This is the Profile Page
+    div#help(style="display:none")
+      h1 This is the Help Page
+hr 

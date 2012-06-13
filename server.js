@@ -21,7 +21,7 @@ mongoose.connection.on('open', function (){
 ss.client.define('main', {
   view: 'app.jade',
   css:  ['libs', 'app.styl'],
-  code: ['libs', 'app', 'system'],
+  code: ['libs', 'app', 'shared', 'system'],
   tmpl: '*'
 });
 
@@ -29,7 +29,7 @@ ss.client.define('main', {
 ss.client.define('login', {
   view: 'login.jade',
   css: ['libs', 'app.styl', 'login.styl'],
-  code: ['libs', 'app', 'system'],
+  code: ['libs', 'app'],
   tmpl: '*'
 });
 
@@ -37,7 +37,7 @@ ss.client.define('login', {
 ss.client.define('admin', {
   view: 'admin.jade',
   css: ['libs', 'app.styl'],
-  code: ['libs', 'admin', 'system'],
+  code: ['libs', 'admin', 'shared', 'system'],
   tmpl: '*'
 });
 

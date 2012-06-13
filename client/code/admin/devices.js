@@ -1,52 +1,15 @@
 // in client/code/admin/devices.js
 
+var models = require('./models')
+  , Daisy = models.Daisy
+  , Daisies = models.Daisies;
+
 var Devices = function() {
-
-  // Backbone namespace DC is global object
-  DC = {
-    /* models */
-    m: {},
-    /* collections */
-    c: {},
-    /* views */
-    v: {},
-    /* templates */
-    t: {}
-  };
-
-  /***********************************************************
-   * Model: Daisy
-   ***********************************************************/
-  DC.m.Daisy = Backbone.Model.extend();
-
-  /***********************************************************
-   * Collection: Daisies
-   ***********************************************************/
-  DC.c.Daisies = Backbone.Collection.extend({
-    
-    model: DC.m.Daisy,
-
-    // override Backbone.Collection.fetch()
-    "fetch": function(options) {
-      var collection = this;
-      var success = options.success;
-      options.success = function(resp, status, xhr) {
-        collection.reset(resp, options);
-        if (success) success(collection, resp);
-      };
-      options.error = Backbone.wrapError(options.error, collection, options);
-      ss.rpc('admin.devices.get', function(err, arr) {
-        if (err) { return options.error(err); }
-        return options.success(arr);
-      });
-      return;
-    }
-  });
 
   /***********************************************************
    * View: TableView
    ***********************************************************/
-  DC.v.TableView = Backbone.View.extend({
+  TableView = Backbone.View.extend({
     el: $('#daisies'),
 
     events: {
@@ -77,7 +40,7 @@ var Devices = function() {
           { "mDataProp": "mac" },
           { "mDataProp": "key", "sClass": "canEdit" },
           { "mDataProp": "lastMod" },
-          { "mDataProp": "online" },
+          { "mDataProp": "online", "sDefaultContent": "false"},
           { "mDataProp": "owners" }
         ]
       });
@@ -126,7 +89,7 @@ var Devices = function() {
   /***********************************************************
    * View: ConsoleView
    ***********************************************************/
-  DC.v.ConsoleView = Backbone.View.extend({
+  ConsoleView = Backbone.View.extend({
     el: $('#console-form'),
 
     events: {
@@ -196,11 +159,11 @@ var Devices = function() {
   // event bus
   var bus = _.extend({}, Backbone.Events);
   // collection of daisies
-  var daisies = new DC.c.Daisies();
+  var daisies = new Daisies({url: 'admin.devices.get'});
   // daisies table view
-  var tableView = new DC.v.TableView({collection: daisies, bus: bus});
+  var tableView = new TableView({collection: daisies, bus: bus});
   // console view
-  var consoleView = new DC.v.ConsoleView({bus: bus}).render();
+  var consoleView = new ConsoleView({bus: bus}).render();
 
   // public module API
   return {

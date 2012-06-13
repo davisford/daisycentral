@@ -2,35 +2,34 @@ extends layout
 
 block title 
   title Daisy Central Login
-block body
-  body
-    div.navbar.navbar-fixed-top
-    div.container-fluid
-      div.row-fluid    
-          div.hero-unit
-            img#login_logo(src="/images/dw-logo2.png", alt="DaisyWorks Logo", width=197, height=128)
-            h1 Daisy Central
-            div.well.login-panel
-              ul.nav.nav-tabs#tabs(data-tabs="tabs")
-                li.active
-                  a(href="#loginTab", data-toggle="tab") Login
-                li
-                  a(href="#registerTab", data-toggle="tab") Register 
-              div.tab-content#myTabContent
-                div.alert.alert-error(style="display:none;")
-                  a.close(data-dismiss="alert") &times;
-                  p#err This is an error
-                div.tab-pane.active#loginTab
-                  form.form-inline#loginForm
-                    input.input-medium#login-email(type="text", placeholder="email", name="email")
-                    input.input-small#login-pass(type="password", placeholder="password", name="password")
-                    button.btn.btn-primary#login-submit(type="submit") Login
-                    hr
-                    div.btn-group
-                      a.btn.btn-large#goog(href="/auth/google") Login with Google
-                div.tab-pane#registerTab(action="/register", method="post")
-                  form.form-inline#registerForm
-                    input.input-medium#reg-email(type="text", placeholder="email", name="email")
-                    input.input-medium#reg-pass1(type="password", placeholder="password", name="password")
-                    input.input-medium#reg-pass2(type="password", placeholder="password (again)", name="password")
-                    button.btn.btn-primary#register-submit(type="submit") Sign Up
+block content
+  div.navbar.navbar-fixed-top
+  div.container-fluid
+    div.row-fluid    
+        div.hero-unit
+          img#login_logo(src="/images/dw-logo2.png", alt="DaisyWorks Logo", width=197, height=128)
+          h1 Daisy Central
+          div.well.login-panel
+            ul.nav.nav-tabs#tabs(data-tabs="tabs")
+              li.active
+                a(href="#loginTab", data-toggle="tab") Login
+              li
+                a(href="#registerTab", data-toggle="tab") Register 
+            div.tab-content#myTabContent
+              div.alert.alert-error(style="display:none;")
+                a.close(data-dismiss="alert") &times;
+                p#err This is an error
+              div.tab-pane.active#loginTab
+                form.form-inline#loginForm
+                  input.input-medium#login-email(type="text", placeholder="email", name="email")
+                  input.input-small#login-pass(type="password", placeholder="password", name="password")
+                  button.btn.btn-primary#login-submit(type="submit") Login
+                  hr
+                  div.btn-group
+                    a.btn.btn-large#goog(href="/auth/google") Login with Google
+              div.tab-pane#registerTab(action="/register", method="post")
+                form.form-inline#registerForm
+                  input.input-medium#reg-email(type="text", placeholder="email", name="email")
+                  input.input-medium#reg-pass1(type="password", placeholder="password", name="password")
+                  input.input-medium#reg-pass2(type="password", placeholder="password (again)", name="password")
+                  button.btn.btn-primary#register-submit(type="submit") Sign Up

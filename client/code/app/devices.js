@@ -1,5 +1,11 @@
 // in client/code/app/devices.js
 
+var models = require('./models')
+  , Daisy = models.Daisy
+  , Sensor = models.Sensor
+  , Daisies = models.Daisies
+  , Sensors = models.Sensors;
+
 var Devices = function() {
 
   // TODO TIE IN SS EVENT HANDLERS
@@ -23,165 +29,11 @@ var Devices = function() {
     }
   });  */
 
-  // Backbone namespace DC 
-  DC = {
-    /* models */
-    m: {},
-    /* collections */
-    c: {},
-    /* views */
-    v: {},
-    /* templates */
-    t: {}
-  }
-
-
-  /*---------------------------------------------------------------------------
-     Model: Daisy
-   --------------------------------------------------------------------------*/
-  DC.m.Daisy = Backbone.Model.extend();
-
-
-  /*---------------------------------------------------------------------------
-     Model: Sensor
-   --------------------------------------------------------------------------*/
-  DC.m.Sensor = Backbone.Model.extend();
-
-
-  /*---------------------------------------------------------------------------
-     SensorInfo: constants; could move this somewhere else
-   --------------------------------------------------------------------------*/
-  DC.m.SensorInfo = {
-    AD0: { name: "RX-I", bool: false, yaxis: -1, color: "#000" },
-    AD1: { name: "Power", bool: true, yaxis: 1, color: "#CB4B4B" },
-    AD2: { name: "Leak Detection", bool: true, yaxis: 1, color: "#4DA74D" },
-    AD3: { name: "Magnetic Switch", bool: true, yaxis: 1, color: "#9440ED" },
-    AD4: { name: "Humidity", bool: false, yaxis: 2, color: "#BD9B33" },
-    AD5: { name: "Temperature", bool: false, yaxis: 3, color: "#8CACC6" },
-    AD6: { name: "Moisture", bool: false, yaxis: 4, color: "#A23C3C" },
-    AD7: { name: "Battery", bool: false, yaxis: 5, color: "#3D853D" }
-  };
-
-
-  /*---------------------------------------------------------------------------
-     Collection: Daisies
-       Holds the collection of Daisies assigned to this user
-   --------------------------------------------------------------------------*/
-  DC.c.Daisies = Backbone.Collection.extend({
-    
-    model: DC.m.Daisy,
-
-    // override Backbone.Collection.fetch()
-    "fetch": function(options) {
-      var collection = this;
-      var success = options.success;
-      options.success = function(resp, status, xhr) {
-        collection.reset(resp, options);
-        if (success) success(collection, resp);
-      };
-      options.error = Backbone.wrapError(options.error, collection, options);
-      ss.rpc('devices.get', function(err, arr) {
-        console.log('fetched daisies: ', err, arr);
-        if (err) { return options.error(err); }
-        return options.success(arr);
-      })
-      return;
-    }
-  });
-
-
-  /*---------------------------------------------------------------------------
-     Collection: Sensors
-       Holds the sensor data for a particular Daisy
-   --------------------------------------------------------------------------*/
-  DC.c.Sensors = Backbone.Collection.extend({
-    model: DC.m.Sensor,
-
-    comparator: function (sensor) {
-      return sensor.get('timestamp');
-    },
-
-    "fetch": function(options) {
-      var collection = this;
-      var success = options.success;
-      options.success = function(resp, status, xhr) {
-        collection.reset(resp, options);
-        if (success) success(collection, resp);
-      }; 
-      options.error = Backbone.wrapError(options.error, collection, options);
-      ss.rpc('sensors.get', options.mac, function(err, arr) {
-        if (err) { return options.error(err); }
-        return options.success(arr);
-      });
-      return;
-    },
-
-    getCached: function () {
-      return this.cached || [];
-    },
-
-    /**
-     * Converts the models in this collection to a format flot expects
-     * @param {Array} [arr] an array naming the sensors that should be shown; other
-     *    sensors will be filtered out.  e.g. ['AD0', 'AD1']
-     * @return an array of data for flot
-     */
-    flotData: function (arr) {
-      var arr, data = [], i, j, info,
-          vals, boolSensor, 
-          timestamps = _.map(this.pluck('timestamp'), function (num) {
-            // convert GMT time to local timestamp
-            var localNow = new Date().getTimezoneOffset(),
-            min = num / 1000 / 60;
-            return (min - localNow) * 1000 * 60;
-          });
-
-      for (i = 0; i < arr.length; i += 1) {
-        info = DC.m.SensorInfo[arr[i]];
-        vals = this.pluck(arr[i]);
-        boolSensor = _.any(["Power", "Leak Detection", "Magnetic Switch"], function (sensor) {
-          return sensor === info.name;
-        });
-
-        if (boolSensor) {
-          // boolean sensors have the raw values converted to 0 or 1 based on midpoint between 0-65534
-          for (j = 0; j < vals.length; j += 1) {
-            if (vals[j] > (65534 / 2)) {
-              vals[j] = 1;
-            } else { vals[j] = 0; }
-          }
-          // boolean sensors all share the same yaxis, and have line steps
-          data.push({
-            color: info.color,
-            label: info.name,
-            data: _.zip(timestamps, vals),
-            yaxis: info.yaxis,
-            clickable: true,
-            hoverable: true,
-            lines: { show: true, steps: true }
-          });
-        } else {
-          data.push({
-            color: info.color,
-            label: info.name,
-            data: _.zip(timestamps, vals),
-            clickable: true,
-            hoverable: true,
-            yaxis: info.yaxis
-          });
-        }
-      }
-      this.cached = data;
-      return data;
-    }
-  });
-
-
   /*---------------------------------------------------------------------------
      View: SideBarView
        Handles sidebar navigation and checkbox selection
    --------------------------------------------------------------------------*/
-  DC.v.SideBarView = Backbone.View.extend({
+  SideBarView = Backbone.View.extend({
     el: $('#sidebar-view'),
 
     events: { 
@@ -230,7 +82,7 @@ var Devices = function() {
      View: RegisterView
        Handles registration of secret key for user to claim Daisy ownership
    --------------------------------------------------------------------------*/
-  DC.v.RegisterView = Backbone.View.extend({
+  RegisterView = Backbone.View.extend({
     el: $('#register-view'),
 
     events: { 
@@ -269,7 +121,7 @@ var Devices = function() {
   /*---------------------------------------------------------------------------
      View: TableView
    --------------------------------------------------------------------------*/
-  DC.v.TableView = Backbone.View.extend({
+  TableView = Backbone.View.extend({
     el: $('#table-view'),
 
     events: {
@@ -353,7 +205,7 @@ var Devices = function() {
         We wrap it in a self-invoking closure so we can make use of private
         vars and we don't have to write this.property all the time.
    --------------------------------------------------------------------------*/
-  DC.v.RealTimeView = (function() {
+  RealTimeView = (function() {
 
     // current named sensors that are checke on SubNav View
     var checkedSensors = [];
@@ -395,21 +247,21 @@ var Devices = function() {
         { labelWidth: 40,
           position: "left",
           sensor: "AD4",
-          color: DC.m.SensorInfo.AD4.color,
+          color: Sensor.info.AD4.color,
           tickFormatter: function (n, obj) { return n + "%"; } },  // humidity
         { labelWidth: 40,
           position: "left",
           sensor: "AD5",
-          color: DC.m.SensorInfo.AD5.color,
+          color: Sensor.info.AD5.color,
           tickFormatter: function (n, obj) { return n + "F"; } },  // temp
         { labelWidth: 40,
           position: "left",
           sensor: "AD6",
-          color: DC.m.SensorInfo.AD6.color },  // moisture
+          color: Sensor.info.AD6.color },  // moisture
         { labelWidth: 40,
           position: "left",
           sensor: "AD7",
-          color: DC.m.SensorInfo.AD7.color,
+          color: Sensor.info.AD7.color,
           tickFormatter: function (n, obj) { return n + "V"; } }  // battery
       ],
       zoom: {
@@ -599,17 +451,17 @@ var Devices = function() {
   // event bus
   var bus = _.extend({}, Backbone.Events);
   // collection of daisies
-  var daisies = new DC.c.Daisies();
+  var daisies = new Daisies({url: 'devices.get'});
   // daisies table view
-  var tableView = new DC.v.TableView({collection: daisies, bus: bus});
+  var tableView = new TableView({collection: daisies, bus: bus});
   // collection of sensors
-  var sensors = new DC.c.Sensors();
+  var sensors = new Sensors({url: 'sensors.get'});
   // realtime charting view
-  var realtimeView = new DC.v.RealTimeView({collection: sensors, bus: bus});
+  var realtimeView = new RealTimeView({collection: sensors, bus: bus});
   // register view
-  var registerView = new DC.v.RegisterView();
+  var registerView = new RegisterView();
   // sidebar nav view
-  var sidebarView = new DC.v.SideBarView({bus: bus});
+  var sidebarView = new SideBarView({bus: bus});
 
   /*---------------------------------------------------------------------------
     This module's public methods 

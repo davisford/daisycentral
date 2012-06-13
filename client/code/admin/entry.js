@@ -4,10 +4,12 @@ window.ss = require('socketstream');
 
 ss.server.on('disconnect', function () {
   console.log('Connection down :-(');
+  $('#warning').modal('show');
 });
 
 ss.server.on('reconnect', function () {
   console.log('Connection back up :-)');
+  $('#warning').modal('hide');
 });
 
 ss.server.on('ready', function () {

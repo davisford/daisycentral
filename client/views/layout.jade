@@ -16,8 +16,19 @@ html(lang="en")
     link(rel="apple-touch-icon-precomposed", sizes="114x114", href="ico/apple-touch-icon-114-precomposed.png")
     link(rel="apple-touch-icon-precomposed", sizes="72x72", href="ico/apple-touch-icon-72-precomposed.png")
     link(rel="apple-touch-icon-precomposed", href="ico/apple-touch-icon-57-precomposed.png")
-  block body
-    body
+  body
+    block content
+    div.modal.hide.fade#warning
+      div.modal-header
+        h3 Connection Lost!
+      div.modal-body
+        p 
+         | The connection to the server has been lost.  This may be temporary.
+         | If you leave your browser open and the connection is restored, this 
+         | dialog will remove itself, and you can continue as you were.  If this 
+         | problem persists, please email 
+         a(href="mailto:support@daisyworks.com") support@daisyworks.com
+      div.modal-footer
   block footer
     footer 
       p &copy; DaisyWorks, Inc. 2012
