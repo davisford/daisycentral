@@ -413,7 +413,7 @@ var Devices = function() {
             bottom = Math.max(Math.round(pos.top) + $(this).outerHeight(), bottom);
           });
           box = {left: left, top: top, width: 50, height: bottom - top};
-          color = DC.m.SensorInfo[axis.options.sensor].color;
+          color = Sensor.info[axis.options.sensor].color;
           // fixme: first time through box is not right size; resize browser or check/uncheck and it fixes itself
           $('<div class="axisTarget" style="position:absolute;left:' +
              box.left + 'px;top:' +
