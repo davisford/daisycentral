@@ -43,8 +43,16 @@ function DaisyConversation(socket, ss) {
    * @return {object} with sensor data
    */
   this.parseData = function (queryString) {
+    console.log('received the querystring: ', queryString);
+
     // shave off the HTTP header and parse into raw object
     var raw = qs.parse(queryString.slice(0, queryString.lastIndexOf(' HTTP')));
+
+    if (raw['GET /wifly-data?DATA'] === undefined) {
+      console.log('WARN: skipping this: wrong format: ', raw);
+      this.socket.end("goodbye\n");
+      return;
+    }
 
     // parse values into new object
     var data = {
@@ -83,6 +91,8 @@ function DaisyConversation(socket, ss) {
    * @param {object} [obj]
    */
   this.storeData = function (obj) {
+    if (!obj) return;
+
     // get a special model with the collection name
     // that includes the mac address
     var SensorDataModel = SensorData.getModel(SensorData.getColName(obj.mac));
@@ -140,6 +150,8 @@ function DaisyConversation(socket, ss) {
    * @param {string} [data] should be ASCII if we set the socket config
    */
   this.onData = function (data) {
+    if (!data) return;
+
     // this is a querystring HTTP GET with sensor data
     if (data.match(/^GET .*/)) {
       // parse it and store it
