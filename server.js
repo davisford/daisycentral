@@ -83,5 +83,7 @@ app.get('/admin', security.isAdmin(), function(req, res, next) {
 });
 
 // start socketstream webapp
-app.listen(conf.webserver.port);
+app.listen(conf.webserver.port, function() {
+  console.log("daisycentral listening on port %d in %s mode", app.address().port, app.settings.env);
+});
 ss.start(app);

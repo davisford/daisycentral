@@ -18,7 +18,7 @@ module.exports = {
       debug: true
   }
   , webserver: {
-      port: 3000 // port the webserver listens on
+      port: 3006 // port the webserver listens on
   }
   , deviceserver: {
       port: 9000 // port the server listens on that receives posts from devices
