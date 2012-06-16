@@ -12,7 +12,7 @@ module.exports = {
   , google: {
       clientId: '897736032157.apps.googleusercontent.com'
       , clientSecret: 'pEXRmB-rLZXVkAiujEkhcJGZ'
-      , myHostname: 'http://localhost:3000'
+      , myHostname: 'http://demo.daisyworks.com'
   }
   , everyauth: {
       debug: true
