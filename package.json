@@ -16,5 +16,10 @@
     "bcrypt": "0.5.x",
     "mongoose": "2.5.x",
     "connect-redis": "1.3.x"
+  },
+  "devDependencies": {
+    "mocha": "1.0.x",
+    "should": "0.6.x",
+    "sinon": "1.3.x"
   }
 }

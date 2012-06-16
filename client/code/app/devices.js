@@ -292,7 +292,7 @@ var Devices = function() {
         bus.bind('daisySelected', this.daisySelected);
         bus.bind('sensorSelected', this.sensorSelected);
         chart = this.$('#chart');
-        plot = $.plot(chart, [], chartOptions);
+        //plot = $.plot(chart, [], chartOptions);
         checkedSensors = _.pluck($('#sensor-cb-table :checked'), 'id');
 
         var me = this;

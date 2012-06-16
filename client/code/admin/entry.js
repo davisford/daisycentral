@@ -16,7 +16,7 @@ ss.server.on('ready', function () {
   jQuery(function () {
 
     // load client modules; order matters here
-    require('datatables');
+    require('datatables-bootstrap');
     require('/router');
     
     // decorate bootstrap tabs

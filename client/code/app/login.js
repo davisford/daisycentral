@@ -1,5 +1,7 @@
 // in client/code/app/login.js
 
+//var validators = require('validation');
+
 // focus on login/email text box when loaded
 $('#login-email').focus();
 

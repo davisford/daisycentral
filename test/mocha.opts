@@ -1,4 +1,5 @@
 --require should
 -R spec
 --ui bdd
---slow 75ms
+--slow 20
+--growl

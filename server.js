@@ -29,7 +29,7 @@ ss.client.define('main', {
 ss.client.define('login', {
   view: 'login.jade',
   css: ['libs', 'app.styl', 'login.styl'],
-  code: ['libs', 'app'],
+  code: ['libs', 'app', 'system', 'shared'],
   tmpl: '*'
 });
 

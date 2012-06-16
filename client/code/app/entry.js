@@ -18,9 +18,9 @@ ss.server.on('ready', function(){
   // Wait for the DOM to finish loading
   jQuery(function(){
     
-    // Load chat demo app
+    // client modules -- order matters here
+    require('datatables-bootstrap');
     require('/login');
-    require('datatables');
     require('/router');
 
     $("#tabs").tab();
