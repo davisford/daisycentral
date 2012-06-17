@@ -2,7 +2,7 @@
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , ObjectId = mongoose.SchemaTypes.ObjectId;
-
+  
 var SensorDataSchema = new Schema({
   did:    String,
   ip:     String,

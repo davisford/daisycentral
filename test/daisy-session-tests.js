@@ -165,9 +165,7 @@ describe("DaisySession", function() {
 	});
 
 	it("should not blow up if no callbacks are registered and data is received", function(done) {
-
 		socket.emit('data', 'bogus data');
-
 		done();
 	});
 

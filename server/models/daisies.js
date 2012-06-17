@@ -2,12 +2,13 @@
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , ObjectId = mongoose.SchemaTypes.ObjectId
-  , lastmodified = require('./plugins/lastmodified');
+  , lastmodified = require('./plugins/lastmodified')
+  , ss = require('socketstream');
 
 var DaisiesSchema = new Schema({
 	did: { type: String, index: true },
 	mac: { type: String, index: true },
-  online: { type: Boolean, index: true },
+  	online: { type: Boolean, index: true },
 	owners: [{ type: ObjectId, index: true, ref: 'User' }],
 	key: { type: String, unique: true }
 });

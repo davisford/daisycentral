@@ -6,10 +6,12 @@ var SensorData = require('../models/sensordata')
   , events = require('events')
   , qs   = require('querystring');
 
+// the channels we publish to
+var adminChannel = 'admin:daisy:status';
+var userChannel = 'user:daisy:status';
+
 // DaisySession subclasses EventEmitter
 util.inherits(DaisySession, events.EventEmitter);
-
-// private, shared variables; these are shared in module for multiple DaisySession instances
 
 /**
  * Represents a bi-directional session between a connected Daisy
@@ -210,9 +212,12 @@ function DaisySession(socket, ss, timeout) {
    * We also need to fire our own 'dc:closed' event
    */
   this._onClose = function() {
-    //console.log('\t socket:close, this.daisy', me.daisy);
+
     if(me.daisy) {
+
       me.daisy.online = false;
+      
+      // save the database state as offline
       Daisies.findOne({mac: me.daisy.mac}, function (err, doc) {
         if (err) { 
           // cached version
