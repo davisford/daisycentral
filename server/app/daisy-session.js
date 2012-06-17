@@ -32,7 +32,7 @@ function DaisySession(socket, ss, timeout) {
   socket.setEncoding('ascii');
 
   // good netizen
-  socket.write('HTTP/1.1 200 OK\n');
+  //socket.write('HTTP/1.1 200 OK\n');
 
   // subclass EventEmitter
   events.EventEmitter.call(this);
@@ -171,7 +171,6 @@ function DaisySession(socket, ss, timeout) {
    * @param {string} [data] should be ASCII if we set the socket config
    */
   this.onData = function (data) {
-    console.log("socket.data =>", data);
     if (!data) return;
 
     // this is a querystring HTTP GET with sensor data
@@ -181,7 +180,9 @@ function DaisySession(socket, ss, timeout) {
     } else {
       // issue a callback b/c it could be return 
       // from a socket.write() call
-      me.callback(null, data);
+      var cb = me._sessionlock.callbacks.shift();
+      if (cb) 
+        cb(null, data);
     }
   } // end this.onData
 
@@ -193,7 +194,6 @@ function DaisySession(socket, ss, timeout) {
     // daisy needs at least a 250ms spacer after $$$
     setTimeout(function () {
       me.socket.write(command);
-      console.log('written to socket: \t'+command);
     }, 250);
     // refresh the session timeout
     this._sessionlock.lastCommand = new Date().getTime();
@@ -256,7 +256,6 @@ function DaisySession(socket, ss, timeout) {
    * @param {Daisies} [daisy] the daisy to publish status for
    */
   this.pubStatus = function(daisy) {
-    console.log("UPDATE DAISY STATUS: ", daisy.online);
     daisy.owners.forEach(function (userId, index, arr) {
       me.ss.api.publish.user(userId, 'daisy:status', daisy);
     });
@@ -269,17 +268,19 @@ function DaisySession(socket, ss, timeout) {
     console.log("\t socket:end");
   }
 
-  this.sessionTimeout = function(session) {
-    var lock = session._sessionlock;
+  /**
+   * Handler when a session's timeout expires for having a lock
+   * on the Daisy.
+   * @param {s} [DaisySession] this context
+   */
+  this.sessionTimeout = function(s) {
     var now = new Date().getTime();
-    if(!lock.lastCommandSent) { 
-      session.unlock();
+    if(!s._sessionlock.lastCommand) { 
+      s.unlock();
     }
-    else if ( (now - lock.lastCommandSent) >= session.timeout ) {
-      session.unlock();
-    } else {
-      console.log("session remains locked by ", session._sessionlock);
-    }
+    else if ( (now - s._sessionlock.lastCommand) >= s.timeout ) {
+      s.unlock();
+    } 
   }
 
   // setup all event handlers
@@ -295,44 +296,7 @@ function DaisySession(socket, ss, timeout) {
 
 /* ------------ Public Methods -------------- */
 
-/**
- * A DaisySession can be used by only one HTTP/WebSocket session at a time.
- * You must lock the DaisySession with your own HTTP/WebSocket sessionId
- * before you can call `send`
- * @param {string} [sessionId]
- * @param {Function} [callback]
- */
-DaisySession.prototype.lock = function(sessionId, callback) {
-  
-  console.log("Trying session.lock =>", sessionId, callback);
-  if (!sessionId || !callback) {
-    return false;
-  }
 
-  var lock = this._sessionLock;
-  
-  if (!lock) 
-    throw new Error("Illegal state: _sessionlock is undefined");
-
-  // already locked by same sessionId
-  if (lock.sessionId === sessionId) {
-    console.log("...."+sessionId + " already has a lock");
-    lock.callbacks.push(callback);
-    return true;
-  } else if (lock.sessionId === "unlocked") {
-    // lock the session
-    lock = this._sessionlock = {
-      sessionId: sessionId,
-      callbacks: [callback]
-    };
-    lock.timeoutId = setTimeout(this.sessionTimeout, this.timeout, this);
-    console.log("Locked by " + sessionId + ", expires in " + (this.timeout / 1000) + " sec");
-    return true;
-  } 
-  console.log("....failed to lock b/c "+lock.sessionId+" has it");
-  // sorry, charlie
-  return false;
-}
 
 /**
  * Unlock the session so it is available
@@ -346,7 +310,7 @@ DaisySession.prototype.unlock = function() {
  * Indicates if this session is locked
  */
 DaisySession.prototype.isLocked = function() {
-  return this._sessionlock.sessionId === "unlocked";
+  return this._sessionlock.sessionId !== "unlocked";
 }
 
 /**
@@ -369,7 +333,6 @@ DaisySession.prototype.send = function(sessionId, command, callback) {
   
   // we can't send anything b/c there's no daisy to send to
   if(!this.daisy) {
-    console.log("NO DAISY");
     return callback("Daisy is not connected yet", null);
   }
 
@@ -387,12 +350,46 @@ DaisySession.prototype.send = function(sessionId, command, callback) {
   }
 }
 
+/**
+ * A DaisySession can be used by only one HTTP/WebSocket session at a time.
+ * You must lock the DaisySession with your own HTTP/WebSocket sessionId
+ * before you can call `send`
+ * @param {string} [sessionId]
+ * @param {Function} [callback]
+ */
+DaisySession.prototype.lock = function(sessionId, callback) {
+
+  if (!sessionId || !callback) {
+    return false;
+  }
+
+  if (!this._sessionlock) 
+    throw new Error("Illegal state: _sessionlock is undefined");
+
+  // already locked by same sessionId
+  if (this._sessionlock.sessionId === sessionId) {
+    // add this callback
+    this._sessionlock.callbacks.push(callback);
+    return true;
+
+  } else if (this._sessionlock.sessionId === "unlocked") {
+    // lock the session
+    this._sessionlock = {
+      sessionId: sessionId,
+      callbacks: [callback]
+    };
+    this._sessionlock.timeoutId = setTimeout(this.sessionTimeout, this.timeout, this);
+    return true;
+  } 
+
+  // sorry, charlie - lock request rejecto'ed
+  return false;
+}
+
 // static class lock object; used if no one has a lock
 DaisySession.defaultLock = {
   sessionId: "unlocked",
-  callback: function(err, res) {
-    console.log("DaisySession unlocked callback handler: "+res);
-  }
+  callbacks: []
 }
 
 module.exports = DaisySession;

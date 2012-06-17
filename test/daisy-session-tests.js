@@ -1,7 +1,9 @@
 var DaisySession = require('../server/app/daisy-session')
   , sinon = require('sinon')
+  , should = require('should')
   , net = require('net')
   , ss = require('socketstream')
+  , util = require('util')
   , mongoose = require('mongoose')
   , SensorData = require('../server/models/sensordata')
   , Daisies = require('../server/models/daisies').getModel();
@@ -104,7 +106,7 @@ describe("DaisySession", function() {
 		}, 1000);
 	}); */
 
-	it("should refresh the lock timeout if client keeps sending", function(done) {
+	/*it("should refresh the lock timeout if client keeps sending", function(done) {
 		var i = 0;
 		var stub = sinon.stub(socket, "write");
 			
@@ -133,24 +135,69 @@ describe("DaisySession", function() {
 
 		done();
 		
-	});
+	}); */
 
-	it("should blah blah balh ", function(done) {
-		var stub = sinon.stub(socket, "write").yields();
+	it("should handle interleaving send calls with different sessions", function(done) {
+		// message 1, 3, 5 should go through
+		// b/c session1 is first and locks out session2 
+		var cmds = [
+				{ sid: 'session1', msg: 'pass1\r' }, 
+				{ sid: 'session2', msg: 'fail1\r' },
+				{ sid: 'session1', msg: 'pass2\r' },
+				{ sid: 'session1', msg: 'pass3\r' },
+				{ sid: 'session2', msg: 'fail2\r' }
+		];
+
+		// the stub echos the command it 
+		// receives via socket.write by emitting the 'data'
+		// event with the same arg
+		var stub = sinon.stub(socket, "write", function(data, enc, cb) {
+			var arg = stub.args[stub.callCount-1][0];
+			this.emit('data', arg);
+		});
 
 		session = new DaisySession(socket, ss);
-		var daisyStub = sinon.stub();
-		session.daisy = daisyStub;
+		// have to set a daisy or send won't work
+		session.daisy = sinon.spy();
 
-		var cb = function(err, res) {
-			console.log(err, res);
-			err.should.not.exist;
-		}
-		session.send('123', '$$$', cb);
-		session.send('123', 'get ip', cb);
-		session.send('123', 'get mac', cb);
-		session.send('abc', 'whoa!', cb);
-		session.send('123', 'bankroll', cb);
+		cmds.forEach(function(cmd, idx, arr) {
+			session.send(cmd.sid, cmd.msg, function(err, res) {
+				if([1,4].indexOf(idx) >= 0) { 
+					should.exist(err);
+				} else {
+					cmd.msg.should.eql(res);
+				}
+
+			});
+		});
+
+		done();
+
+	});
+
+	it("should expire a session", function(done) {
+		var stub = sinon.stub(socket, "write", function(data, enc, cb) {
+			this.emit('data', stub.args[stub.callCount-1][0]);
+		});
+
+		// expires in 1 second
+		session = new DaisySession(socket, ss, 1);
+		// have to set a daisy or send won't work
+		session.daisy = sinon.spy();
+
+		session.send("session1", "foo", function(err, res) {
+			should.not.exist(err);
+			"foo\r".should.eql(res);
+		});
+
+		setTimeout(function() {
+			session.isLocked().should.be.false;
+			session.send("session2", "bar", function(err, res) {
+				should.not.exist(err);
+				"bar\r".should.eql(res);
+				done();
+			});
+		}, 1000);
 	});
 
 	
