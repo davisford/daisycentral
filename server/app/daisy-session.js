@@ -9,6 +9,10 @@ var SensorData = require('../models/sensordata')
 // DaisySession subclasses EventEmitter
 util.inherits(DaisySession, events.EventEmitter);
 
+// private, shared variables; these are shared in module for multiple DaisySession instances
+var _ss;
+
+
 /**
  * Represents a bi-directional session between a connected Daisy
  * and any other client.  Clients send commands to the Daisy.
@@ -23,7 +27,7 @@ util.inherits(DaisySession, events.EventEmitter);
  */
 function DaisySession(socket, ss, timeout) {
   this.socket = socket;
-  this.ss = ss;
+  _ss = ss;
   this.timeout = (timeout * 1000) || (300 * 1000); // default 5 min. timeout
   this._sessionlock = DaisySession.defaultLock;
   var me = this;
@@ -278,7 +282,7 @@ function DaisySession(socket, ss, timeout) {
     if(!s._sessionlock.lastCommand) { 
       s.unlock();
     }
-    else if ( (now - s._sessionlock.lastCommand) >= s.timeout ) {
+    else if ( (now - s._sessionlock.lastCommand) >= timeout ) {
       s.unlock();
     } 
   }

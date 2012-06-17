@@ -32,7 +32,8 @@ describe("DaisySession", function() {
 	});
 
 	afterEach(function (done) {
-		//session.unlock();
+		// so we don't have lingering timeout callbacks
+		session.unlock();
 		done();
 	});
 
@@ -184,6 +185,7 @@ describe("DaisySession", function() {
 		session = new DaisySession(socket, ss, 1);
 		// have to set a daisy or send won't work
 		session.daisy = sinon.spy();
+	  should.not.exist(session._timeout);
 
 		session.send("session1", "foo", function(err, res) {
 			should.not.exist(err);
