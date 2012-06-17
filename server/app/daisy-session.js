@@ -10,8 +10,6 @@ var SensorData = require('../models/sensordata')
 util.inherits(DaisySession, events.EventEmitter);
 
 // private, shared variables; these are shared in module for multiple DaisySession instances
-var _ss;
-
 
 /**
  * Represents a bi-directional session between a connected Daisy
@@ -27,16 +25,13 @@ var _ss;
  */
 function DaisySession(socket, ss, timeout) {
   this.socket = socket;
-  _ss = ss;
+  this.ss = ss;
   this.timeout = (timeout * 1000) || (300 * 1000); // default 5 min. timeout
   this._sessionlock = DaisySession.defaultLock;
   var me = this;
 
   // we always use ascii for daisy wifi
   socket.setEncoding('ascii');
-
-  // good netizen
-  //socket.write('HTTP/1.1 200 OK\n');
 
   // subclass EventEmitter
   events.EventEmitter.call(this);
@@ -48,7 +43,7 @@ function DaisySession(socket, ss, timeout) {
    * @param {string} [queryString] the querystring from HTTP request; example: GET /wifly-data?DATA=051108C20874000987D70B4C6A9031093124&id=Troys-Mailbox&mac=00:06:66:72:16:81&bss=e0:46:9a:5a:c8:43&rtc=4fc2558b&bat=3066&io=510&wake=1&seq=60f&cnt=1&rssi=e7 HTTP/1.0 Host: 192.168.25.200
    * @return {object} with sensor data
    */
-  this.parseData = function (queryString) {
+  this._parseData = function (queryString) {
     console.log('received the querystring: ', queryString);
 
     // shave off the HTTP header and parse into raw object
@@ -88,7 +83,7 @@ function DaisySession(socket, ss, timeout) {
     me.emit('dc:initialized', data.mac, me);
 
     return data;
-  } // end this.parseData
+  } // end this._parseData
 
   /**
    * Persists the sensor data into {SensorData} model.  If this is the
@@ -96,7 +91,7 @@ function DaisySession(socket, ss, timeout) {
    * record or update the {Daisies} record with the online status.
    * @param {object} [obj]
    */
-  this.storeData = function (obj) {
+  this._storeData = function (obj) {
     if (!obj) return;
 
     // get a special model with the collection name
@@ -168,27 +163,91 @@ function DaisySession(socket, ss, timeout) {
 
       }
     }); // end findOne
-  } // end this.storeData
+  } // end this._storeData
   
   /**
    * Callback for socket.on('data')
    * @param {string} [data] should be ASCII if we set the socket config
    */
-  this.onData = function (data) {
+  this._onData = function (data) {
+    console.log('socket received data => ', data);
     if (!data) return;
 
     // this is a querystring HTTP GET with sensor data
     if (data.match(/^GET .*/)) {
       // parse it and store it
-      me.storeData(me.parseData(data));
+      me._storeData(me._parseData(data));
     } else {
       // issue a callback b/c it could be return 
       // from a socket.write() call
       var cb = me._sessionlock.callbacks.shift();
       if (cb) 
         cb(null, data);
+      else 
+        console.log("nobody is listening...nobody cares about "+data);
     }
-  } // end this.onData
+  } // end this._onData
+
+
+
+  /**
+   * Net.Socket error handler
+   */
+  this._onError = function(err) {
+    console.log('\t socket:error: ', err);
+  }
+
+  /**
+   * Net.Socket timeout handler
+   */
+  this._onTimeout = function() {
+    console.log('\t socket:timeout');
+  }
+
+  /**
+   * Net.Socket close handler. When it closes we want to do pub/sub
+   * to all consumers so they have an updated status on the connection.
+   * We also need to fire our own 'dc:closed' event
+   */
+  this._onClose = function() {
+    //console.log('\t socket:close, this.daisy', me.daisy);
+    if(me.daisy) {
+      me.daisy.online = false;
+      Daisies.findOne({mac: me.daisy.mac}, function (err, doc) {
+        if (err) { 
+          // cached version
+          me._pubStatus(me.daisy);
+          //console.log("Could not look up daisy", me.daisy); 
+        }
+        else {
+          if (doc) {
+            doc.online = false;
+            doc.save(function (err, doc) {
+              if (err) { console.log("Could not update daisy to set status offline", err); }
+            });
+            // fresh version
+            me._pubStatus(doc);
+          } else {
+            // cached version
+            me._pubStatus(me.daisy);
+          }
+        }
+      });
+      // regardless of whether we're able to update the db state
+      // we know the device is offline, b/c the socket is closed.
+      me.ss.api.publish.channel('dw:admin', 'daisy:status', me.daisy);
+      me.emit('dc:closed', me.daisy.mac);
+    } else {
+      console.log("In socket.close handler, but no daisy attached");
+    }
+  } // end _onClose
+
+  /**
+   * Net.Socket end handler
+   */
+  this._onEnd = function() {
+    console.log("\t socket:end");
+  }
 
   /**
    * Write a command to the Daisy
@@ -204,72 +263,13 @@ function DaisySession(socket, ss, timeout) {
   } // end _write
 
   /**
-   * Net.Socket error handler
-   */
-  this.onError = function(err) {
-    console.log('\t socket:error: ', err);
-  }
-
-  /**
-   * Net.Socket timeout handler
-   */
-  this.onTimeout = function() {
-    console.log('\t socket:timeout');
-  }
-
-  /**
-   * Net.Socket close handler. When it closes we want to do pub/sub
-   * to all consumers so they have an updated status on the connection.
-   * We also need to fire our own 'dc:closed' event
-   */
-  this.onClose = function() {
-    //console.log('\t socket:close, this.daisy', me.daisy);
-    if(me.daisy) {
-      me.daisy.online = false;
-      Daisies.findOne({mac: me.daisy.mac}, function (err, doc) {
-        if (err) { 
-          // cached version
-          me.pubStatus(me.daisy);
-          //console.log("Could not look up daisy", me.daisy); 
-        }
-        else {
-          if (doc) {
-            doc.online = false;
-            doc.save(function (err, doc) {
-              if (err) { console.log("Could not update daisy to set status offline", err); }
-            });
-            // fresh version
-            me.pubStatus(doc);
-          } else {
-            // cached version
-            me.pubStatus(me.daisy);
-          }
-        }
-      });
-      // regardless of whether we're able to update the db state
-      // we know the device is offline, b/c the socket is closed.
-      me.ss.api.publish.channel('dw:admin', 'daisy:status', me.daisy);
-      me.emit('dc:closed', me.daisy.mac);
-    } else {
-      console.log("In socket.close handler, but no daisy attached");
-    }
-  } // end _onClose
-
-  /**
    * Publish this daisy's status to any pub/sub consumers
    * @param {Daisies} [daisy] the daisy to publish status for
    */
-  this.pubStatus = function(daisy) {
+  this._pubStatus = function(daisy) {
     daisy.owners.forEach(function (userId, index, arr) {
       me.ss.api.publish.user(userId, 'daisy:status', daisy);
     });
-  }
-
-  /**
-   * Net.Socket end handler
-   */
-  this.onEnd = function() {
-    console.log("\t socket:end");
   }
 
   /**
@@ -277,7 +277,7 @@ function DaisySession(socket, ss, timeout) {
    * on the Daisy.
    * @param {s} [DaisySession] this context
    */
-  this.sessionTimeout = function(s) {
+  this._sessionTimeout = function(s) {
     var now = new Date().getTime();
     if(!s._sessionlock.lastCommand) { 
       s.unlock();
@@ -288,11 +288,11 @@ function DaisySession(socket, ss, timeout) {
   }
 
   // setup all event handlers
-  socket.on('data', this.onData);
-  socket.on('error', this.onError);
-  socket.on('timeout', this.onTimeout);
-  socket.on('close', this.onClose);
-  socket.on('end', this.onEnd);
+  socket.on('data', this._onData);
+  socket.on('error', this._onError);
+  socket.on('timeout', this._onTimeout);
+  socket.on('close', this._onClose);
+  socket.on('end', this._onEnd);
 
   return this;
 
@@ -356,8 +356,8 @@ DaisySession.prototype.send = function(sessionId, command, callback) {
 
 /**
  * A DaisySession can be used by only one HTTP/WebSocket session at a time.
- * You must lock the DaisySession with your own HTTP/WebSocket sessionId
- * before you can call `send`
+ * DaisySession.send will take care of locking - this is exposed 
+ * for efficiency and testing.
  * @param {string} [sessionId]
  * @param {Function} [callback]
  */
@@ -382,7 +382,7 @@ DaisySession.prototype.lock = function(sessionId, callback) {
       sessionId: sessionId,
       callbacks: [callback]
     };
-    this._sessionlock.timeoutId = setTimeout(this.sessionTimeout, this.timeout, this);
+    this._sessionlock.timeoutId = setTimeout(this._sessionTimeout, this.timeout, this);
     return true;
   } 
 
