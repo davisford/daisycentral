@@ -1,9 +1,6 @@
 var should = require('should')
   , mongoose = require('mongoose');
 
-// this is a test
-process.env['NODE_ENV'] = 'test';
-
 mongoose.connect("mongodb://localhost/daisycentral-test");
 
 var SensorData = require('../server/models/sensordata')

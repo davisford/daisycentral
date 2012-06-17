@@ -1,5 +1,9 @@
 --require should
+--require sinon
 -R spec
 --ui bdd
 --slow 20
+--timeout 3000
 --growl
+--grep DaisySession
+--watch

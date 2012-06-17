@@ -1,7 +1,7 @@
 // in server/rpc/admin/devices.js
 
 var Daisies = require('../../models/daisies').getModel(),
-    server  = require('../../app/daisyServer');
+    server  = require('../../app/daisy-server');
 
 exports.actions = function (req, res, ss) {
 	// populate the session object
@@ -62,14 +62,14 @@ exports.actions = function (req, res, ss) {
         return res("Cannot send null/empty command", null); 
       }
 
-      var daisyConvo = server.getConvo(mac);
-      if (!daisyConvo) { 
-        console.log("Daisy Convo is not available for mac: " + mac);
-        return res("That Daisy doesn't appear to be online at the moment", null); 
+      var session = server.getSession(mac);
+      if (!session) { 
+        console.log("DaisySession is not available for mac: " + mac);
+        return res("That Daisy doesn't appear to be online at the moment \n", null); 
       }
 
       var cmd = command;
-      daisyConvo.send(command, function (err, result) {
+      session.send(command, function (err, result) {
         if (result && result.indexOf(cmd) === 0) {
           console.log("Ignore echo command: "+result);
         } else {

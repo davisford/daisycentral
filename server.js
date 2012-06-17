@@ -3,7 +3,7 @@
 var express = require('express')
   , ss = require('socketstream')
   , conf = require('./server/app/conf')
-  , daisyServer = require('./server/app/daisyServer.js').init(ss).start()
+  , daisyServer = require('./server/app/daisy-server.js').init(ss).start()
   , mongoose = require('mongoose')
   , mongooseAuth = require('mongoose-auth')
   , security = require('./server/middleware/security');
