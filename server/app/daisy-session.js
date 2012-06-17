@@ -133,7 +133,7 @@ function DaisySession(socket, ss, timeout) {
           // publish the data to any owners (subscribers)
           daisy.owners.forEach(function (userId, index, arr) {
             me.ss.api.publish.user(userId, 'daisy:sensors', sensors);
-            me.pubStatus(me.daisy);
+            me._pubStatus(me.daisy);
           });
       
           // save the status update

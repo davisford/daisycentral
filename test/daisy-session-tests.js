@@ -105,37 +105,6 @@ describe("DaisySession", function() {
 		}, 1000);
 	}); 
 
-	/*it("should refresh the lock timeout if client keeps sending", function(done) {
-		var i = 0;
-		var stub = sinon.stub(socket, "write");
-			
-		socket.on('data', function(data) {
-			console.log('data received', data);
-		});
-
-		socket.write("foobar", null, function(echo){ 
-			socket.emit('data', '\nfoobar echo '+echo);
-		})
-		socket.write.yields(socket.write.getCall(0).args[0]);
-
-		socket.write("boofar", null, function(echo){
-			setTimeout(function() {
-				socket.emit('data', '\nboofar echo '+echo);
-			}, 1000)	
-		});
-		socket.write.yields(socket.write.getCall(1).args[0]);
-		
-		socket.write("zanzibar", null, function(echo){
-			socket.emit('data', '\nzanzibar echo '+echo);
-		});
-		socket.write.yields(socket.write.getCall(2).args[0]);
-		
-		console.log("\nwrite args\n", socket.write.args);
-
-		done();
-		
-	}); */
-
 	it("should handle interleaving send calls with different sessions", function(done) {
 		// message index 0,2,3,6 should go through
 		// b/c session1 is first and locks out session2 
