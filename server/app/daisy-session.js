@@ -100,7 +100,9 @@ function DaisySession(socket, ss, timeout) {
    * @param {object} [obj]
    */
   this._storeData = function (obj) {
-    if (!obj && !obj.mac) return;
+    if (!obj && 
+        !obj.hasOwnProperty('mac') &&
+        !obj.hasOwnProperty('did')) { return };
 
     // get a special model with the collection name
     // that includes the mac address
