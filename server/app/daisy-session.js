@@ -63,7 +63,8 @@ function DaisySession(socket, ss, timeout) {
       var data = {
         did: raw.id,
         mac: raw.mac,
-        timestamp: parseInt(raw.rtc, 16) * 1000,
+        // ignore device timestamp
+        timestamp: new Date().getTime(),
         bat: parseInt(raw.bat),
         rssi: parseInt(raw.rssi, 16),
         wake: parseInt(raw.wake),
