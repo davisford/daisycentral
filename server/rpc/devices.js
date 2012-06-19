@@ -1,9 +1,12 @@
 // in server/rpc/devices.js
 
-var Daisies = require('../models/daisies').getModel()
-  , ObjectId = require('mongoose').Schema.ObjectId;
+var Daisies
+  , ObjectId = require('mongoose').Schema.ObjectId; 
 
 exports.actions = function (req, res, ss) {
+
+  Daisies = require('../models/daisies')(ss);
+
   // populate the session object
   req.use('session');
 
@@ -21,7 +24,7 @@ exports.actions = function (req, res, ss) {
         else {
           return res(null, daisies);
         }
-      });
+      }); 
     },
 
     // registering a new daisy means if they authenticate
@@ -50,7 +53,7 @@ exports.actions = function (req, res, ss) {
             return res("You've already registered that Daisy", true);
           }
         }
-      });
+      }); 
     }
 
   } // end return

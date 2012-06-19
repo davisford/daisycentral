@@ -5,5 +5,4 @@
 --slow 20
 --timeout 3000
 --growl
---grep DaisySession
 --watch

@@ -13,12 +13,15 @@ exports.actions = function (req, res, ss) {
 
 		// TODO adding paging functionality
 		get: function(mac) {
+
 			if (!mac) { return res("MAC address is not valid: "+mac); }
-			console.log('sensors.get =>'+mac);
+
 			var SensorDataModel = SensorData.getModel(SensorData.getColName(mac));
+			
 			var query = SensorDataModel.where({}).limit(25);
+			
 			query.run(function (err, sensors) {
-				if (err) { return res("An error occurred, please try again"); return; }
+				if (err) { return res("An error occurred, please try again"); }
 				else { return res(null, sensors); }
 			});
 		}

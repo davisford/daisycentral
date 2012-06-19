@@ -6,7 +6,7 @@ var DaisySession = require('../server/app/daisy-session')
   , util = require('util')
   , mongoose = require('mongoose')
   , SensorData = require('../server/models/sensordata')
-  , Daisies = require('../server/models/daisies').getModel();
+  , Daisies = require('../server/models/daisies')(ss);
 
 mongoose.connect('mongodb://localhost/daisycentral-test');
 
@@ -29,7 +29,7 @@ describe("DaisySession", function() {
 		// it just echoes the command right back by firing the data event
 	  stub = sinon.stub(socket, "write", function(data, enc, cb) {
 	  	var args = stub.args;
-	  	console.log("socket.write was called with args: ", args);
+	  	//console.log("socket.write was called with args: ", args);
 	  	if (args.length > 0) 
 				this.emit('data', stub.args[stub.callCount-1][0]);
 		});
@@ -37,7 +37,7 @@ describe("DaisySession", function() {
 		// clean database
 		Daisies.remove({}, function (err) {
 			if (err) { return done(err); }
-		})
+		});
 		done();
 	});
 
@@ -46,20 +46,6 @@ describe("DaisySession", function() {
 		session.unlock();
 		done();
 	});
-
-	/*
-
-	it("constructor should set the socket encoding to `ascii`", function(done) {
-		mockSocket.expects("setEncoding").withExactArgs("ascii").once();
-		mockSocket.expects("write").withExactArgs("HTTP/1.1 200 OK\n").once();
-
-		session = new DaisySession(socket, ss);
-	
-		mockSocket.verify();
-		socket.should.eql(session.socket);
-		ss.should.eql(session.ss);
-		done();
-	}); */
 
 	it("should fail to lock if sessionId is invalid", function(done) {
 		session = new DaisySession(socket, ss);
@@ -122,11 +108,9 @@ describe("DaisySession", function() {
 		session.daisy = sinon.spy();
 
 		cmds.forEach(function(cmd, idx, arr) {
-			
-			session.send(cmd.sid, cmd.msg, function(err, res) {
-				
-				console.log("session.send callback["+idx+"] => ", err, res);
-				
+			// send all cmds
+			session.send(cmd.sid, cmd.msg, function(err, res) {				
+				//console.log("session.send callback["+idx+"] => ", err, res);
 				if([1,4].indexOf(idx) >= 0) { 
 					should.exist(err);
 				} else {
@@ -136,8 +120,8 @@ describe("DaisySession", function() {
 				if (idx === cmds.length-1) {
 					done();
 				}
-
 			});
+
 		});
 	});
 
@@ -145,22 +129,27 @@ describe("DaisySession", function() {
 
 		// expires in 1 second
 		session = new DaisySession(socket, ss, 1);
+
 		// have to set a daisy or send won't work
 		session.daisy = sinon.spy();
-	  should.not.exist(session._timeout);
 
 		session.send("session1", "foo", function(err, res) {
 			should.not.exist(err);
 			"foo\r".should.eql(res);
 		});
 
-		setTimeout(function() {
+		// subject to timing failure; 1s from now, sesison2 will try
+		// and should succeed in locking session and sending ok
+		setTimeout( function() {
+
 			session.isLocked().should.be.false;
+			
 			session.send("session2", "bar", function(err, res) {
 				should.not.exist(err);
 				"bar\r".should.eql(res);
 				done();
 			});
+
 		}, 1000);
 	});
 
@@ -168,6 +157,64 @@ describe("DaisySession", function() {
 		socket.emit('data', 'bogus data');
 		done();
 	});
+
+	it("should not blow up parsing bogus input", function (done) {
+		session = new DaisySession(socket, ss);
+		should.not.exist(session._parseData('Hungry Hungry Hippos'));
+
+		var undef = session._parseData("GET /wifly-data?DATA=0");
+
+		// this is almost right, but will create a parse error
+		should.not.exist(undef);
+
+		done();
+	});
+
+	it("should parse a valid query string and fire initialized event ", function (done) {
+		session = new DaisySession(socket, ss);
+		
+		// event should fire after successful parse
+		session.on('daisy-session:initialized', function(mac, ses) {
+			should.exist(mac);
+			mac.should.eql('00:06:66:72:10:ec');
+			should.exist(ses);
+			session.should.eql(ses);
+			done();
+		});
+		
+		var qs = "GET /wifly-data?DATA=051208BECF29CF29001F09F30AF52EC33DD7&id=Garden&mac=00:06:66:72:10:ec&bss=e0:46:9a:5b:22:ee&rtc=42ab&bat=2621&io=510&wake=2&seq=409&cnt=2&rssi=bc HTTP/1.0\rHost: live.daisyworks.com";
+		var data = session._parseData(qs);
+		
+		should.exist(data);
+		data.mac.should.eql('00:06:66:72:10:ec');
+		data.timestamp.should.eql(17067000);
+		data.bat.should.eql(2621);
+		data.rssi.should.eql(188);
+		data.wake.should.eql(2);
+		data.seq.should.eql(1033);
+		data.PIO3.should.eql(0);
+		data.PIO2.should.eql(0);
+		data.PIO1.should.eql(0);
+		data.AD0.should.eql(2238);
+		data.AD1.should.eql(53033);
+		data.AD2.should.eql(53033);
+		data.AD3.should.eql(31);
+		data.AD4.should.eql(2547);
+		data.AD5.should.eql(2805);
+		data.AD6.should.eql(11971);
+	});
+
+  it("should fire closed event on socket close", function(done) {
+  	session = new DaisySession(socket, ss);
+  	// mock daisy; simulate a real one; close won't fire w/o it
+  	session.daisy = new sinon.spy();
+  	session.on('daisy-session:closed', function(mac) {
+  		// TODO test storing a daisy
+  		done();
+  	});
+
+  	socket.emit('close');
+  });
 
 	
 });

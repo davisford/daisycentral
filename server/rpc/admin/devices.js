@@ -1,9 +1,12 @@
 // in server/rpc/admin/devices.js
 
-var Daisies = require('../../models/daisies').getModel(),
-    server  = require('../../app/daisy-server');
+var server = require('../../app/daisy-server')
+  , Daisies;
 
 exports.actions = function (req, res, ss) {
+
+  Daisies = require('../../models/daisies')(ss);
+
 	// populate the session object
 	req.use('session');
 
@@ -17,6 +20,7 @@ exports.actions = function (req, res, ss) {
     // TODO: add pagination support
     // get all devices
 		get: function (pageNum, pageSize) {
+
       Daisies.find({}, function (err, daisies) {
         if (err) { 
           console.log(err);
@@ -24,7 +28,8 @@ exports.actions = function (req, res, ss) {
         else {
           return res(null, daisies);
         }
-      });
+      }); 
+
 		},
 
     // admin can update daisy properties
@@ -47,37 +52,38 @@ exports.actions = function (req, res, ss) {
             else { return res(true); }
           });
         }
-      });
+      }); 
     },
 
     sendCommand: function (mac, command) {
-      console.log('mac:'+mac+", command:"+command);
 
       if (!mac) { 
-        console.log("mac is not valid: "+mac);
-        return res("Cannot send to null/empty daisy", null); 
+        return res("Invalid mac address"); 
       }
       if (!command) { 
-        console.log("command is not valid: "+command);
-        return res("Cannot send null/empty command", null); 
+        return res("Cannot send null/empty command"); 
       }
 
       var session = server.getSession(mac);
       if (!session) { 
-        console.log("DaisySession is not available for mac: " + mac);
-        return res("That Daisy doesn't appear to be online at the moment \n", null); 
+        return res("That Daisy doesn't appear to be online at the moment.  Try again later. \n"); 
       }
 
       var cmd = command;
+
       session.send(command, function (err, result) {
-        if (result && result.indexOf(cmd) === 0) {
-          console.log("Ignore echo command: "+result);
+        if (err) {
+          console.log(err);
+          return res(err);
+        } 
+        // ignore echo 
+        if (result && result.indexOf(cmd) !== 0) {
+          res (null, result);
         } else {
-          console.log("responding to RPC with "+result);
-          res(err, result);
+          res ("No response");
         }
-      }); 
-      console.log('command should be sent');
+      });
+
     }
 
 	} // end return

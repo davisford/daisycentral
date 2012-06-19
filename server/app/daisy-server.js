@@ -19,16 +19,18 @@ var DaisyServer = (function () {
 
   function createServer(ss) {
     if (!server) {
+
       var server = net.createServer( function (socket) {
         console.log('new connection made on daisy server');
         var daisySession = new DaisySession(socket, ss);
 
-        daisySession.on('dc:initialized', sessionReady);
-        daisySession.on('dc:closed', sessionClosed);
+        daisySession.on('daisy-session:initialized', sessionReady);
+        daisySession.on('daisy-session:closed', sessionClosed);
       }).listen(conf.deviceserver.port, function () {
         console.log('daisy server listening on port '+conf.deviceserver.port);
       });
     }
+    
     return server;
   }
 
