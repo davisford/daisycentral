@@ -7,19 +7,21 @@ I'm now working on building out a full-blown app that will provide a web bridge 
 
 ## Tech Stack
 
-* [node.js](http://nodejs.org)
-* [socketstream](https://github.com/socketstream/socketstream)
-* [socket.io](http://socket.io/)
-* [connect](https://github.com/senchalabs/connect)
-* [express](http://expressjs.com/)
-* [redis](http://redis.io)
-* [MongoDB](http://www.mongodb.org/)
-* [jade](http://jade-lang.com/)
-* [nib](https://github.com/visionmedia/nib)
-* [stylus](http://learnboost.github.com/stylus/)
-* [Twitter Bootstrap](http://twitter.github.com/bootstrap/)
-* [Flot](http://code.google.com/p/flot/)
-* [DataTables](http://datatables.net/)
+* [node.js](http://nodejs.org) - app server
+* [socketstream](https://github.com/socketstream/socketstream) - main framework
+* [socket.io](http://socket.io/) - client server comms via websocket (hopefully)
+* [connect](https://github.com/senchalabs/connect) / [express](http://expressjs.com/) - routing, HTTP, etc.
+* [redis](http://redis.io) - session state and pub/sub for distributed environ
+* [MongoDB](http://www.mongodb.org/) - persistence (took long hard look at Riak)
+* [mongoose](http://mongoosejs.org) - ORM on top of MongoDB
+* [Backbone.js](http://documentcloud.github.com/backbone/) - client side Model-View app architecture
+* [underscore](http://documentcloud.github.com/underscore/) - server/client side functional syntactic JS sugar
+* [jade](http://jade-lang.com/) - server/client templating
+* [stylus](http://learnboost.github.com/stylus/) / [nib](https://github.com/visionmedia/nib) - makes CSS bearable
+* [Twitter Bootstrap](http://twitter.github.com/bootstrap/) - layout, widgets
+* [Flot](http://code.google.com/p/flot/) - charting
+* [DataTables](http://datatables.net/) - tables
+* [jsPlumb](http://jsplumb.org) - pipes / connectors for drawing rules
 
 ## Dev Setup
 This Dev setup is for Ubuntu.  I dev on both Mac and Ubuntu.  Mac setup is similar, but you can use 
