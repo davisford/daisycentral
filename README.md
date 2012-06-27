@@ -37,14 +37,14 @@ This Dev setup is for Ubuntu.  I dev on both Mac and Ubuntu.  Mac setup is simil
 If you don't want to bother building it, you can get it [through aptitude](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager)
 
 ##### Build From Latest Source
-`HEAD 0.7.x` is unstable so you cannot use it yet.  [Check node.js release page](https://github.com/joyent/node/tags) to 
+`HEAD 0.8.x` is the current stable release.  [Check node.js release page](https://github.com/joyent/node/tags) to 
 find out what the latest stable release is.  Checkout that version.  
 
-For example, if the latest stable is `v0.6.14-release` then do this:
+For example, if the latest stable is `v0.8.0` then do this:
 ```sh
 sudo apt-get install -y make git git-core g++ curl libssl-dev apache2-utils python
 git clone https://github.com/joyent/node.git && cd node
-git checkout v0.6.14-release
+git checkout v0.8.0
 ./configure && make && make install
 ```
 
@@ -80,6 +80,7 @@ npm install nodemon -g
 ```
 
 ##### Install [ss-console](https://github.com/socketstream/ss-console) 
+###### OPTIONAL
 Adds REPL support in Chrome devtools console; can call server-side rpc from browser console
 
 ```sh
@@ -87,18 +88,11 @@ npm install ss-console -g
 ```
 
 ##### Install [node-inspector](https://github.com/dannycoates/node-inspector) 
+###### OPTIONAL BUT VERY USEFUL
 Allows you to breakpoint and debug client and server-side code in Chrome devtools
 
 ```sh
 npm install node-inspector -g
-```
-
-#### Install SocketStream
-SocketStream had not been published to `npm` yet, so I'm building from github `HEAD` and linking it.
-
-```sh
-git clone https://github.com/socketstream/socketstream.git
-cd socketstream && sudo npm link
 ```
 
 #### Install Redis
@@ -125,21 +119,32 @@ $ mongod &
 
 It should start without error.
 
-### Grab The Source
+### Grab The Source & Build & Run
 Checkout the source and run `sudo npm install`.  If I've done a good job of keeping the `package.json` file up to date, 
 then `npm install` will install all local dependencies for you.  If you get an error complaining about a particular
 library not being found, then run `npm install "library-name"` and I'll fix the `package.json` file.
 
+#### Clone The Repo
 ```sh 
 git clone git@github.com:davisford/daisycentral.git
-sudo npm install
-npm socketstream link
-cd daisycentral && nodemon app.js
 ```
 
-Now open browser to http://localhost:3000
+#### Build
+```sh
+cd daisycentral
+sudo npm install
+npm socketstream link
+```
+
+#### Run
+```sh
+nodemon server.js
+```
+
+Now open browser to http://localhost:3006
 
 ### Rebuilding Twitter Bootstrap
+I'm just documenting the process here for building Twitter Bootstrap.  You do not need to do this.
 This step is not strictly necessary unless you want to rebuild it.  I have already built bootstrap and copied the files needed into the project...however, if we want to tweak bootstrap with a theme or what-not, then this is how to rebuild:
 
 You need less and uglify-js to build:
@@ -251,4 +256,4 @@ The original maintainer got too busy, but this proved to be the best charting to
 
 https://github.com/davisford/flot
 
-I made some changes to it, so that is the version used in DaisyCentral
+I made some changes to it, so that is the version used in DaisyCentral.  Note to self: [this library](http://novus.github.com/nvd3/) looks _really_ nice.
