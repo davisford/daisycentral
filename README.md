@@ -2,7 +2,8 @@
 
 ## Introduction
 
-This is the webapp that runs at http://live.daisyworks.com
+This is the webapp that runs at http://demo.daisyworks.com.  Early prototype code was hosted at http://live.daisyworks.com.
+I'm now working on building out a full-blown app that will provide a web bridge to our hardware devices found at http://daisyworks.com
 
 ## Tech Stack
 
