@@ -52,7 +52,7 @@ function DaisySession(socket, ss, timeout) {
     // wrap in try/catch b/c parsing is easy to break
     try {
       // shave off the HTTP header and parse into raw object
-      var raw = qs.parse(queryString.slice(0, queryString.lastIndexOf(' HTTP')));
+      var raw = qs.parse(queryString.slice(0, queryString.indexOf(' HTTP')));
 
       if (raw['GET /wifly-data?DATA'] === undefined || 
           raw['mac'] === undefined) {
@@ -92,8 +92,11 @@ function DaisySession(socket, ss, timeout) {
       me.emit('daisy-session:initialized', data.mac, me);
 
     } catch (e) {
-      console.log('Error parsing input: ', queryString);
+      console.log('Error parsing input: ', queryString, e);
     }
+
+    // tell the daisy what's up
+    this.socket.write('HTTP/1.1 200 OK\n');
  
     return data;
   } // end this._parseData

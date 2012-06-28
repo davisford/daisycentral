@@ -182,7 +182,10 @@ describe("DaisySession", function() {
 			done();
 		});
 		
-		var qs = "GET /wifly-data?DATA=051208BECF29CF29001F09F30AF52EC33DD7&id=Garden&mac=00:06:66:72:10:ec&bss=e0:46:9a:5b:22:ee&rtc=42ab&bat=2621&io=510&wake=2&seq=409&cnt=2&rssi=bc HTTP/1.0\rHost: live.daisyworks.com";
+		// normal looking query string
+		var qs = "GET /wifly-data?DATA=051208BECF29CF29001F09F30AF52EC33DD7&"+
+			"id=Garden&mac=00:06:66:72:10:ec&bss=e0:46:9a:5b:22:ee&rtc=42ab&bat=2621&"+
+			"io=510&wake=2&seq=409&cnt=2&rssi=bc HTTP/1.0\nHost: live.daisyworks.com\n\n";
 		var data = session._parseData(qs);
 		
 		should.exist(data);
@@ -203,6 +206,34 @@ describe("DaisySession", function() {
 		data.AD5.should.eql(2805);
 		data.AD6.should.eql(11971);
 	});
+
+  it("should deal with dupe query strings", function(done) {
+  	session = new DaisySession(socket, ss);
+
+  	// event should fire after successful parse
+  	session.on('daisy-session:initialized', function(mac, ses) {
+  		should.exist(mac);
+  		mac.should.eql('00:06:66:72:10:ec');
+  		should.exist(ses);
+  		session.should.eql(ses);
+  		done();
+  	});
+
+  	// sometimes it sends query string twice like this!!
+  	var qs = "GET /wifly-data?DATA=051308BBCF29CF29001A070D0B822EB942DA&"+
+  		"id=Garden&mac=00:06:66:72:10:ec&bss=e0:46:9a:5b:22:ee&rtc=10&bat=2642&"+
+  		"io=510&wake=3&seq=1&cnt=3&rssi=b1 HTTP/1.0\n"+
+			"Host: live.daisyworks.com\n\n"+
+		"GET /wifly-data?DATA=051308BACF29CF29001C072D0B7C2EC242BA&"+
+			"id=Garden&mac=00:06:66:72:10:ec&bss=e0:46:9a:5b:22:ee&rtc=12&bat=2620&"+
+			"io=510&wake=3&seq=2&cnt=3&rssi=b5 HTTP/1.0\n"+
+			"Host: live.daisyworks.com\n\n";
+
+		var data = session._parseData(qs);
+		should.exist(data);
+		data.mac.should.eql('00:06:66:72:10:ec');
+
+  });
 
   it("should fire closed event on socket close", function(done) {
   	session = new DaisySession(socket, ss);
