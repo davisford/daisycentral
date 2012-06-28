@@ -1,7 +1,7 @@
 // in server/app/daisy-session.js
 
 var SensorData = require('../models/sensordata')
-  //, Daisies = require('../models/daisies').getModel()
+  , channels = require('./channels')
   , util = require('util')
   , events = require('events')
   , qs   = require('querystring');
@@ -115,12 +115,14 @@ function DaisySession(socket, ss, timeout) {
     // get a special model with the collection name
     // that includes the mac address
     var SensorDataModel = SensorData.getModel(SensorData.getColName(obj.mac));
-    var sensors = new SensorDataModel(obj);
+    var sensors = new SensorDataModel(obj)
+      , saved;
     sensors.save(function (err, doc) {
       if (err) {
         console.log("Could not save sensor data", err);
         me._callback(err);
       } else {
+        saved = doc;
         console.log("New sensor data saved at (localdate) "+doc.date);
       }
     });
@@ -154,6 +156,12 @@ function DaisySession(socket, ss, timeout) {
           daisy.save(function (err) {
             if (err) { console.log(err); }
           });
+
+          if (daisy.owners && daisy.owners.length > 0) {
+            daisy.owners.forEach( function (userId, idx, arr) {
+              ss.api.publish.user(userId.toString(), channels.user.sensors, saved);
+            });
+          }
       
         } else {
       

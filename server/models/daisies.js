@@ -38,21 +38,24 @@ module.exports = function(ss) {
   DaisiesSchema.pre('save', function (next) {
 
     // trying to send 'this' will result in circular JSON error
-    var data = JSON.stringify(this).p;
+    var data = JSON.stringify(this);
 
-    // publish daisy status to admin channel
-    ss.api.publish.channel(channels.admin, channels.admin.daisy.status, data);
+    if(ss.hasOwnProperty('api')) {
+      // publish daisy status to admin channel
+      ss.api.publish.channel(channels.admin, channels.admin.daisy.status, data);
     
-    if(this.owners && this.owners.length > 0) {
+      if(this.owners && this.owners.length > 0) {
 
-      // publish daisy status to each user channel
-      this.owners.forEach( function(userId, idx, arr) {
-        ss.api.publish.user(userId.toString(), channels.user.daisy.status, data);
-      });
+        // publish daisy status to each user channel
+        this.owners.forEach( function(userId, idx, arr) {
+          ss.api.publish.user(userId.toString(), channels.user.daisy.status, data);
+        });
+      }
 
       next();
 
     } else {
+      console.log('WARN: no ss.api.publish available ');
       next();
     }
 

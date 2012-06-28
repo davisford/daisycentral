@@ -15,6 +15,8 @@ module.exports = {
     daisy: {
       status: 'daisy:status',
       registered: 'daisy:registered'
-    }
+    },
+
+    sensors: 'daisy:sensors'
   }
 }

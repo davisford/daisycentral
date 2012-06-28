@@ -8,27 +8,6 @@ var models = require('./models')
 
 var Devices = function() {
 
-  // TODO TIE IN SS EVENT HANDLERS
-    // handler for pub/sub coming from server
-  // on user channel; any devices we claim 
-  // ownership to that are live, the server will
-  // relay live messages to us here
-/*
-  ss.event.on('daisy:status', function (daisy, channelName) {
-    // todo find table row, and update status
-    console.log('daisy status => ',daisy);
-    var row = table.$('tr:contains('+daisy.mac+')');
-    if(row) {
-      var td = $(':nth-child(2)', row);
-      $(td).val(daisy.online);
-      if(daisy.online === true) {
-        $(td).removeClass('daisy-offline').addClass('daisy-online');
-      } else {
-        $(td).removeClass('daisy-online').addClass('daisy-offline');
-      }
-    }
-  });  */
-
   /*---------------------------------------------------------------------------
      View: SideBarView
        Handles sidebar navigation and checkbox selection
@@ -51,7 +30,6 @@ var Devices = function() {
     },
 
     sensorSelected: function() {
-      console.log('sensorSelected');
       // broadcast event about sensors that are checked
       var arr = _.pluck($('#sensor-cb-table :checked'), 'id');
       this.bus.trigger('sensorSelected', arr);
@@ -156,6 +134,24 @@ var Devices = function() {
           { "mDataProp": "mac" }
         ]
       });
+
+      var table = this.table;
+
+      ss.event.on('daisy:status', function (daisy, channelName) {
+        var obj = JSON.parse(daisy)
+          , row = table.$('tr:contains('+obj.mac+')')
+          , td;
+        if (row) {
+          td = $(':nth-child(2)', row);
+          $(td).val(obj.online);
+          if(obj.online === true) {
+            $(td).removeClass('daisy-offline').addClass('daisy-online');
+          } else {
+            $(td).removeClass('daisy-online').addClass('daisy-offline');
+          }
+        }
+      });  
+
     },
 
     render: function() {
@@ -169,7 +165,6 @@ var Devices = function() {
           var obj = table.fnGetData(table.fnGetPosition(this)[0]);
           // we know it is the did property
           obj.did = val;
-          console.log(obj);
           ss.rpc('devices.save', obj, function(ok) {
             if (ok === false) {
               alert("update failed");
@@ -303,8 +298,6 @@ var Devices = function() {
           if ( me.collection.find( function(s) {
             return s.get('mac') === data.mac;
             }) ) {
-            console.log('new datapoint timestamp: '+data.timestamp);
-            console.log('adding new datapoint to collection at '+new Date(data.timestamp), data);
             me.collection.add(data);
             me.render();
           }
@@ -314,16 +307,18 @@ var Devices = function() {
       render: function() {
         var points = this.collection.flotData(checkedSensors);
 
-        console.log('render: this.ranges', this.ranges);
         if (this.ranges) {
           // keep zoom level the same
-          
+
           var last = this.collection.pluck('timestamp')[this.collection.length-1];
-          var xaxis = { xaxis: { min: this.ranges.xaxis.from, max: last + 100 }};
+          var xaxis = { xaxis: { min: this.ranges.xaxis.from, max: last }};
+
           plot = $.plot(chart, points, 
               $.extend(true, {}, chartOptions, xaxis) );
+          this.updateAxes(plot);
+
         } else {
-          console.log('NEW PLOT HAPPENS');
+
           plot = $.plot(chart, points, chartOptions);
           this.updateAxes(plot);
         }
@@ -359,7 +354,7 @@ var Devices = function() {
             $("#tooltip").remove();
             $(ss.tmpl['devices-tooltip'].render({
               sensor: item.series.label + ': ' + item.datapoint[1].toFixed(2),
-              timestamp: new Date(item.datapoint[0])
+              timestamp: new Date(item.datapoint[0]).toUTCString()
             }))
             .css('top', item.pageY + 5)
             .css('left', item.pageX + 5)
@@ -383,7 +378,6 @@ var Devices = function() {
       },
 
       plotUnselected: function(e) {
-        console.log('plotUnselected: ', this.ranges);
         var xaxis = { xaxis: { min: this.min, max: this.max } };
         if (this.ranges) {
           plot = $.plot( chart, this.collection.getCached(),
