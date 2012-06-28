@@ -47,6 +47,8 @@ function DaisySession(socket, ss, timeout) {
    */
   this._parseData = function (queryString) {
 
+    console.log('_parseData : queryString =>', queryString);
+
     // wrap in try/catch b/c parsing is easy to break
     try {
       // shave off the HTTP header and parse into raw object
@@ -84,6 +86,8 @@ function DaisySession(socket, ss, timeout) {
         data["AD" + i] = parseInt(sensors.substring(i * 4, i * 4 + 4), 16);
       }
 
+      console.log("_parseData parsed into the object => ", data);
+
       // notify server that we are initialized for this mac
       me.emit('daisy-session:initialized', data.mac, me);
 
@@ -120,6 +124,8 @@ function DaisySession(socket, ss, timeout) {
 
     // register the device if it isn't found in the db
     Daisies.findOne({mac: obj.mac}, function (err, daisy) {
+
+      console.log("did I find a daisy? ", daisy);
       
       if (err) { 
       

@@ -10,10 +10,14 @@ var DaisyServer = (function () {
 
   function sessionReady(mac, daisySession) {
     sessions[mac] = daisySession;
-    console.log("session count: "+sessions);
+    console.log('current daisy sessions =>');
+    Object.keys(sessions).forEach(function(mac) {
+      console.log('\t'+mac);
+    });
   }
 
   function sessionClosed(mac) {
+    console.log('daisy session closed for '+mac);
     delete sessions[mac];
   }
 
