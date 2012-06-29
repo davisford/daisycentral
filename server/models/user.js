@@ -169,7 +169,8 @@ UserSchema.plugin(mongooseAuth, {
     , scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
     , findOrCreateUser: function (session, accessTok, accessTokExtra, googleUser) {
 
-        var promise = this.Promise();
+        var promise = this.Promise()
+          , User = this.User()();
       
         // if the user is already logged in, we can find them by session.userId
         User.findById(session.userId, function (err, user) {
