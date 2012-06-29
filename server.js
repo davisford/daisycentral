@@ -87,3 +87,7 @@ app.listen(conf.webserver.port, function() {
   console.log("daisycentral listening on port %d in %s mode", app.address().port, app.settings.env);
 });
 ss.start(app);
+
+process.on('uncaughtException', function (err) {
+  console.log(err);
+});
