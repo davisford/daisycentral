@@ -6,6 +6,9 @@ var conf = require('../app/conf')
   , bcrypt = require('bcrypt')
   , everyauth = require('everyauth')
   , lastmodified = require('./plugins/lastmodified');
+
+// debug everyauth
+everyauth.debug = conf.everyauth.debug;
   
 var Schema = mongoose.Schema
   , ObjectId = mongoose.SchemaTypes.ObjectId
@@ -169,8 +172,7 @@ UserSchema.plugin(mongooseAuth, {
     , scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
     , findOrCreateUser: function (session, accessTok, accessTokExtra, googleUser) {
 
-        var promise = this.Promise()
-          , User = this.User()();
+        var promise = this.Promise();
       
         // if the user is already logged in, we can find them by session.userId
         User.findById(session.userId, function (err, user) {
@@ -193,7 +195,7 @@ UserSchema.plugin(mongooseAuth, {
               if (!user) {
 
                 // let everyauth create the user
-                User.createWithGoogle(googleUser, accessTok, accessTokExtra.expires, function (err, createdUser) {
+                User.createWithGoogleOAuth(googleUser, accessTok, accessTokExtra.expires_in, function (err, createdUser) {
                   if (err) {
                     console.log("error trying to create google user: ", err);
                     return promise.fail(err);
