@@ -18,10 +18,8 @@ exports.actions = function (req, res, ss) {
 
 			var SensorDataModel = SensorData.getModel(SensorData.getColName(mac));
 			
-			var query = SensorDataModel.where({}).limit(25);
-			
-			query.run(function (err, sensors) {
-				if (err) { return res("An error occurred, please try again"); }
+			SensorDataModel.find().sort("timestamp", -1).limit(25).execFind(function (err, sensors) {
+				if (err) { console.log(err); return res("An error occurred, please try again."); }
 				else { return res(null, sensors); }
 			});
 		}
