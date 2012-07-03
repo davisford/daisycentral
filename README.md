@@ -256,6 +256,7 @@ Now, uncomment the line `session required pam_limits.so` in `/etc/pam.d/su` and 
 To test it, after you reboot run `ulimit -n` and you should see 65534.
 
 ## Modified Libs
+Here's a list of libs I have modified from their master / source and why
 
 ### Flot
 The original maintainer got too busy, but this proved to be the best charting tool after looking at some alternatives.  There are a couple people picking up as maintainers for flot, but I forked it myself:
@@ -263,3 +264,8 @@ The original maintainer got too busy, but this proved to be the best charting to
 https://github.com/davisford/flot
 
 I made some changes to it, so that is the version used in DaisyCentral.  Note to self: [this library](http://novus.github.com/nvd3/) looks _really_ nice.
+
+I made some changes to support angles on x-axis labels.
+
+### mongoose-auth
+I forked it and updated the google module to pull through google profile information (gives full name, etc.)
