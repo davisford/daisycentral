@@ -5,6 +5,9 @@
 This is the webapp that runs at http://demo.daisyworks.com.  Early prototype code was hosted at http://live.daisyworks.com.
 I'm now working on building out a full-blown app that will provide a web bridge to our hardware devices found at http://daisyworks.com
 
+# NOTE
+I'm going to rip `node_modules` out of the git repo.  This had previously been recommended as best practice but is now discouraged in favor of [npm shrinkwrap](http://blog.nodejs.org/2012/02/27/managing-node-js-dependencies-with-shrinkwrap/) so that change is coming soon.
+
 ## Tech Stack
 
 * [node.js](http://nodejs.org) - app server
