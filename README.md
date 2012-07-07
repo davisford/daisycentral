@@ -5,9 +5,6 @@
 This is the webapp that runs at http://demo.daisyworks.com.  Early prototype code was hosted at http://live.daisyworks.com.
 I'm now working on building out a full-blown app that will provide a web bridge to our hardware devices found at http://daisyworks.com
 
-# NOTE
-I'm going to rip `node_modules` out of the git repo.  This had previously been recommended as best practice but is now discouraged in favor of [npm shrinkwrap](http://blog.nodejs.org/2012/02/27/managing-node-js-dependencies-with-shrinkwrap/) so that change is coming soon.
-
 ## Tech Stack
 
 * [node.js](http://nodejs.org) - app server
@@ -136,10 +133,11 @@ git clone git@github.com:davisford/daisycentral.git
 ```
 
 #### Build
+I have excluded `node_modules` from the git repo in favor of using [npm shrinkwrap](http://blog.nodejs.org/2012/02/27/managing-node-js-dependencies-with-shrinkwrap/).  There is an `npm-shrinkwrap.json` file that declares explicit dependencies that are known to work.  When you run `npm install` it will use the dependencies defined in that file.
+
 ```sh
 cd daisycentral
 sudo npm install
-npm socketstream link
 ```
 
 #### Run
@@ -181,23 +179,10 @@ nodemon --debug app.js
 
 Now, open browser to http://0.0.0.0:8080/debug?port=5858 in **Chrome**
 
-Port 9000 receives Daisy WiFly HTTP data.  Port 3000 is the webapp.
-
-### Updating package dependencies
-
-To update locally run `sudo npm update` in the project dir.  To update globally run `sudo npm update -g`.  After update, you'll probably need to rebuild socketstream so:
-
-```sh
-cd socketstream
-git pull
-sudo npm update
-sudo npm link
-```
+Port 9000 receives Daisy WiFly HTTP data.  Port 3006 is the webapp.
 
 ### Rebuild Platform Dependent Stuff
 Libraries like `bcrypt` have to be compiled natively, so do it thusly: `sudp npm rebuild bcrypt`
-
-The bcrypt binary build output should not be checked into git.  It is platform specific.
 
 ## MongoDB Admin
 To start the database server, run `mongod &` or `mongod -dbpath /path/to/data`.  The default path it uses is `/data/`.  You can then start the REPL in another window via `mongo`.
