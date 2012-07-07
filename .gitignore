@@ -25,18 +25,11 @@ nbproject
 *.sublime-project
 *.sublime-workspace
 
-# Komodo
-*.komodoproject
-.komodotools
-
 # Folders to ignore
 .hg
 .svn
 .CVS
 .idea
 
-# don't check in bcrypt
-bcrypt/build
-bcrypt/.lock-wscript
-node_modules/bcrypt/.lock-wscript
-node_modules/bcrypt/build
+# don't check in node_modules
+node_modules/
