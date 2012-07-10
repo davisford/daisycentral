@@ -125,6 +125,17 @@ cd daisycentral
 sudo npm install
 ```
 
+#### Link SocketStream HEAD rev
+I'm running with the HEAD revision of [SocketStream](http://github.com/socketstream/socketstream), so you will want to clone it and link it yourself.
+
+```sh
+git clone git://github.com/socketstream/socketstream.git
+cd socketstream
+sudo npm link
+cd ../daisycentral
+sudo npm link socketstream
+```
+
 #### Run
 ```sh
 nodemon server.js
