@@ -29,21 +29,20 @@ This Dev setup is for Ubuntu.  I dev on both Mac and Ubuntu.  Mac setup is simil
 
 *pro-tips* 
 
-* Install [sublime text 2](http://www.sublimetext.com/2)
-* Install [chrome](http://www.liberiangeek.net/2011/12/install-google-chrome-using-apt-get-in-ubuntu-11-10-oneiric-ocelot/)
+* Use [sublime text 2](http://www.sublimetext.com/2)
+* Use [chrome](http://www.liberiangeek.net/2011/12/install-google-chrome-using-apt-get-in-ubuntu-11-10-oneiric-ocelot/)
 
 ### Ubuntu
 
 #### Install Node 
 
 ##### Use Package Manager
-If you don't want to bother building it, you can get it [through aptitude](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager)
+[Aptitude](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager)
 
 ##### Build From Latest Source
-`HEAD 0.8.x` is the current stable release.  [Check node.js release page](https://github.com/joyent/node/tags) to 
-find out what the latest stable release is.  Checkout that version.  
+[node.js release page](https://github.com/joyent/node/tags)  
 
-For example, if the latest stable is `v0.8.0` then do this:
+Example for `v0.8.0`:
 ```sh
 sudo apt-get install -y make git git-core g++ curl libssl-dev apache2-utils python
 git clone https://github.com/joyent/node.git && cd node
@@ -51,22 +50,8 @@ git checkout v0.8.0
 ./configure && make && make install
 ```
 
-Test it:
-
-```sh
-node console.log('hello, world'); 
-hello, world
-```
-
 #### Install NPM
-NPM is the package manager for node.js.  [Read this first](http://npmjs.org/doc/folders.html) so you understand
-about packages / folders, etc.  If you installed node via aptitude, then _I think_ it installs npm for you, so 
-this step would be unnecessary.  Try running `npm` from the command line to see if it is there.
-
-*pro-tips*
-* If a library/package is just a dependency that this project needs, (i.e. a library that the code will `require()` 
-locally then you want to install it **without** the `-g` option.  
-* If a package is a command line program that you want to run, then install command line binaries globally with `-g`.
+[Background](http://npmjs.org/doc/folders.html) 
 
 ```sh
 curl http://npmjs.org/install.sh | sh
@@ -140,12 +125,23 @@ cd daisycentral
 sudo npm install
 ```
 
+#### Link SocketStream HEAD rev
+I'm running with the HEAD revision of [SocketStream](http://github.com/socketstream/socketstream), so you will want to clone it and link it yourself.
+
+```sh
+git clone git://github.com/socketstream/socketstream.git
+cd socketstream
+sudo npm link
+cd ../daisycentral
+sudo npm link socketstream
+```
+
 #### Run
 ```sh
 nodemon server.js
 ```
 
-Now open browser to http://localhost:3006
+Now open browser to http://localhost:3006.  Why port 3006?  Because I'm running node-proxy with other servers on a Linode.
 
 ### Rebuilding Twitter Bootstrap
 I'm just documenting the process here for building Twitter Bootstrap.  You do not need to do this.
@@ -215,7 +211,7 @@ Now you have access to /admin section of the app.  To reach the admin section, f
 you have logged in go to http://localhost:3000/admin
 
 ## nodemon on Ubuntu
-Current version is *0.6.14* but this doesn't work on Ubuntu 11.10 https://github.com/remy/nodemon/issues/82, so drop it down:
+Current version is *0.6.14* but [this doesn't work on Ubuntu 11.10](https://github.com/remy/nodemon/issues/82), so drop it down:
 
 ```sh
 sudo npm remove nodemon -g
