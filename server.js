@@ -55,8 +55,9 @@ if (ss.env == 'production') ss.client.packAssets();
 // express cookieParser + session added by ss.http.middleware
 var app = express.createServer(
     express.bodyParser()
-  , express.static(__dirname + "/client/static")
   , ss.http.middleware
+  , express.staticCache()
+  , express.static(__dirname + "/client/static")
   , mongooseAuth.middleware()
 );
 
