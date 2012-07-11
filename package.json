@@ -6,7 +6,7 @@
   "private": true,
   "engines": { "node": ">= 0.8.1" },
   "dependencies": {
-    "socketstream": ">=0.3.0RC2",
+    "socketstream": "git://github.com/socketstream/socketstream.git",
     "ss-stylus": ">=0.1.x",
     "ss-jade": ">=0.1.x",
     "ss-hogan": ">=0.1.x",
