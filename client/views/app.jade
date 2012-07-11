@@ -16,8 +16,14 @@ block content
               a(href="#") Home
             li
               a(href="#devices") Devices 
-            li
-              a(href="#rules") Rules
+            li.dropdown#rules-menu
+              a(href="#rules-menu", data-toggle="dropdown").dropdown-toggle Rules
+                b.caret
+              ul.dropdown-menu
+                li
+                  a(href="#rules/rules") My Rules
+                li 
+                  a(href="#rules/editor") Rule Editor
             li 
               a(href="#profile") Profile
             li
@@ -158,8 +164,20 @@ block content
               p Select a section of the graph to zoom in.  Click to zoom back out.
               // flot data chart
               div.span8#chart(style="height:400px; width:95%;")
-    div.row-fluid#rules(style="display:none")
-      h1 This is the Rules Page
+    div.container-fluid#rules(style="display:none")
+      div.row-fluid
+        div.span3#rules-sidebar-view
+          div.well.sidebar-nav
+            ul.nav.nav-list
+              li.active#rules-li
+                a(href="#rules/rules") Rules
+              li#editor-li
+                a(href="#rules/editor") Rule Editor
+        div.span9#rules-content
+          div#rules-view
+            h1 This is the rules View
+          div#editor-view(style="display:none;")
+            h1 This is the editor View
     div#profile(style="display:none")
       h1 This is the Profile Page
     div#help(style="display:none")

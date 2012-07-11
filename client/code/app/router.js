@@ -1,6 +1,7 @@
 // in client/app/router.js
 
 var devicesHandler = require('./devices');
+var rulesHandler = require('./rules');
 
 var Router = Backbone.Router.extend({
   routes: {
@@ -9,6 +10,8 @@ var Router = Backbone.Router.extend({
     "devices/register": "devicesRegister",
     "devices/daisies": "devicesDaisies",
     "rules": "rules",
+    "rules/rules": "rulesRules",
+    "rules/editor": "rulesEditor",
     "profile": "profile",
     "help": "help",
   },
@@ -57,6 +60,22 @@ var Router = Backbone.Router.extend({
     $("#content").children().hide();
     $("#rules").show("fast", function() {
       console.log("rules");
+    });
+  },
+
+  rulesRules: function() {
+    this.rules();
+    $('#rules-content').children().hide();
+    $('#rules-view').show('fast', function() {
+
+    });
+  },
+
+  rulesEditor: function() {
+    this.rules();
+    $('#rules-content').children().hide();
+    $('#editor-view').show('fast', function() {
+
     });
   },
 
