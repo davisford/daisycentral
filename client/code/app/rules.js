@@ -1,8 +1,8 @@
 // in client/code/app/rules.js
 
-var widgets = require('./widgets')
-  , SensorWidget = widgets.SensorWidget
-  , Widgets = widgets.Widgets;
+var models = require('./widgets')
+  , SensorWidget = models.SensorWidget
+  , Widgets = models.Widgets;
 
 var Rules = function() {
 
@@ -63,7 +63,7 @@ var Rules = function() {
           switch(ui.draggable[0].innerHTML) {
             case "Sensor":
 
-              col.add(new Sensor(), o);
+              col.add(new SensorWidget(), o);
               break;
           }
         }
@@ -261,12 +261,12 @@ var Rules = function() {
         .html(this.template);
 
       // set the position where they dropped it
-      $('#editor-view').position({
-        of: $('#ed-canvas'),
+ /*     $('#editor-view').position({
+        of: $('#editor-view'),
         my: 'left top',
         at: 'left top',
         offset: this.position.left + ' ' + this.position.top
-      });
+      }); */
 
       // add endpoint
       //jsPlumb.addEndpoint(this.el, Plumbing.actionSourceEndpoint);
