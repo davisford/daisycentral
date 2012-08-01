@@ -82,4 +82,98 @@ table#sensorButtons
   color white
   text-shadow 1px 1px 1px rgba(255, 255, 255, 0.5), -1px -1px 1px rgba(0,0,0,0.7)
   
+#editor-view
+  background-image: url('/images/grid-bg.png');
+  position fixed
+  left 0
+  right 0
+  top 0
+  bottom 0
+  z-index -1
+
+#ed-toolbar a
+  background-color transparent
+#ed-toolbar a:hover
+  text-decoration underline
+#ed-toolbar .ui-state-active
+  background rgba(15,15,15,0.25)
+  color white
+#ed-toolbar
+  cursor drag
+  border 1px solid hsl(0, 0%, 73%)
+  background hsl(0, 0%, 85%)
+  font-weight bold
+  color hsl(201, 20%, 23%)
+  text-shadow 0 1px 1px white
+  background-image: -webkit-gradient(linear,left top, left bottom, from(hsl(0, 0%, 93%)), to(hsl(0, 0%, 85%)));
+  background-image: -webkit-linear-gradient(hsl(0,0%,93%), hsl(0,0%,85%));
+  background-image: -moz-linear-gradient(hsl(0,0%,93%), hsl(0,0%,85%));
+  background-image: -ms-linear-gradient(hsl(0,0%,93%), hsl(0,0%,85%));
+  background-image: -o-linear-gradient(hsl(0,0%,93%), hsl(0,0%,85%));
+  //background-image: linear-gradient(hsl(0,0%,93%), hsl(0,0%,85%));
+  position absolute
+  left 1em
+  top 5em
+  width 18em
+  font-size 90%
+  padding 1em
+  padding-top 10px
+  z-index 1000
+  font-family helvetica
+  box-shadow 2px 2px 19px #aaa
+  -o-box-shadow 2px 2px 19px #aaa
+  -webkit-box-shadow 2px 2px 19px #aaa
+  -moz-box-shadow 2px 2px 19px #aaa
+  ul
+    list-style none
+
+.ed-toolbar-item 
+  padding 0.9em
+  padding-left 4em
+  margin 0.5em
+  -moz-border-radius 1em
+  -webkit-border-radius 1em
+  border-radius 1em
+  border 2px solid hsl(204, 70%, 47%)
+  background hsl(205, 58%, 54%)
+  font-weight bold
+  color white
+  text-shadow 0 1px 0 black
+  font-family Helvetica,Arial,sans-serif
+  font-size 13px
+  -moz-box-shadow 0 1px 4px rgba(0,0,0,0.3)
+  -webkit-box-shadow 0 1px 4px rgba(0,0,0,0.3)
+  box-shadow 0 1px 4px rgba(0,0,0,0.3)
+  background-repeat no-repeat !important
+  background-position 10px !important
+  cursor pointer
+
+.ed-toolbar-item:hover
+  box-shadow 2px 2px 19px #aaa
+  -o-box-shadow 2px 2px 19px #aaa
+  -webkit-box-shadow 2px 2px 19px #aaa
+  -moz-box-shadow 2px 2px 19px #aaa
+
+.ed-toolbar-sensor-item
+  background-image url('/images/transmit.png') !important
+.ed-toolbar-control-item
+  background-image url('/images/transmit_go.png') !important
+.ed-toolbar-date-item
+  background-image url('/images/calendar.png') !important
+.ed-toolbar-time-item
+  background-image url('/images/time.png') !important
+.ed-toolbar-and-item
+  background-image url('/images/sql_join_outer.png') !important
+.ed-toolbar-or-item
+  background-image url('/images/sql_join_outer_exclude.png') !important
+.ed-toolbar-email-item
+  background-image url('/images/email_open.png') !important
+.ed-toolbar-tweet-item
+  background-image url('/images/twitter_1.png') !important
+.ed-toolbar-twilio-item
+  background-image url('/images/twilio32.png') !important
+.ed-toolbar-gtalk-item
+  background-image url('/images/gtalk32.png') !important
+.ed-toolbar-gps-item
+  background-image url('/images/google_map.png') !important
 
