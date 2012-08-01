@@ -1,7 +1,7 @@
 
-var Models = function() {
+var Widgets = function() {
 
-  Sensor = Backbone.Model.extend({
+  SensorWidget = Backbone.Model.extend({
     defaults: {
       type: 'Sensor'
     },
@@ -22,4 +22,4 @@ var Models = function() {
 }();
 
 exports.Widgets = Widgets;
-exports.Sensor = Sensor;
+exports.SensorWidget = SensorWidget;

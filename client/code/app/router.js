@@ -1,7 +1,7 @@
 // in client/app/router.js
 
 var devicesHandler = require('./devices');
-var rulesHandler = require('./rules');
+//var rulesHandler = require('./rules');
 
 var Router = Backbone.Router.extend({
   routes: {

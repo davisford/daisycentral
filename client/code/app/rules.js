@@ -1,10 +1,10 @@
 // in client/code/app/rules.js
 
-var models = require('./widgets')
-  , Sensor = models.Sensor
-  , Widgets = models.Widgets;
+var widgets = require('./widgets')
+  , SensorWidget = widgets.SensorWidget
+  , Widgets = widgets.Widgets;
 
-module.exports = function() {
+var Rules = function() {
 
   SideBarView = Backbone.View.extend({
     el: $('#rules-sidebar-view'),
@@ -40,9 +40,9 @@ module.exports = function() {
 
     initialize: function(options) {
       // FIXME: see if we can load jqueryui on demand instead
-      /*ss.load.code('/editor', function() {
+      ss.load.code('/editor', function() {
         console.log('all code is loaded');
-      });*/
+      });
 
       _.bindAll(this, 'render', 'addOne', 'removeOne', 'save', 'clear');
 
@@ -137,13 +137,7 @@ module.exports = function() {
       // add it to the canvas
       $('#ed-canvas').append(this.el);
 
-      // set the position where they dropped it
-      $(this.el).position({
-        of: $('#ed-canvas'),
-        my: 'left top',
-        at: 'left top',
-        offset: this.position.left + ' ' + this.position.top
-      });
+      
     },
 
     connected: function (e, info) {
@@ -260,11 +254,19 @@ module.exports = function() {
     render: function () {
       this.constructor.__super__.render.call(this);
 
-      $(this.el).addClass('ui-dialog')
+      $('#editor-view').addClass('ui-dialog')
         .addClass('ui-widget-content')
         .addClass('ui-corner-all')
         .attr('tabIndex', '-1')
         .html(this.template);
+
+      // set the position where they dropped it
+      $('#editor-view').position({
+        of: $('#ed-canvas'),
+        my: 'left top',
+        at: 'left top',
+        offset: this.position.left + ' ' + this.position.top
+      });
 
       // add endpoint
       //jsPlumb.addEndpoint(this.el, Plumbing.actionSourceEndpoint);
@@ -297,3 +299,4 @@ module.exports = function() {
   };
 
 }();
+module.exports = Rules;
