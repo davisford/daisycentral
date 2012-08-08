@@ -81,15 +81,19 @@ table#sensorButtons
   opacity 0.80
   color white
   text-shadow 1px 1px 1px rgba(255, 255, 255, 0.5), -1px -1px 1px rgba(0,0,0,0.7)
-  
+
 #editor-view
-  background-image: url('/images/grid-bg.png');
-  position fixed
+  background transparent
+
+#ed-canvas
+  background-image url('/images/grid-bg.png')
+  position absolute
   left 0
   right 0
   top 0
   bottom 0
   z-index -1
+  background transparent
 
 #ed-toolbar a
   background-color transparent
@@ -176,4 +180,53 @@ table#sensorButtons
   background-image url('/images/gtalk32.png') !important
 .ed-toolbar-gps-item
   background-image url('/images/google_map.png') !important
+
+.ed-widget
+  cursor move
+  padding 0.5em
+  margin 0
+  background hsl(0,0%,80%) !important
+  background-image -webkit-linear-gradient(hsl(0,0%,80%), hsl(0,0%,99%)) !important
+  background-image -moz-linear-gradient(hsl(0,0%,80%), hsl(0,0%,99%)) !important
+  background-image -ms-linear-gradient(hsl(0,0%,80%), hsl(0,0%,99%)) !important
+  background-image -o-linear-gradient(hsl(0,0%,80%), hsl(0,0%,99%)) !important
+  background-image -linear-gradient(hsl(0,0%,80%), hsl(0,0%,99%)) !important
+  box-shadow 2px 2px 19px #aaa
+  -o-box-shadow 2px 2px 19px #aaa
+  -webkit-box-shadow 2px 2px 19px #aaa
+  -moz-box-shadow 2px 2px 19px #aaa
+
+.ed-widget-logic
+  width 15em
+
+.ed-widget fieldset 
+  border none
+
+.ui-dialog
+  overflow visible !important
+
+.ed-widget-title
+  background-repeat no-repeat
+  background-position 0px
+  padding-left 2em
+
+.ed-widget-slider-text
+  color black
+  border 0
+  margin-left 1em
+  margin-right 0.5em
+  font-weight bold
+
+.ed-widget-slider-text-val
+  width 3.5em
+
+.ed-widget-slider-text-duration
+  width 2.5em
+
+.ed-widget-chart-hi, .ed-widget-chart-lo, .ed-widget-chart-rm 
+  top 5px
+  width 20px !important
+  height 20px !important
+  margin-left 10px
+
 

@@ -169,40 +169,41 @@ block content
         div#rules-view
           h1 This is the rules View
         div#editor-view(style="display:none;")
-          div#ed-toolbar.ui-corner-all
-            h3 Widget Toolbar
-            p Drag widgets onto the canvas to create a rule.
-            p Click and drag between widgets to connect them.
-            div#ed-toolbar-accordion.accordion
-              div.accordion-group
-                div.accordion-heading
-                  a.accordion-toggle(data-toggle="collapse", data-parent="#ed-toolbar-accordion", href="#editor-conditions") Conditions
-                div#editor-conditions.accordion-body.collapse
-                  div.accordion-inner
-                    ul
-                      li.ed-toolbar-item.ed-toolbar-sensor-item.ui-corner-all Sensor
-                      li.ed-toolbar-item.ed-toolbar-date-item.ui-corner-all Date
-                      li.ed-toolbar-item.ed-toolbar-time-item.ui-corner-all Time
-                      li.ed-toolbar-item.ed-toolbar-gps-item.ui-corner-all GPS
-              div.accordion-group
-                div.accordion-heading
-                  a.accordion-toggle(data-toggle="collapse", data-parent="#ed-toolbar-accordion", href="#editor-logic") Logic
-                div#editor-logic.accordion-body.collapse
-                  div.accordion-inner
-                    ul
-                      li.ed-toolbar-item.ed-toolbar-and-item.ui-corner-all And
-                      li.ed-toolbar-item.ed-toolbar-or-item.ui-corner-all Or
-              div.accordion-group
-                div.accordion-heading
-                  a.accordion-toggle(data-toggle="collapse", data-parent="#ed-toolbar-accordion", href="#editor-actions") Actions
-                div#editor-actions.accordion-body
-                  div.accordion-inner
-                    ul
-                      li.ed-toolbar-item.ed-toolbar-control-item.ui-corner-all Signal
-                      li.ed-toolbar-item.ed-toolbar-email-item.ui-corner-all Email
-                      li.ed-toolbar-item.ed-toolbar-tweet-item.ui-corner-all Tweet
-                      li.ed-toolbar-item.ed-toolbar-twilio-item.ui-corner-all Twilio
-                      li.ed-toolbar-item.ed-toolbar-gtalk-item.ui-corner-all GTalk
+          div#ed-canvas
+            div#ed-toolbar.ui-corner-all
+              h3 Widget Toolbar
+              p Drag widgets onto the canvas to create a rule.
+              p Click and drag between widgets to connect them.
+              div#ed-toolbar-accordion.accordion
+                div.accordion-group
+                  div.accordion-heading
+                    a.accordion-toggle(data-toggle="collapse", data-parent="#ed-toolbar-accordion", href="#editor-conditions") Conditions
+                  div#editor-conditions.accordion-body
+                    div.accordion-inner
+                      ul
+                        li.ed-toolbar-item.ed-toolbar-sensor-item.ui-corner-all Sensor
+                        li.ed-toolbar-item.ed-toolbar-date-item.ui-corner-all Date
+                        li.ed-toolbar-item.ed-toolbar-time-item.ui-corner-all Time
+                        li.ed-toolbar-item.ed-toolbar-gps-item.ui-corner-all GPS
+                div.accordion-group
+                  div.accordion-heading
+                    a.accordion-toggle(data-toggle="collapse", data-parent="#ed-toolbar-accordion", href="#editor-logic") Logic
+                  div#editor-logic.accordion-body.collapse
+                    div.accordion-inner
+                      ul
+                        li.ed-toolbar-item.ed-toolbar-and-item.ui-corner-all And
+                        li.ed-toolbar-item.ed-toolbar-or-item.ui-corner-all Or
+                div.accordion-group
+                  div.accordion-heading
+                    a.accordion-toggle(data-toggle="collapse", data-parent="#ed-toolbar-accordion", href="#editor-actions") Actions
+                  div#editor-actions.accordion-body.collapse
+                    div.accordion-inner
+                      ul
+                        li.ed-toolbar-item.ed-toolbar-control-item.ui-corner-all Signal
+                        li.ed-toolbar-item.ed-toolbar-email-item.ui-corner-all Email
+                        li.ed-toolbar-item.ed-toolbar-tweet-item.ui-corner-all Tweet
+                        li.ed-toolbar-item.ed-toolbar-twilio-item.ui-corner-all Twilio
+                        li.ed-toolbar-item.ed-toolbar-gtalk-item.ui-corner-all GTalk
     div#profile(style="display:none")
       h1 This is the Profile Page
     div#help(style="display:none")
