@@ -152,8 +152,6 @@ You need less and uglify-js to build:
 npm install less uglify-js -g
 ```
 
-*Warning* I tried installing uglify-js before socketstream and it broke it.  Make sure you install uglify-js after socketstream.
-
 ```sh
 git clone https://github.com/twitter/bootstrap/
 cd bootstrap && make
@@ -186,7 +184,7 @@ To start the database server, run `mongod &` or `mongod -dbpath /path/to/data`. 
 The database for this app is named `daisycentral` so after you start the client by running `mongo` do: `use daisycentral`. Example:
 
 ```sh
-davis@pluto:/srv/www/foobar.daisyworks.com$ mongo
+davis@pluto:$ mongo
 MongoDB shell version: 1.2.2
 url: test
 connecting to: test
