@@ -5,6 +5,10 @@
 This is the webapp that runs at http://demo.daisyworks.com.  Early prototype code was hosted at http://live.daisyworks.com.
 I'm now working on building out a full-blown app that will provide a web bridge to our hardware devices found at http://daisyworks.com
 
+[Draft Architecture Overview](https://github.com/davisford/daisycentral/wiki/Architectural-Overview)
+
+[Mailing List](https://groups.google.com/forum/?fromgroups#!forum/iofthings)
+
 ## Tech Stack
 
 * [node.js](http://nodejs.org) - app server
