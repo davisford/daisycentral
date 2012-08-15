@@ -74,7 +74,7 @@ var Router = Backbone.Router.extend({
     this.rules();
     $('#rules-content').children().hide();
     $('#editor-view').show('fast', function () {
-
+      rulesHandler.refresh();
     });
   },
 

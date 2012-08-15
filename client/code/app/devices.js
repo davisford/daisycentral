@@ -86,6 +86,8 @@ var Devices = (function () {
         ss.rpc('devices.register', secret, function (err, res) {
           if (true === res) {
             html = ss.tmpl['devices-register-true'].render({message: err});
+            // refresh to fetch the latest daisy
+            _refresh();
           } else {
             html = ss.tmpl['devices-register-false'].render({message: err});
           }

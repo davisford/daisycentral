@@ -1,8 +1,10 @@
 // in client/code/app/rules.js
 
-var models = require('./widgets'),
-  SensorWidget = models.SensorWidget,
-  Widgets = models.Widgets;
+var widgetModels = require('./widgets'),
+  daisyModels = require('./models'),
+  Daisies = daisyModels.Daisies,
+  SensorWidget = widgetModels.SensorWidget,
+  Widgets = widgetModels.Widgets;
 
 var Rules = (function () {
 
@@ -113,8 +115,6 @@ var Rules = (function () {
 
     render: function () {
 
-      console.log(this.el);
-
       $(this.el).html(this.template);
       $(this.el).css('position', 'absolute');
       $(this.el).position({
@@ -123,13 +123,14 @@ var Rules = (function () {
         at: 'left top',
         offset: this.position.left + ' ' + this.position.top
       });
-/*
-      this.$('.sensor').multiselect({
-        multiple: false,
-        header: "Choose a Sensor",
-        noneSelectedText: "No Sensor Selected",
-        selectedList: 1
-      }); */
+
+      // dynamically build the <option> for Daisy <select>
+      var i, m, html;
+      for (i = 0; i<daisies.models.length; i++) {
+        m = daisies.models[i];
+        html = ss.tmpl['rules-daisyOption'].render(m.toJSON());
+        this.$('.daisy').append(html);
+      }
 
       $('#ed-canvas')
         .append(this.el);
@@ -143,10 +144,13 @@ var Rules = (function () {
   // event bus
   var bus = _.extend({}, Backbone.Events),
     widgets = new Widgets(),
+    daisies = new Daisies({url: 'devices.get'}),
     editorView = new EditorView({bus: bus, collection: widgets});
 
   var _refresh = function () {
     editorView.render();
+    // fetch the list of daisies
+    daisies.fetch({success: function () {}});
   };
 
   return {

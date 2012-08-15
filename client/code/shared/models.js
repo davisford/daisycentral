@@ -47,7 +47,6 @@ module.exports = (function () {
       };
       options.error = Backbone.wrapError(options.error, collection, options);
       ss.rpc(this.url, function (err, arr) {
-        console.log('fetched daisies: ', err, arr);
         if (err) { return options.error(err); }
         return options.success(arr);
       });
