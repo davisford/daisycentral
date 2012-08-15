@@ -1,7 +1,7 @@
 // - server/rpc/auth.js
 
-var mongoose = require('mongoose')
- ,  User = require('../models/user').User;
+var mongoose = require('mongoose'),
+  User = require('../models/user').User;
 
 exports.actions = function (req, res, ss) {
   req.use('session');
@@ -23,17 +23,16 @@ exports.actions = function (req, res, ss) {
           } else {
             req.session.isAdmin = false;
           }
-          req.session.save(function(err) {
-            if (err) return res(false);
-            else return res(true);
+          req.session.save(function (err) {
+            if (err) { return res(false); } else { return res(true); }
           });
-          
+
         }
       }); // end authenticate
     }, // end login
 
     // create a new user
-    register: function(email, pass, confirm) {
+    register: function (email, pass, confirm) {
       User.register(email, pass, confirm, function (err, user, msg) {
         if (err) {
           console.log("user register failed =>", err);
@@ -42,9 +41,8 @@ exports.actions = function (req, res, ss) {
           return res(false, msg.message);
         } else {
           req.session.userId = user.id;
-          req.session.save(function(err) {
-            if (err) return res(false);
-            else return res(true);
+          req.session.save(function (err) {
+            if (err) { return res(false); } else { return res(true); }
           });
         }
       });

@@ -2,7 +2,7 @@
 
 // list of pub/sub channels and events
 module.exports = {
-  
+
   admin: {
     channel: 'admin',
     daisy: {
@@ -19,4 +19,4 @@ module.exports = {
 
     sensors: 'daisy:sensors'
   }
-}
+};

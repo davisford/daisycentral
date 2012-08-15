@@ -1,16 +1,15 @@
 // in server/app/daisy-session.js
 
-var SensorData = require('../models/sensordata')
-  , channels = require('./channels')
-  , util = require('util')
-  , events = require('events')
-  , qs   = require('querystring');
+var SensorData = require('../models/sensordata'),
+  channels = require('./channels'),
+  util = require('util'),
+  events = require('events'),
+  qs = require('querystring');
 
 // late binding b/c it needs SocketStream
 var Daisies;
 
-// DaisySession subclasses EventEmitter
-util.inherits(DaisySession, events.EventEmitter);
+
 
 /**
  * Represents a bi-directional session between a connected Daisy
@@ -47,40 +46,43 @@ function DaisySession(socket, ss, timeout) {
    */
   this._parseData = function (queryString) {
 
+    var data, raw, gpio, mask, sensors, i;
+
     // wrap in try/catch b/c parsing is easy to break
     try {
       // shave off the HTTP header and parse into raw object
-      var raw = qs.parse(queryString.slice(0, queryString.indexOf(' HTTP')));
+      raw = qs.parse(queryString.slice(0, queryString.indexOf(' HTTP')));
 
-      if (raw['GET /wifly-data?DATA'] === undefined || 
-          raw['mac'] === undefined) {
+      if (raw['GET /wifly-data?DATA'] === undefined ||
+          raw.mac === undefined) {
         console.log('WARN: invalid: ', raw);
         this.socket.end("goodbye\n");
         return;
       }
 
       // parse values into new object
-      var data = {
+      data = {
         did: raw.id,
         mac: raw.mac,
         // ignore device timestamp
         timestamp: new Date().getTime(),
-        bat: parseInt(raw.bat),
+        bat: parseInt(raw.bat, 10),
         rssi: parseInt(raw.rssi, 16),
-        wake: parseInt(raw.wake),
+        wake: parseInt(raw.wake, 10),
         seq: parseInt(raw.seq, 16)
       };
 
       // process GPIO values
-      var gpio = parseInt(raw.io, 16), mask = 0x10;
-      for (var i = 3; i > 0; i--) {
+      gpio = parseInt(raw.io, 16);
+      mask = 0x10;
+      for (i = 3; i > 0; i--) {
         mask = mask >> 1;
         data["PIO" + i] = (gpio & mask) === mask ? 1 : 0;
       }
 
       // process senosor values
-      var sensors = raw['GET /wifly-data?DATA'].substring(4);
-      for (var i = 0; i < 8; i++) {
+      sensors = raw['GET /wifly-data?DATA'].substring(4);
+      for (i = 0; i < 8; i++) {
         data["AD" + i] = parseInt(sensors.substring(i * 4, i * 4 + 4), 16);
       }
 
@@ -93,9 +95,9 @@ function DaisySession(socket, ss, timeout) {
 
     // tell the daisy what's up
     this.socket.write('HTTP/1.1 200 OK\n');
- 
+
     return data;
-  } // end this._parseData
+  }; // end this._parseData
 
   /**
    * Persists the sensor data into {SensorData} model.  If this is the
@@ -104,33 +106,36 @@ function DaisySession(socket, ss, timeout) {
    * @param {object} [obj]
    */
   this._storeData = function (obj) {
-    if (!obj || 
-        !obj.hasOwnProperty('mac') &&
-        !obj.hasOwnProperty('did')) { return };
+    if (!obj ||
+        (!obj.hasOwnProperty('mac') &&
+        !obj.hasOwnProperty('did'))) {
+      return;
+    }
 
     // get a special model with the collection name
     // that includes the mac address
-    var SensorDataModel = SensorData.getModel(SensorData.getColName(obj.mac));
-    var sensors = new SensorDataModel(obj)
-      , saved;
+    var SensorDataModel = SensorData.getModel(SensorData.getColName(obj.mac)),
+      sensors = new SensorDataModel(obj),
+      saved;
+
     sensors.save(function (err, doc) {
       if (err) {
         console.log("Could not save sensor data", err);
         me._callback(err);
       } else {
         saved = doc;
-        console.log("New sensor data saved at (localdate) "+doc.date);
+        console.log("New sensor data saved at (localdate) " + doc.date);
       }
     });
 
     // register the device if it isn't found in the db
     Daisies.findOne({mac: obj.mac}, function (err, daisy) {
-      
-      if (err) { 
-      
+
+      if (err) {
+
         console.log("Could not look up daisy to create it", err);
         me._callback(err);
-      
+
       } else {
 
         // daisy already exists
@@ -145,31 +150,31 @@ function DaisySession(socket, ss, timeout) {
             // close the connection
             me.socket.end();
           }
-      
+
           // save the status update
           daisy.save(function (err) {
             if (err) { console.log(err); }
           });
 
           if (daisy.owners && daisy.owners.length > 0) {
-            daisy.owners.forEach( function (userId, idx, arr) {
+            daisy.owners.forEach(function (userId, idx, arr) {
               ss.api.publish.user(userId.toString(), channels.user.sensors, saved);
             });
           }
-      
+
         } else {
-      
+
           // this is the first time; create it
           // for new registrations, we hold the socket
           daisy = new Daisies({
-            did: obj.did, 
-            mac: obj.mac, 
-            online:true, 
-            hold:true
+            did: obj.did,
+            mac: obj.mac,
+            online: true,
+            hold: true
           });
-      
+
           daisy.save(function (err, doc) {
-            if (err) { 
+            if (err) {
               console.log("Could not save Daisy", err);
             } else {
               console.log("New Daisy registered! ", doc);
@@ -182,24 +187,26 @@ function DaisySession(socket, ss, timeout) {
 
       }
     }); // end findOne
-  } // end this._storeData
+  }; // end this._storeData
 
   /**
    * Wrapper around client callbacks, which can be queued up
    */
-  this._callback = function(err, res) {
+  this._callback = function (err, res) {
     var cb = me._sessionlock.callbacks.shift();
     if (cb) {
       cb(err, res);
     }
-  }
-  
+  };
+
   /**
    * Callback for socket.on('data')
    * @param {string} [data] should be ASCII if we set the socket config
    */
   this._onData = function (data) {
-    if (!data) return;
+    if (!data) {
+      return;
+    }
 
     // this is a querystring HTTP GET with sensor data
     if (data.match(/^GET .*/)) {
@@ -210,38 +217,39 @@ function DaisySession(socket, ss, timeout) {
       // from a socket.write() call
       me._callback(null, data);
     }
-  } // end this._onData
+  }; // end this._onData
 
   /**
    * Net.Socket error handler
    */
-  this._onError = function(err) {
+  this._onError = function (err) {
     console.log('\t socket:error: ', err);
-  }
+  };
 
   /**
    * Net.Socket timeout handler
    */
-  this._onTimeout = function() {
+  this._onTimeout = function () {
     console.log('\t socket:timeout');
-  }
+  };
 
   /**
    * Net.Socket close handler. When it closes we want to do pub/sub
    * to all consumers so they have an updated status on the connection.
    * We also need to fire our own 'dc:closed' event
    */
-  this._onClose = function() {
+  this._onClose = function () {
 
     // if there is a daisy, update it to offline
-    if(me.daisy) {
+    if (me.daisy) {
 
       me.daisy.online = false;
-      
+
       // save the database state as offline
       Daisies.findOne({mac: me.daisy.mac}, function (err, doc) {
-        if (err) { console.log('could not look up daisy: '+me.daisy.mac); }
-        else if (doc) {
+        if (err) {
+          console.log('could not look up daisy: ' + me.daisy.mac);
+        } else if (doc) {
           doc.online = false;
           doc.save(function (err, doc) {
             if (err) { console.log("Could not update daisy to set status offline", err); }
@@ -250,43 +258,42 @@ function DaisySession(socket, ss, timeout) {
       });
 
       me.emit('daisy-session:closed', me.daisy.mac);
-    } 
-  } // end _onClose
+    }
+  }; // end _onClose
 
   /**
    * Net.Socket end handler
    */
-  this._onEnd = function() {
+  this._onEnd = function () {
     console.log("\t socket:end");
-  }
+  };
 
   /**
    * Write a command to the Daisy
    * @param {string} [command]
    */
-  this._write = function(command) {
+  this._write = function (command) {
     // daisy needs at least a 250ms spacer after $$$
     setTimeout(function () {
       me.socket.write(command);
     }, 250);
     // refresh the session timeout
     this._sessionlock.lastCommand = new Date().getTime();
-  } // end _write
+  }; // end _write
 
   /**
    * Handler when a session's timeout expires for having a lock
    * on the Daisy.
    * @param {s} [DaisySession] this context
    */
-  this._sessionTimeout = function(s) {
+  this._sessionTimeout = function (s) {
     var now = new Date().getTime();
-    if(!s._sessionlock.lastCommand) { 
+    if (!s._sessionlock.lastCommand) {
+      s.unlock();
+    } else if ((now - s._sessionlock.lastCommand) >= timeout) {
       s.unlock();
     }
-    else if ( (now - s._sessionlock.lastCommand) >= timeout ) {
-      s.unlock();
-    } 
-  }
+  };
 
   // setup all event handlers
   socket.on('data', this._onData);
@@ -297,24 +304,24 @@ function DaisySession(socket, ss, timeout) {
 
   return this;
 
-};
+}
 
 /* ------------ Public Methods -------------- */
 
 /**
  * Unlock the session so it is available
  */
-DaisySession.prototype.unlock = function() {
+DaisySession.prototype.unlock = function () {
   clearTimeout(this._sessionlock.timeoutId);
   this._sessionlock = DaisySession.defaultLock;
-}
+};
 
 /**
  * Indicates if this session is locked
  */
-DaisySession.prototype.isLocked = function() {
+DaisySession.prototype.isLocked = function () {
   return this._sessionlock.sessionId !== "unlocked";
-}
+};
 
 /**
  * Send a list of commands to the Daisy
@@ -326,35 +333,35 @@ DaisySession.prototype.isLocked = function() {
  * If you close the socket, you won't be able to communicate with the Daisy until the
  * next time it connects.
  */
-DaisySession.prototype.send = function(sessionId, command, callback) {
-  
+DaisySession.prototype.send = function (sessionId, command, callback) {
+
   // sanity checks
   if (!sessionId || !command) {
-    if (callback)
+    if (callback) {
       return callback("Invalid parameters (sessionId, command)", null);
+    }
   }
-  
+
   // we can't send anything b/c there's no daisy to send to
-  if(!this.daisy) {
+  if (!this.daisy) {
     return callback("Daisy is not connected yet", null);
   }
 
   // try lock
-  if ( this.lock( sessionId, callback ) === false ) {
+  if (this.lock(sessionId, callback) === false) {
     return callback("Session is currently locked: TODO queue commands in redis", null);
   }
 
   // $$$ command must not have any trailing characters
-  if(command.match(/\$\$\$/)) {
+  if (command.match(/\$\$\$/)) {
     this._write('$$$');
-  } 
-  // all other commands _must_ end in carriage return
-  else if(!command.match(/[\r]$/)) {
+  } else if (!command.match(/[\r]$/)) {
+    // all other commands must have trailing carriage return
     this._write(command + '\r');
   } else {
     this._write(command);
   }
-}
+};
 
 /**
  * A DaisySession can be used by only one HTTP/WebSocket session at a time.
@@ -363,47 +370,51 @@ DaisySession.prototype.send = function(sessionId, command, callback) {
  * @param {string} [sessionId]
  * @param {Function} [callback] gets added to the queue on each send
  */
-DaisySession.prototype.lock = function(sessionId, callback) {
+DaisySession.prototype.lock = function (sessionId, callback) {
 
   if (!sessionId || !callback) {
     return false;
   }
 
-  if (!this._sessionlock) 
+  if (!this._sessionlock) {
     throw new Error("Illegal state: _sessionlock is undefined");
+  }
 
   // already locked by same sessionId
   if (this._sessionlock.sessionId === sessionId) {
-    
+
     // add this callback to the LIFO
     this._sessionlock.callbacks.push(callback);
-    
+
     return true;
 
   } else if (this._sessionlock.sessionId === "unlocked") {
-    
+
     // session is unlocked, lock it now
     this._sessionlock = {
       sessionId: sessionId,
       callbacks: [callback]
     };
-    
+
     // start the timer
-    this._sessionlock.timeoutId = 
+    this._sessionlock.timeoutId =
       setTimeout(this._sessionTimeout, this.timeout, this);
-    
+
     return true;
-  } 
+  }
 
   // sorry, charlie - lock request rejecto'ed
   return false;
-}
+};
 
 // static class lock object; used if no one has a lock
 DaisySession.defaultLock = {
   sessionId: "unlocked",
   callbacks: []
-}
+};
+
+// DaisySession subclasses EventEmitter
+util.inherits(DaisySession, events.EventEmitter);
 
 module.exports = DaisySession;
 

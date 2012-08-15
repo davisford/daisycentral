@@ -1,8 +1,8 @@
 // in server/models/sensordata.js
-var mongoose = require('mongoose')
-  , Schema = mongoose.Schema
-  , ObjectId = mongoose.SchemaTypes.ObjectId;
-  
+var mongoose = require('mongoose'),
+  Schema = mongoose.Schema,
+  ObjectId = mongoose.SchemaTypes.ObjectId;
+
 var SensorDataSchema = new Schema({
   did:    String,
   ip:     String,
@@ -26,57 +26,61 @@ var SensorDataSchema = new Schema({
 });
 
 SensorDataSchema.virtual('wakeReason')
-  .get(function (){
-    switch(this.wake) {
-      case 0: return "Not Defined";
-      case 1: return "Power On or Hardware Reset";
-      case 2: return "Awoke from Sleep via Timer";
-      case 3: return "Sensor Interrupt";
-      case 4: /* fall thru */
-      case 5: return "Not Defined";
-      case 6: return "Software Reboot";
-      case 7: return "Watchdog";
-      default: return "Unknown";
+  .get(function () {
+    switch (this.wake) {
+    case 0: return "Not Defined";
+    case 1: return "Power On or Hardware Reset";
+    case 2: return "Awoke from Sleep via Timer";
+    case 3: return "Sensor Interrupt";
+    case 4: /* fall thru */
+    case 5: return "Not Defined";
+    case 6: return "Software Reboot";
+    case 7: return "Watchdog";
+    default: return "Unknown";
     }
   });
 
 SensorDataSchema.virtual('localtime')
-  .get(function (){
+  .get(function () {
     var localNow = new Date().getTimezoneOffset(),
-        min = this.timestamp / 1000 / 60;
+      min = this.timestamp / 1000 / 60;
     return (min - localNow) * 1000 * 60;
   });
 
 SensorDataSchema.virtual('date')
-  .get(function (){
+  .get(function () {
     return new Date(this.timestamp);
   });
 
 SensorDataSchema.virtual('localdate')
-  .get(function (){
+  .get(function () {
     return new Date(this.localtime);
   });
 
-var SensorData = function() {
+var SensorData = (function () {
+
   // get the real mongoose model tied to a specific collection name
-  var _getModel = function(colName) {
-    if (typeof(colName) === "undefined" || colName === null || colName.length === 0) {
+  var _getModel = function (colName) {
+    if (typeof colName === "undefined" || colName === null || colName.length === 0) {
       throw new Error("collection name cannot be null/empty");
     }
     return mongoose.model(colName, SensorDataSchema, colName);
-  }
+  };
+
   // generate the collection name from the mac
-  var _getColName = function(mac) {
-    if(typeof(mac) === "undefined" || mac === null || mac.length === 0) {
+  var _getColName = function (mac) {
+    if (typeof mac === "undefined" || mac === null || mac.length === 0) {
       throw new Error("mac address cannot be null/empty");
     }
-    return "sensors."+mac;
-  }
+    return "sensors." + mac;
+  };
+
   return {
     getModel: _getModel,
     getColName: _getColName
-  }
-}();
+  };
+
+}());
 module.exports = SensorData;
 
 /*

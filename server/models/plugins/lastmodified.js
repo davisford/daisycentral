@@ -5,7 +5,7 @@
  * Add it to your schema like MySchema.plugin(require('./models/plugins/lastmodified'))
  * ..and it will update the timestamp on any update/save
  */
-module.exports = exports = function lastModifiedPlugin (schema, options) {
+module.exports = exports = function lastModifiedPlugin(schema, options) {
   schema.add({ lastMod: Date });
 
   schema.pre('save', function (next) {
@@ -16,4 +16,4 @@ module.exports = exports = function lastModifiedPlugin (schema, options) {
   if (options && options.index) {
     schema.path('lastMod').index(options.index);
   }
-}
+};

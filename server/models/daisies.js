@@ -1,18 +1,19 @@
 // in server/models/daisies.js
 
-var mongoose = require('mongoose')
-  , Schema = mongoose.Schema
-  , ObjectId = mongoose.SchemaTypes.ObjectId
-  , channels = require('../app/channels')
-  , lastmodified = require('./plugins/lastmodified');
+var mongoose = require('mongoose'),
+  Schema = mongoose.Schema,
+  ObjectId = mongoose.SchemaTypes.ObjectId,
+  channels = require('../app/channels'),
+  lastmodified = require('./plugins/lastmodified');
 
 /**
  * Model object for Daisy meta-info (not sensors)
  */
-module.exports = function(ss) {
+module.exports = function (ss) {
 
-  if (!ss) 
+  if (!ss) {
     throw new Error("must pass SocketStream object");
+  }
 
   var DaisiesSchema = new Schema({
     // human-readable name
@@ -40,14 +41,14 @@ module.exports = function(ss) {
     // trying to send 'this' will result in circular JSON error
     var data = JSON.stringify(this);
 
-    if(ss.hasOwnProperty('api')) {
+    if (ss.hasOwnProperty('api')) {
       // publish daisy status to admin channel
       ss.api.publish.channel(channels.admin, channels.admin.daisy.status, data);
-    
-      if(this.owners && this.owners.length > 0) {
+
+      if (this.owners && this.owners.length > 0) {
 
         // publish daisy status to each user channel
-        this.owners.forEach( function(userId, idx, arr) {
+        this.owners.forEach(function (userId, idx, arr) {
           ss.api.publish.user(userId.toString(), channels.user.daisy.status, data);
         });
       }
@@ -59,7 +60,7 @@ module.exports = function(ss) {
       next();
     }
 
-  }); 
+  });
 
   return mongoose.model("Daisies", DaisiesSchema);
 
