@@ -99,7 +99,7 @@ var Rules = (function () {
     tagName: 'div',
     //className: 'ui-widget-content',
     position: {},
-    template: ss.tmpl['rules-foobar'].render({title: "If the Sensor"}),
+    template: ss.tmpl['rules-sensor'].render({title: "If the Sensor"}),
 
     initialize: function (options) {
       this.position = options.position;
@@ -123,13 +123,13 @@ var Rules = (function () {
         at: 'left top',
         offset: this.position.left + ' ' + this.position.top
       });
-
+/*
       this.$('.sensor').multiselect({
         multiple: false,
         header: "Choose a Sensor",
         noneSelectedText: "No Sensor Selected",
         selectedList: 1
-      });
+      }); */
 
       $('#ed-canvas')
         .append(this.el);
