@@ -179,6 +179,12 @@ Now, open browser to http://0.0.0.0:8080/debug?port=5858 in **Chrome**
 
 Port 9000 receives Daisy WiFly HTTP data.  Port 3006 is the webapp.
 
+You can simulate a new Daisy registration via HTTP if you hit the following URL: 
+
+```
+http://localhost:9000/wifly-data?DATA=051208BACF29CF290018088B0C8539B63DF2&id=MyFakeDaisy&mac=00:06:66:FF:FF:ec&bss=e0:46:9a:5b:22:ee&rtc=21d0&bat=2633&io=510&wake=2&seq=1f1&cnt=80&rssi=bb
+```
+
 ### Rebuild Platform Dependent Stuff
 Libraries like `bcrypt` have to be compiled natively, so do it thusly: `sudp npm rebuild bcrypt`
 
@@ -252,3 +258,12 @@ I made some changes to support angles on x-axis labels.
 
 ### mongoose-auth
 I forked it and updated the google module to pull through google profile information (gives full name, etc.)
+
+# Tests
+There isn't yet a giant suite of tests, but I'm working on adding more.  I'm using mocha, should, and sinon for testing.
+
+There is a Makefile for running the tests:
+
+```sh
+$ make
+```
