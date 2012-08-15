@@ -1,45 +1,45 @@
 // in client/code/app/devices.js
 
-var models = require('./models')
-  , Daisy = models.Daisy
-  , Sensor = models.Sensor
-  , Daisies = models.Daisies
-  , Sensors = models.Sensors;
+var models = require('./models'),
+  Daisy = models.Daisy,
+  Sensor = models.Sensor,
+  Daisies = models.Daisies,
+  Sensors = models.Sensors;
 
-var Devices = function() {
+var Devices = (function () {
 
   /*---------------------------------------------------------------------------
      View: SideBarView
        Handles sidebar navigation and checkbox selection
    --------------------------------------------------------------------------*/
-  SideBarView = Backbone.View.extend({
+  var SideBarView = Backbone.View.extend({
     el: $('#sidebar-view'),
 
-    events: { 
+    events: {
       'change .sensor-cb': 'sensorSelected',
       'click a': 'menuClicked'
     },
 
-    initialize: function(options) {
+    initialize: function (options) {
       this.bus = options.bus;
       _.bindAll(this, 'render', 'sensorSelected', 'fadeSensorButtons');
     },
 
-    render: function() {
+    render: function () {
       this.fadeSensorButtons(location.hash);
     },
 
-    sensorSelected: function() {
+    sensorSelected: function () {
       // broadcast event about sensors that are checked
       var arr = _.pluck($('#sensor-cb-table :checked'), 'id');
       this.bus.trigger('sensorSelected', arr);
     },
 
-    menuClicked: function(e) {
+    menuClicked: function (e) {
       this.fadeSensorButtons(e.currentTarget.hash);
     },
 
-    fadeSensorButtons: function(hash) {
+    fadeSensorButtons: function (hash) {
       var sensorButtons$ = this.$('#sensor-cb-table');
       if (hash === "#devices/register") {
         // we have to do this b/c they can come in straight on the URL
@@ -60,37 +60,38 @@ var Devices = function() {
      View: RegisterView
        Handles registration of secret key for user to claim Daisy ownership
    --------------------------------------------------------------------------*/
-  RegisterView = Backbone.View.extend({
+  var RegisterView = Backbone.View.extend({
     el: $('#register-view'),
 
-    events: { 
+    events: {
       'click #register-button': 'register'
     },
 
-    initialize: function(options) {
+    initialize: function (options) {
       _.bindAll(this, 'render', 'register');
     },
 
-    render: function() {
+    render: function () {
 
     },
 
-    register: function(e) {
+    register: function (e) {
+
       e.preventDefault();
       this.$('.alert').remove();
-      var secret = $('#secret-key').val();
-      if(!secret) {
-        return;
-      } else {
-        var me = this, html;
-        ss.rpc('devices.register', secret, function(err, res) {
-          if(true === res) {
-            html = ss.tmpl['devices-register-true'].render({message:err});
+      var secret = $('#secret-key').val(), me = this, html;
+
+      if (!secret) { return; } else {
+
+        ss.rpc('devices.register', secret, function (err, res) {
+          if (true === res) {
+            html = ss.tmpl['devices-register-true'].render({message: err});
           } else {
-            html = ss.tmpl['devices-register-false'].render({message:err});
+            html = ss.tmpl['devices-register-false'].render({message: err});
           }
           $(html).hide().appendTo(me.el).slideDown();
         });
+
       }
     }
   });
@@ -99,14 +100,14 @@ var Devices = function() {
   /*---------------------------------------------------------------------------
      View: TableView
    --------------------------------------------------------------------------*/
-  TableView = Backbone.View.extend({
+  var TableView = Backbone.View.extend({
     el: $('#table-view'),
 
     events: {
       'click #daisies-table tbody tr': 'selectRow'
     },
 
-    initialize: function(options) {
+    initialize: function (options) {
       _.bindAll(this, 'render', 'selectRow');
       this.bus = options.bus;
 
@@ -138,50 +139,50 @@ var Devices = function() {
       var table = this.table;
 
       ss.event.on('daisy:status', function (daisy, channelName) {
-        var obj = JSON.parse(daisy)
-          , row = table.$('tr:contains('+obj.mac+')')
-          , td;
+        var obj = JSON.parse(daisy),
+          row = table.$('tr:contains(' + obj.mac + ')'),
+          td;
         if (row) {
           td = $(':nth-child(2)', row);
           $(td).val(obj.online);
-          if(obj.online === true) {
+          if (obj.online === true) {
             $(td).removeClass('daisy-offline').addClass('daisy-online');
           } else {
             $(td).removeClass('daisy-online').addClass('daisy-offline');
           }
         }
-      });  
+      });
 
     },
 
-    render: function() {
+    render: function () {
       var table = this.table;
       table.fnClearTable();
       table.fnAddData(this.collection.toJSON());
 
       // add jEditable to table data; only .canEdit class are editable
       $('.canEdit', table.fnGetNodes()).editable(function (val, settings) {
-          // get the object for this row
-          var obj = table.fnGetData(table.fnGetPosition(this)[0]);
-          // we know it is the did property
-          obj.did = val;
-          ss.rpc('devices.save', obj, function(ok) {
-            if (ok === false) {
-              alert("update failed");
-              _refresh();
-            }
-          });
-          return (val);
-        }, {
-          type: 'textarea',
-          event: 'dblclick',
-          tooltip: 'Doubleclick to edit...', 
-          submit: 'OK'  }
-      ); // end .editable 
+        // get the object for this row
+        var obj = table.fnGetData(table.fnGetPosition(this)[0]);
+        // we know it is the did property
+        obj.did = val;
+        ss.rpc('devices.save', obj, function (ok) {
+          if (ok === false) {
+            alert("update failed");
+            _refresh();
+          }
+        });
+        return (val);
+      }, {
+        type: 'textarea',
+        event: 'dblclick',
+        tooltip: 'Doubleclick to edit...',
+        submit: 'OK'
+      }); // end .editable 
     },
 
-    selectRow: function(e) {
-      var row = $(e.currentTarget);
+    selectRow: function (e) {
+      var row = $(e.currentTarget), daisy;
       // toggle selected style on row
       if (row.hasClass('row_selected')) {
         row.removeClass('row_selected');
@@ -189,7 +190,7 @@ var Devices = function() {
         this.table.$('tr.row_selected').removeClass('row_selected');
         row.addClass('row_selected');
       }
-      var daisy = this.table._('.row_selected')[0];
+      daisy = this.table._('.row_selected')[0];
       // broadcast event about daisy that is selected
       this.bus.trigger('daisySelected', daisy);
     }
@@ -200,88 +201,81 @@ var Devices = function() {
         We wrap it in a self-invoking closure so we can make use of private
         vars and we don't have to write this.property all the time.
    --------------------------------------------------------------------------*/
-  RealTimeView = (function() {
+  var RealTimeView = (function () {
 
     // current named sensors that are checke on SubNav View
-    var checkedSensors = [];
-
-    var bus = null;
-
-    // the div that holds the Flot graph
-    var chart = $('#chart');
-
-    // the Flot Plot
-    var plot = null;
-
-    // configures Flot
-    var chartOptions = {
-      legend: {
-        show: true,
-        margin: 10,
-        backgroundOpacity: 0.5
-      },
-      grid: { hoverable: true, clickable: true },
-      points: {
-        show: true,
-        radius: 3
-      },
-      lines: {
-        show: true
-      },
-      xaxis: {
-        mode: 'time',
-        twelveHourClock: true,
-        labelAngle: -45
-      },
-      selection: { mode: 'x' },
-      yaxes: [
-        { labelWidth: 40,
-          position: "right",
-          sensor: "shared",
-          ticks: [[0.0, "OFF"], [1.0, "ON"]] }, // power,leak,magnet
-        { labelWidth: 40,
-          position: "left",
-          sensor: "AD4",
-          color: Sensor.info.AD4.color,
-          tickFormatter: function (n, obj) { return n + "%"; } },  // humidity
-        { labelWidth: 40,
-          position: "left",
-          sensor: "AD5",
-          color: Sensor.info.AD5.color,
-          tickFormatter: function (n, obj) { return n + "F"; } },  // temp
-        { labelWidth: 40,
-          position: "left",
-          sensor: "AD6",
-          color: Sensor.info.AD6.color },  // moisture
-        { labelWidth: 40,
-          position: "left",
-          sensor: "AD7",
-          color: Sensor.info.AD7.color,
-          tickFormatter: function (n, obj) { return n + "V"; } }  // battery
-      ],
-      zoom: {
-        interactive: false,
-        trigger: "dblclick", // or "click" for single click
-        amount: 0.1       // 2 = 200% (zoom in), 0.5 = 50% (zoom out)
-      },
-      pan: {
-        interactive: false,
-        cursor: "move",      // CSS mouse cursor value used when dragging, e.g. "pointer"
-        frameRate: 20
-      }
-    };
+    var checkedSensors = [],
+      bus = null,
+      chart = $('#chart'), // the div that holds Flot chart
+      plot = null, // the Flot plot obj
+      chartOptions = {
+        legend: {
+          show: true,
+          margin: 10,
+          backgroundOpacity: 0.5
+        },
+        grid: { hoverable: true, clickable: true },
+        points: {
+          show: true,
+          radius: 3
+        },
+        lines: {
+          show: true
+        },
+        xaxis: {
+          mode: 'time',
+          twelveHourClock: true,
+          labelAngle: -45
+        },
+        selection: { mode: 'x' },
+        yaxes: [
+          { labelWidth: 40,
+            position: "right",
+            sensor: "shared",
+            ticks: [[0.0, "OFF"], [1.0, "ON"]] }, // power,leak,magnet
+          { labelWidth: 40,
+            position: "left",
+            sensor: "AD4",
+            color: Sensor.info.AD4.color,
+            tickFormatter: function (n, obj) { return n + "%"; } },  // humidity
+          { labelWidth: 40,
+            position: "left",
+            sensor: "AD5",
+            color: Sensor.info.AD5.color,
+            tickFormatter: function (n, obj) { return n + "F"; } },  // temp
+          { labelWidth: 40,
+            position: "left",
+            sensor: "AD6",
+            color: Sensor.info.AD6.color },  // moisture
+          { labelWidth: 40,
+            position: "left",
+            sensor: "AD7",
+            color: Sensor.info.AD7.color,
+            tickFormatter: function (n, obj) { return n + "V"; } }  // battery
+        ],
+        zoom: {
+          interactive: false,
+          trigger: "dblclick", // or "click" for single click
+          amount: 0.1       // 2 = 200% (zoom in), 0.5 = 50% (zoom out)
+        },
+        pan: {
+          interactive: false,
+          cursor: "move",      // CSS mouse cursor value used when dragging, e.g. "pointer"
+          frameRate: 20
+        }
+      };
 
     return Backbone.View.extend({
-   
+
       el: $('#realtime-view'),
 
-      events: { 
+      events: {
         'plothover #chart': 'plotHover',
         'plotselected #chart': 'plotSelected',
         'plotunselected #chart': 'plotUnselected'
       },
 
-      initialize: function(options) {
+      initialize: function (options) {
         bus = options.bus;
         _.bindAll(this, 'render', 'daisySelected', 'sensorSelected', 'plotHover', 'plotSelected', 'plotUnselected');
         bus.bind('daisySelected', this.daisySelected);
@@ -292,29 +286,28 @@ var Devices = function() {
 
         var me = this;
 
-        ss.event.on('daisy:sensors', function(data, channelName) {
+        ss.event.on('daisy:sensors', function (data, channelName) {
           // if we received data with mac for the daisy currently selected, we
           // add it to the collection and refresh the chart
-          if ( me.collection.find( function(s) {
-            return s.get('mac') === data.mac;
-            }) ) {
+          if (me.collection.find(function (s) {
+              return s.get('mac') === data.mac;
+            })) {
             me.collection.add(data);
             me.render();
           }
         });
       },
 
-      render: function() {
-        var points = this.collection.flotData(checkedSensors);
+      render: function () {
+        var points = this.collection.flotData(checkedSensors), last, xaxis;
 
         if (this.ranges) {
+
           // keep zoom level the same
+          last = this.collection.pluck('timestamp')[this.collection.length - 1];
+          xaxis = { xaxis: { min: this.ranges.xaxis.from, max: last }};
 
-          var last = this.collection.pluck('timestamp')[this.collection.length-1];
-          var xaxis = { xaxis: { min: this.ranges.xaxis.from, max: last }};
-
-          plot = $.plot(chart, points, 
-              $.extend(true, {}, chartOptions, xaxis) );
+          plot = $.plot(chart, points, $.extend(true, {}, chartOptions, xaxis));
           this.updateAxes(plot);
 
         } else {
@@ -322,17 +315,16 @@ var Devices = function() {
           plot = $.plot(chart, points, chartOptions);
           this.updateAxes(plot);
         }
-        
+
       },
 
       /* daisy was selected in the table, fetch it's sensor data */
-      daisySelected: function(daisy) {
+      daisySelected: function (daisy) {
         this.ranges = undefined;
         if (daisy) {
           this.model = daisy;
-          this.collection.fetch({mac: daisy.mac, 
-            success: this.render});
-          this.$('#realtime-header').html('Real-Time Data: '+daisy.did);
+          this.collection.fetch({mac: daisy.mac, success: this.render});
+          this.$('#realtime-header').html('Real-Time Data: ' + daisy.did);
         } else {
           this.collection.reset();
           plot = $.plot(chart, [], chartOptions);
@@ -340,7 +332,7 @@ var Devices = function() {
         }
       },
 
-      sensorSelected: function(arr) {
+      sensorSelected: function (arr) {
         checkedSensors = arr;
         this.render();
       },
@@ -356,11 +348,11 @@ var Devices = function() {
               sensor: item.series.label + ': ' + item.datapoint[1].toFixed(2),
               timestamp: new Date(item.datapoint[0]).toUTCString()
             }))
-            .css('top', item.pageY + 5)
-            .css('left', item.pageX + 5)
-            .css('background-color', item.series.color)
-            .appendTo('body')
-            .fadeIn(200);
+              .css('top', item.pageY + 5)
+              .css('left', item.pageX + 5)
+              .css('background-color', item.series.color)
+              .appendTo('body')
+              .fadeIn(200);
           }
         } else {
           $("#tooltip").remove();
@@ -368,20 +360,20 @@ var Devices = function() {
         }
       },
 
-      plotSelected: function(e, ranges) {
+      plotSelected: function (e, ranges) {
         if (ranges) {
           this.ranges = ranges;
           var xaxis = { xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }};
-          plot = $.plot( chart, this.collection.getCached(),
-            $.extend(true, {}, chartOptions, xaxis) ); 
+
+          plot = $.plot(chart, this.collection.getCached(), $.extend(true, {}, chartOptions, xaxis));
         }
       },
 
-      plotUnselected: function(e) {
+      plotUnselected: function (e) {
         var xaxis = { xaxis: { min: this.min, max: this.max } };
         if (this.ranges) {
-          plot = $.plot( chart, this.collection.getCached(),
-            $.extend(true, {}, chartOptions, xaxis) ); 
+
+          plot = $.plot(chart, this.collection.getCached(), $.extend(true, {}, chartOptions, xaxis));
         }
       },
 
@@ -426,36 +418,30 @@ var Devices = function() {
 
         this.minx = plot.getAxes().xaxis.min;
         this.maxx = plot.getAxes().xaxis.max;
-      }, // end updateAxes
+      } // end updateAxes
 
     });
-  })();
-  
+  }());
+
 
   /*---------------------------------------------------------------------------
     This module's private methods and variable initialization 
    --------------------------------------------------------------------------*/
 
+  // event bus
+  var bus = _.extend({}, Backbone.Events),
+    daisies = new Daisies({url: 'devices.get'}),
+    tableView = new TableView({collection: daisies, bus: bus}),
+    sensors = new Sensors({url: 'sensors.get'}),
+    realtimeView = new RealTimeView({collection: sensors, bus: bus}),
+    registerView = new RegisterView(),
+    sidebarView = new SideBarView({bus: bus});
+
   // refresh function
-  var _refresh = function() {
+  var _refresh = function () {
     sidebarView.render();
     daisies.fetch({success: tableView.render});
   };
-
-  // event bus
-  var bus = _.extend({}, Backbone.Events);
-  // collection of daisies
-  var daisies = new Daisies({url: 'devices.get'});
-  // daisies table view
-  var tableView = new TableView({collection: daisies, bus: bus});
-  // collection of sensors
-  var sensors = new Sensors({url: 'sensors.get'});
-  // realtime charting view
-  var realtimeView = new RealTimeView({collection: sensors, bus: bus});
-  // register view
-  var registerView = new RegisterView();
-  // sidebar nav view
-  var sidebarView = new SideBarView({bus: bus});
 
   /*---------------------------------------------------------------------------
     This module's public methods 
@@ -463,6 +449,6 @@ var Devices = function() {
   return {
     refresh: _refresh
   };
-  
-}();
+
+}());
 module.exports = Devices;

@@ -1,7 +1,7 @@
 // in client/app/router.js
 
-var devicesHandler = require('./devices');
-var rulesHandler = require('./rules');
+var devicesHandler = require('./devices'),
+  rulesHandler = require('./rules');
 
 var Router = Backbone.Router.extend({
   routes: {
@@ -13,83 +13,82 @@ var Router = Backbone.Router.extend({
     "rules/rules": "rulesRules",
     "rules/editor": "rulesEditor",
     "profile": "profile",
-    "help": "help",
+    "help": "help"
   },
 
-  home: function() {
+  home: function () {
     $("#content").children().hide();
-    $("#home").show("fast", function() {
-      // do something when home is shown
-      console.log('home');
+    $("#home").show("fast", function () {
+
     });
   },
 
-  devices: function() {
+  devices: function () {
     $("#content").children().hide();
-    $("#devices").show("fast", function() {
+    $("#devices").show("fast", function () {
       // refresh table data
       devicesHandler.refresh();
     });
   },
 
-  devicesDaisies: function() {
+  devicesDaisies: function () {
     $('#devices-content').children().hide();
-    $('#table-view').show('fast', function() {
-      if ( !$('#devices').is(':visible') ) {
+    $('#table-view').show('fast', function () {
+      if (!$('#devices').is(':visible')) {
         $('#content').children().hide();
-        $('#devices').show('fast', function() {
+        $('#devices').show('fast', function () {
           devicesHandler.refresh();
         });
       }
     });
   },
 
-  devicesRegister: function() {
+  devicesRegister: function () {
     $('#devices-content').children().hide();
-    $('#register-view').show('fast', function() {
-      if ( !$('#devices').is(':visible') ) {
+    $('#register-view').show('fast', function () {
+      if (!$('#devices').is(':visible')) {
         $('#content').children().hide();
-        $('#devices').show('fast', function() {
+        $('#devices').show('fast', function () {
           devicesHandler.refresh();
         });
       }
     });
   },
 
-  rules: function() {
+  rules: function () {
     $("#content").children().hide();
-    $("#rules").show("fast", function() {
-      console.log("rules");
+    $("#rules").show("fast", function () {
+
     });
   },
 
-  rulesRules: function() {
+  rulesRules: function () {
     this.rules();
     $('#rules-content').children().hide();
-    $('#rules-view').show('fast', function() {
+    $('#rules-view').show('fast', function () {
 
     });
   },
 
-  rulesEditor: function() {
+  rulesEditor: function () {
     this.rules();
     $('#rules-content').children().hide();
-    $('#editor-view').show('fast', function() {
+    $('#editor-view').show('fast', function () {
 
     });
   },
 
-  profile: function() {
+  profile: function () {
     $("#content").children().hide();
-    $("#profile").show("fast", function() {
-      console.log("profile");
+    $("#profile").show("fast", function () {
+
     });
   },
 
-  help: function() {
+  help: function () {
     $("#content").children().hide();
-    $("#help").show("fast", function() {
-      console.log("help");
+    $("#help").show("fast", function () {
+
     });
   }
 });
@@ -106,4 +105,4 @@ $(".top-menu li").click(function (e) {
 $(".sidebar-nav li").click(function (e) {
   $(".sidebar-nav li").removeClass("active");
   $(this).addClass("active");
-})
+});

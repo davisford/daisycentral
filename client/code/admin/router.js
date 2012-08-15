@@ -13,40 +13,36 @@ var Router = Backbone.Router.extend({
 
   home: function () {
     $("#content").children().hide();
-    $("#home").show("fast", function() {
-      // do something when home is shown
-      console.log('home');
+    $("#home").show("fast", function () {
+
     });
   },
 
   devices: function () {
     $("#content").children().hide();
-    $("#devices").show("fast", function() {
+    $("#devices").show("fast", function () {
       devicesHandler.refresh();
     });
   },
 
   rules: function () {
     $("#content").children().hide();
-    $("#rules").show("fast", function() {
-      // do something when rules is shown
-      console.log('rules');
+    $("#rules").show("fast", function () {
+
     });
   },
 
   profile: function () {
     $("#content").children().hide();
-    $("#profile").show("fast", function() {
-      // do something when profile is shown
-      console.log('profile');
+    $("#profile").show("fast", function () {
+
     });
   },
 
   help: function () {
     $("#content").children().hide();
-    $("#help").show("fast", function() {
-      // do something when help is shown
-      console.log('help');
+    $("#help").show("fast", function () {
+
     });
   }
 });

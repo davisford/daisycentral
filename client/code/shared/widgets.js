@@ -1,26 +1,27 @@
+// models for rule editor
+module.exports = (function () {
 
-
-SensorWidget = Backbone.Model.extend({
-  defaults: {
-    type: 'Sensor'
-  },
-  validation: {
-    daisy: { required: true, msg: "Error" },
-    sensor: { required: true, msg: "Error" },
-    value: { required: true, msg: "Error" },
-    connections: function (val) {
-      if (!val || val.length === 0) { return "Error"; }
+  var SensorWidget = Backbone.Model.extend({
+    defaults: {
+      type: 'Sensor'
+    },
+    validation: {
+      daisy: { required: true, msg: "Error" },
+      sensor: { required: true, msg: "Error" },
+      value: { required: true, msg: "Error" },
+      connections: function (val) {
+        if (!val || val.length === 0) { return "Error"; }
+      }
     }
-  }
-});
+  });
 
-Widgets = Backbone.Collection.extend({
+  var Widgets = Backbone.Collection.extend({
 
-});
+  });
 
-console.log(this);
-console.log(module);
+  return {
+    SensorWidget: SensorWidget,
+    Widgets: Widgets
+  };
 
-
-exports.Widgets = Widgets;
-exports.SensorWidget = SensorWidget;
+}());
