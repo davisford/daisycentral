@@ -9,7 +9,8 @@ var SensorData = require('../models/sensordata'),
 // late binding b/c it needs SocketStream
 var Daisies;
 
-
+// DaisySession subclasses EventEmitter
+util.inherits(DaisySession, events.EventEmitter);
 
 /**
  * Represents a bi-directional session between a connected Daisy
@@ -412,9 +413,6 @@ DaisySession.defaultLock = {
   sessionId: "unlocked",
   callbacks: []
 };
-
-// DaisySession subclasses EventEmitter
-util.inherits(DaisySession, events.EventEmitter);
 
 module.exports = DaisySession;
 
