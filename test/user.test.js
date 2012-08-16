@@ -7,11 +7,19 @@ var should = require('should'),
 // this is a test
 process.env['NODE_ENV'] = 'test';
 
-mongoose.connect("mongodb://localhost/daisycentral-test");
-
 describe("User", function () {
 
   var currentUser = null;
+
+  before(function (done) {
+    mongoose.connect('mongodb://localhost/daisycentral-test');
+    done();
+  });
+
+  after(function (done) {
+    mongoose.disconnect();
+    done();
+  });
 
   beforeEach(function (done) {
     // remove all users before each test

@@ -60,8 +60,6 @@ var app = express.createServer(
   mongooseAuth.middleware()
 );
 
-mongooseAuth.helpExpress(app);
-
 /* _________________ ROUTES _________________ */
 app.get('/', security.authenticated(), function (req, res) {
   res.serveClient('main');

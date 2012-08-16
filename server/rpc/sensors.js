@@ -18,7 +18,7 @@ exports.actions = function (req, res, ss) {
 
       var SensorDataModel = SensorData.getModel(SensorData.getColName(mac));
 
-      SensorDataModel.find().sort("timestamp", -1).limit(25).execFind(function (err, sensors) {
+      SensorDataModel.find().sort("-timestamp").limit(25).execFind(function (err, sensors) {
         if (err) {
           console.log(err); return res("An error occurred, please try again.");
         } else { return res(null, sensors); }

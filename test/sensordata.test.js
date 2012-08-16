@@ -3,8 +3,6 @@
 var should = require('should'),
   mongoose = require('mongoose');
 
-mongoose.connect("mongodb://localhost/daisycentral-test");
-
 var SensorData = require('../server/models/sensordata'),
   colOne = SensorData.getColName("00:11:22:33:44:55"),
   colTwo = SensorData.getColName("00:DE:AD:BE:EF:00"),
@@ -26,6 +24,16 @@ var dataTwo = {
 };
 
 describe("SensorData", function () {
+
+  before(function (done) {
+    mongoose.connect('mongodb://localhost/daisycentral-test');
+    done();
+  });
+
+  after(function (done) {
+    mongoose.disconnect();
+    done();
+  });
 
   beforeEach(function (done) {
     SensorDataOne.remove({}, function (err) {

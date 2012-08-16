@@ -3,6 +3,7 @@
 var sinon = require('sinon'),
   should = require('should'),
   ss = require('socketstream').start(),
+  mongoose = require('mongoose'),
   ObjectId = require('mongoose').Types.ObjectId,
   channels = require('../server/app/channels'),
   Daisies;
@@ -12,8 +13,14 @@ describe("DaisiesTest", function () {
   var channelspy, userspy;
 
   before(function (done) {
+    mongoose.connect('mongodb://localhost/daisycentral-test');
     // this has to be done late - or SocketStream isn't init'd
     Daisies = require('../server/models/daisies')(ss);
+    done();
+  });
+
+  after(function (done) {
+    mongoose.disconnect();
     done();
   });
 

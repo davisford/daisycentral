@@ -10,8 +10,6 @@ var DaisySession = require('../server/app/daisy-session'),
   SensorData = require('../server/models/sensordata'),
   Daisies = require('../server/models/daisies')(ss);
 
-mongoose.connect('mongodb://localhost/daisycentral-test');
-
 describe("DaisySession", function () {
 
   // object under test
@@ -19,6 +17,16 @@ describe("DaisySession", function () {
     socket,   // NET socket
     spy,      // spy on SocketStream
     stub;     // stub of net.Socket
+
+  before(function (done) {
+    mongoose.connect('mongodb://localhost/daisycentral-test');
+    done();
+  });
+
+  after(function (done) {
+    mongoose.disconnect();
+    done();
+  });
 
   beforeEach(function (done) {
     // create new socket, ss, and mock them

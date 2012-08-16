@@ -10,7 +10,7 @@
     "ss-stylus": ">=0.1.x",
     "ss-jade": ">=0.1.x",
     "ss-hogan": ">=0.1.x",
-    "express": ">=2.5.x",
+    "express": ">=2.5.x <3.x.x",
     "everyauth": ">=0.2.x",
     "mongoose-auth": "git://github.com/davisford/mongoose-auth/",
     "bcrypt": ">=0.7.x",
