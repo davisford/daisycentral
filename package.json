@@ -14,7 +14,7 @@
     "everyauth": ">=0.2.x",
     "mongoose-auth": "git://github.com/davisford/mongoose-auth/",
     "bcrypt": ">=0.7.x",
-    "mongoose": ">=2.7.x",
+    "mongoose": ">=3.x",
     "connect-redis": ">=1.4.x"
   },
   "devDependencies": {
