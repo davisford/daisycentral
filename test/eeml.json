@@ -1,0 +1,28 @@
+{
+  "1": {
+      "max_value": "999.0",
+      "current_value": "23",
+      "datapoints": [{
+          "value": "1",
+          "at": "2011-03-02T15:59:56.895922Z"
+      },
+      {
+          "value": "1",
+          "at": "2011-03-02T16:00:07.188648Z"
+      },
+      {
+          "value": "2",
+          "at": "2011-03-02T16:00:18.416500Z"
+      }],
+      "min_value": "0.0",
+      "id": "0",
+      "tags": ["Moisture", "Temperature", "Leak Detection"],
+      "version": "1.0.0",
+      "unit": {
+          "label": "percentage",
+          "symbol": "%",
+          "type": "derived SI"
+      },
+      "at": "2011-02-16T16:21:01.834174Z"
+  }
+}
