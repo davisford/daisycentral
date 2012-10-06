@@ -11,6 +11,7 @@
 *.sass-cache
 # Don't check in compiled native code
 *.{node,a,o,dylib}
+*.sublime-workspace
 
 # OS or Editor folders
 .DS_Store
@@ -22,7 +23,6 @@ Thumbs.db
 .tmproj
 *.esproj
 nbproject
-*.sublime-project
 *.sublime-workspace
 
 # Folders to ignore
